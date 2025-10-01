@@ -12,3 +12,4 @@ openai 의 LLM 을 이용한 파이프라인 템플릿
 - rm -rf venv_pipeline_template
 - pip install --upgrade pip
 - pip install -r requirements.txt
+- pip freeze > requirements.txt
