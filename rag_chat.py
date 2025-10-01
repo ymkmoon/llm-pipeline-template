@@ -1,3 +1,6 @@
+## 터미널 채팅
+## python rag_chat.py
+
 # rag_chat.py
 import os
 from dotenv import load_dotenv
