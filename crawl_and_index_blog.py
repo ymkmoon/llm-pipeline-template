@@ -2,6 +2,7 @@
 ## python crawl_and_index_blog.py
 
 # crawl_and_index_blog.py
+import os
 import requests
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor, as_completed
