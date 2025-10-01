@@ -53,7 +53,7 @@ qa = RetrievalQA.from_chain_type(
 # 안전한 터미널 채팅 루프
 # ----------------------------
 def main():
-    print("💬 RAG Chat (환경변수 기반) 시작")
+    print("💬 RAG Chat 시작")
     print("종료하려면 'exit', 'quit', '종료' 입력")
 
     while True:
