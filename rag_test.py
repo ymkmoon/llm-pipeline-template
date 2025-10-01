@@ -6,6 +6,13 @@ from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
 from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv
+
+# ====== .env 로드 ======
+load_dotenv()
+
+# ====== 환경 변수 ======
+DB_PATH = os.getenv("EMBEDDING_DB_PATH")
 
 # 1) LLM (LM Studio API 서버 연결)
 llm = ChatOpenAI(
@@ -18,7 +25,7 @@ llm = ChatOpenAI(
 embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 )
-db = Chroma(persist_directory="./data_collection_db", embedding_function=embeddings)
+db = Chroma(persist_directory=DB_PATH, embedding_function=embeddings)
 retriever = db.as_retriever()
 
 # 3) QA 체인 생성
