@@ -11,9 +11,4 @@ openai 의 LLM 을 이용한 파이프라인 템플릿
 - deactivate
 - rm -rf venv_pipeline_template
 - pip install --upgrade pip
-- pip install langchain chromadb openai tiktoken sentence-transformers
-- pip install -U langchain-community
-- pip install -U langchain-chroma
-- pip install -U langchain-huggingface
-- pip install -U langchain_openai
-- pip install beautifulsoup4 requests
+- pip install -r requirements.txt

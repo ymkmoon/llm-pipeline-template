@@ -1,3 +1,5 @@
+## python rag_chat.py
+
 # rag_chat.py
 import os
 from langchain.chains import RetrievalQA
@@ -19,7 +21,7 @@ llm = ChatOpenAI(
 embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 )
-db = Chroma(persist_directory="./blog_db", embedding_function=embeddings)
+db = Chroma(persist_directory="./data_collection_db", embedding_function=embeddings)
 retriever = db.as_retriever()
 
 # 3) QA 체인 생성

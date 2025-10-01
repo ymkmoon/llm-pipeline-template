@@ -1,6 +1,7 @@
-## 크롤링 => 임베디드 DB 저장
+## 크롤링 => 임베딩 DB 저장
+## python crawl_and_index_blog.py
 
-# crawl_and_index.py
+# crawl_and_index_blog.py
 import requests
 from bs4 import BeautifulSoup
 from langchain_community.vectorstores import Chroma
@@ -39,7 +40,7 @@ def save_to_vectorstore(docs):
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     )
-    db = Chroma(persist_directory="./blog_db", embedding_function=embeddings)
+    db = Chroma(persist_directory="./data_collection_db", embedding_function=embeddings)
     
     for i, doc in enumerate(docs):
         db.add_texts([doc], ids=[f"blog-{i}"])
