@@ -1,0 +1,863 @@
+[Java] JMS(Java Message Service) ëž€?
+August 8, 2022
+ì´ ë¬¸ì„œëŠ” ê°œì¸ì ì¸ ëª©ì ì´ë‚˜ ë°°í¬í•˜ê¸° ìœ„í•´ì„œ ë³µì‚¬í•  ìˆ˜ ìžˆë‹¤. ì¶œë ¥ë¬¼ì´ë“  ë””ì§€í„¸ ë¬¸ì„œë“  ê° ë³µì‚¬ë³¸ì— ì–´ë–¤ ë¹„ìš©ë„ ì²­êµ¬í•  ìˆ˜ ì—†ê³  ëª¨ë“  ë³µì‚¬ë³¸ì—ëŠ” ì´ ì¹´í”¼ë¼ì´íŠ¸ ë¬¸êµ¬ê°€ ìžˆì–´ì•¼ í•œë‹¤.
+ìŠ¤í”„ë§ì€ JDBC APIë¥¼ í†µí•©í–ˆë“¯ì´ JMS APIë„ ì‚¬ìš©í•˜ê¸° ì‰½ê²Œ JMS í†µí•© í”„ë ˆìž„ì›Œí¬ë¥¼ ì œê³µí•œë‹¤.JMSëŠ” ê¸°ëŠ¥ì ìœ¼ë¡œ ëŒ€ëžµ ë‘ ë¶€ë¶„ìœ¼ë¡œ ë‚˜ëˆŒ ìˆ˜ ìžˆëŠ”ë° ë©”ì‹œì§€ì˜ ìƒì‚°(production)ê³¼ ì†Œë¹„(consumption)ì´ë‹¤. JmsTemplate í´ëž˜ìŠ¤ëŠ” ë©”ì‹œì§€ ìƒì‚°ê³¼ ë™ê¸°ì ì¸ ë©”ì‹œì§€ ìˆ˜ì‹ ì— ì‚¬ìš©í•œë‹¤. Java EEì˜ ë©”ì‹œì§€ì£¼ë„ ë¹ˆ(bean) ë°©ì‹ê³¼ ìœ ì‚¬í•œ ë¹„ë™ê¸°ì ì¸ ìˆ˜ì‹ ì— ëŒ€í•´ì„œ ìŠ¤í”„ë§ì€ ë©”ì‹œì§€ì£¼ë„ POJO(MDP, Message-Driven POJOs)ë¥¼ ìƒì„±í•˜ëŠ”ë° ì‚¬ìš©í•˜ëŠ” ë‹¤ìˆ˜ì˜ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆë¥¼ ì œê³µí•œë‹¤.org.springframework.jms.core íŒ¨í‚¤ì§€ëŠ” JMS ì‚¬ìš©ì— í•µì‹¬ì ì¸ ê¸°ëŠ¥ì„ ì œê³µí•œë‹¤. ì´ íŒ¨í‚¤ì§€ì— JdbcTemplateê°€ JDBCì— í•˜ë“¯ì´ ë¦¬ì†ŒìŠ¤ì˜ ìƒì„±ê³¼ ì†Œë©¸ì„ ë‹¤ë¤„ì¤Œìœ¼ë¡œì¨ JMSë¥¼ ê°„íŽ¸í•˜ê²Œ ì‚¬ìš©í•˜ê²Œ í•˜ëŠ” JMS í…œí”Œë¦¿ í´ëž˜ìŠ¤ê°€ ìžˆë‹¤. ìŠ¤í”„ë§ í…œí”Œë¦¿ í´ëž˜ìŠ¤ì™€ ê³µí†µë˜ëŠ” ì„¤ê³„ ì›ë¦¬ëŠ” ë” ì„¸ë ¨ëœ ì‚¬ìš©ë°©ë²•ì„ ìœ„í•´ì„œ ê³µí†µë˜ëŠ” ìž‘ì—…ì„ ìˆ˜í–‰í•˜ëŠ” í—¬í¼ ë©”ì„œë“œë¥¼ ì œê³µí•˜ê³  ìž‘ì—…ì„ ì²˜ë¦¬í•˜ëŠ” ë¶€ë¶„ì„ ì½œë°± ì¸í„°íŽ˜ì´ìŠ¤ë¥¼ êµ¬í˜„í•œ ì‚¬ìš©ìžì—ê²Œ ë§¡ê¸°ëŠ” ê²ƒì´ë‹¤. ì´ í´ëž˜ìŠ¤ëŠ” ë™ê¸°ì ìœ¼ë¡œ ë©”ì‹œì§€ë¥¼ ë³´ë‚´ê³  ë©”ì‹œì§€ë¥¼ ì†Œë¹„í•˜ê³  JMS ì„¸ì…˜ì™€ ë©”ì‹œì§€ ìƒì‚°ìž(producer)ë¥¼ ì‚¬ìš©ìžì—ê²Œ ë…¸ì¶œí•˜ëŠ” ë‹¤ì–‘í•œ íŽ¸ì˜ ë©”ì„œë“œë¥¼ ì œê³µí•œë‹¤.org.springframework.jms.support íŒ¨í‚¤ì§€ëŠ” JMSException ë³€í™˜ ê¸°ëŠ¥ì„ ì œê³µí•œë‹¤. ì´ ë³€í™˜ê¸°ëŠ¥ì€ ì²´í¬ë“œ JMSException ê³„ì¸µì„ ë™ì¼í•œ ê³„ì¸µì˜ ì–¸ì²´í¬ë“œ ì˜ˆì™¸ë¡œ ë³€í™˜í•œë‹¤. í”„ë¡œë°”ì´ë”ì— íŠ¹í™”ëœ ì²´í¬ë“œ javax.jms.JMSExceptionì˜ í•˜ìœ„í´ëž˜ìŠ¤ê°€ ìžˆë‹¤ë©´ ì´ ì˜ˆì™¸ëŠ” ì–¸ì²´í¬ë“œ UncategorizedJmsExceptionë¡œ ê°ì‹¸ì§„ë‹¤.org.springframework.jms.support.converter íŒ¨í‚¤ì§€ëŠ” Java ê°ì²´ì™€ JMS ë©”ì‹œì§€ê°„ì— ë³€í™˜ì„ í•˜ëŠ” MessageConverter ì¶”ìƒí™”ë¥¼ ì œê³µí•œë‹¤.org.springframework.jms.support.destination íŒ¨í‚¤ì§€ëŠ” JNDIì— ì €ìž¥ëœ ëª©ì ì§€ì— ëŒ€í•œ ì„œë¹„ìŠ¤ ë¡œì¼€ì´í„°ë¥¼ ì œê³µí•˜ë“¯ì´ JMS ëª©ì ì§€ë¥¼ ê´€ë¦¬í•˜ëŠ” ë‹¤ì–‘í•œ ì „ëžµì„ ì œê³µí•œë‹¤.ë§ˆì§€ë§‰ìœ¼ë¡œ org.springframework.jms.connection íŒ¨í‚¤ì§€ëŠ” ë…ë¦½ ì–´í”Œë¦¬ì¼€ì´ì…˜ì—ì„œ ì‚¬ìš©í•˜ëŠ”ë° ì í•©í•œ ConnectionFactoryì˜ êµ¬í˜„ì²´ë¥¼ ì œê³µí•œë‹¤. ì´ íŒ¨í‚¤ì§€ì—ëŠ” JMSë¥¼ ìœ„í•œ ìŠ¤í”„ë§ PlatformTransactionManagerì˜ êµ¬í˜„ì²´ë„ ìžˆë‹¤.(ì´ ì´ë¦„ì€ JmsTransactionManagerì´ë‹¤) ì´ëŠ” JMSë¥¼ íŠ¸ëžœìž­ì…˜ ë¦¬ì†ŒìŠ¤ì²˜ëŸ¼ ìŠ¤í”„ë§ì˜ íŠ¸ëžœìž­ì…˜ ê´€ë¦¬ ë©”ì¹´ë‹ˆì¦˜ìœ¼ë¡œ ì–´ë ¤ì›€ì—†ì´ í†µí•©í•  ìˆ˜ ìžˆê²Œ í•œë‹¤.
+JmsTemplate í´ëž˜ìŠ¤ëŠ” JMS ì½”ì–´ íŒ¨í‚¤ì§€ì˜ í•µì‹¬ í´ëž˜ìŠ¤ë‹¤. JmsTemplate í´ëž˜ìŠ¤ëŠ” ë©”ì‹œì§€ë¥¼ ë³´ë‚´ê±°ë‚˜ ë™ê¸°ì ìœ¼ë¡œ ë©”ì‹œì§€ë¥¼ ë°›ì„ ë•Œ ë¦¬ì†Œë¥´ë¥¼ ìƒì„±í•˜ê³  ì œê±°í•˜ëŠ” ì²˜ë¦¬ë¥¼ í•´ì£¼ë¯€ë¡œ JMSì˜ ì‚¬ìš©ì„ ê°„ë‹¨í•˜ê²Œ í•´ì¤€ë‹¤.JmsTemplateì„ ì‚¬ìš©í•˜ëŠ” ì½”ë“œëŠ” ê³ ìˆ˜ì¤€ì˜ ê³„ì•½ì„ ëª…í™•í•˜ê²Œ ì •ì˜í•´ì£¼ëŠ” ì½œë°± ì¸í„°íŽ˜ì´ìŠ¤ë§Œ êµ¬í˜„í•˜ë©´ ëœë‹¤. MessageCreator ì½œë°± ì¸í„°íŽ˜ì´ìŠ¤ëŠ” JmsTemplateì—ì„œ ì½”ë“œë¥¼ í˜¸ì¶œí•´ì„œ ì œê³µí•œ Sessionì˜ ë©”ì‹œì§€ë¥¼ ìƒì„±í•œë‹¤. JMS APIì˜ ë” ë³µìž¡í•œ ì‚¬ìš©ì„ ìœ„í•´ì„œ SessionCallback ì½œë°±ì€ JMS ì„¸ì…˜ì„ ê°€ì§„ ì‚¬ìš©ìžì™€ Sessionê³¼ MessageProducer ìŒì„ ë…¸ì¶œí•˜ëŠ” ProducerCallback ì½œë°±ì„ ë…¸ì¶œí•œë‹¤.JMS APIëŠ” ë‘ ì¢…ë¥˜ì˜ send ë©”ì„œë“œë¥¼ ë…¸ì¶œí•˜ëŠ”ë° í•˜ë‚˜ëŠ” ì „ì†¡ëª¨ë“œ, ì¤‘ìš”ë„, ì„œë¹„ìŠ¤í’ˆì§ˆ (QOS, Quality of Service)ë¡œ time-to-liveë¥¼ ë°›ê³  í•˜ë‚˜ëŠ” QOS íŒŒë¼ë¯¸í„°ë¥¼ ë°›ì§€ ì•Šê³  ê¸°ë³¸ê°’ì„ ì‚¬ìš©í•œë‹¤. JmsTemplateì— ë‹¤ìˆ˜ì˜ send ë©”ì„œë“œê°€ ìžˆìœ¼ë¯€ë¡œ QOS íŒŒë¼ë¯¸í„°ë¥¼ ì„¤ì •í•˜ëŠ” ê²ƒì€ ë‹¤ìˆ˜ì˜ send ë©”ì„œë“œì˜ ì¤‘ë³µì„ í”¼í•˜ê¸° ìœ„í•´ ë¹ˆ í”„ë¡œí¼í‹°ë¡œ ë…¸ì¶œëœë‹¤. ë¹„ìŠ·í•˜ê²Œ ë™ê¸°ì ì¸ receive í˜¸ì¶œì˜ íƒ€ìž„ì•„ì›ƒê°’ì€ setReceiveTimeout í”„ë¡œí¼í‹°ë¡œ ì„¤ì •í•œë‹¤.ì¼ë¶€ JMS í”„ë¡œë°”ì´ë”ëŠ” ê´€ë¦¬ìƒ(administratively) ConnectionFactoryì˜ ì„¤ì •ìœ¼ë¡œ ê¸°ë³¸ QOS ê°’ì„ ì„¤ì •í•  ìˆ˜ ìžˆê²Œ í•œë‹¤. MessageProducerì˜ send ë©”ì„œë“œ send(Destination destination, Message message)ë¥¼ í˜¸ì¶œí•´ì„œ JMS ëª…ì„¸ì„œì— ë‚˜ì˜¨ ê²ƒê³¼ëŠ” ë‹¤ë¥¸ QOS ê¸°ë³¸ê°’ì„ ì‚¬ìš©í•˜ê²Œ í•  ê²ƒì´ë‹¤. ì¼ê´€ëœ QOS ê°’ì˜ ê´€ë¦¬ë¥¼ ìœ„í•´ì„œ JmsTemplateì€ íŠ¹ížˆ isExplicitQosEnabled í”„ë¡œí¼í‹°ë¥¼ trueë¡œ ì„¤ì •í•´ì„œ ìžì‹ ë§Œì˜ QOS ê°’ì„ ì‚¬ìš©í•˜ë„ë¡ ë˜ì–´ì•¼ í•œë‹¤.
+NoteJmsTemplate í´ëž˜ìŠ¤ì˜ ì¸ìŠ¤í„´ìŠ¤ëŠ” ì„¤ì •ë˜ê³  ë‚˜ë©´ ìŠ¤ë ˆë“œ ì„¸ì´í”„í•˜ë‹¤. ì´ëŠ” í•˜ë‚˜ì˜ JmsTemplate ì¸ìŠ¤í„´ìŠ¤ë¥¼ ì„¤ì •í•´ì„œ ê³µìœ ë˜ëŠ” ì°¸ì¡°ë¡œ ì—¬ëŸ¬ í˜‘ë ¥ê°ì²´ì— ì•ˆì „í•˜ê²Œ ì£¼ìž…í•  ìˆ˜ ìžˆë‹¤ëŠ” ì˜ë¯¸ì´ë¯€ë¡œ ì¤‘ìš”í•˜ë‹¤. ì¢€ ë” ë¶„ëª…í•˜ê²Œ JmsTemplateì€ ìƒíƒœë¥¼ ê°€ì§€ì§€ë§Œ(ConnectionFactoryì— ëŒ€í•œ ì°¸ì¡°ë¥¼ ìœ ì§€í•œë‹¤ëŠ” ì ì—ì„œ) ì´ ìƒíƒœëŠ” ëŒ€í™”ì‹ ìƒíƒœëŠ” ì•„ë‹ˆë‹¤.
+JmsTemplateëŠ” ConnectionFactoryì— ëŒ€í•œ ì°¸ì¡°ë¥¼ í•„ìš”ë¡œ í•œë‹¤.ConnectionFactoryëŠ” JMS ëª…ì„¸ì— í¬í•¨ë˜ì–´ ìžˆê³  JMSì™€ ë™ìž‘í•˜ëŠ” ì§„ìž…ì ìœ¼ë¡œ ì œê³µëœë‹¤. í´ë¼ì´ì–¸íŠ¸ ì–´í”Œë¦¬ì¼€ì´ì…˜ì´ ConnectionFactoryë¥¼ JMS í”„ë¡œë°”ì´ë”ì˜ ì—°ê²°ì„ ìƒì„±í•˜ëŠ” íŒ©í† ë¦¬ë¡œ ì‚¬ìš©í•˜ê³  ë‹¤ì–‘í•œ ì„¤ì • íŒŒë¼ë¯¸í„°(ëŒ€ë¶€ë¶„ì€ SSL ì„¤ì •ì˜µì…˜ ê°™ì€ ë²¤ë”ì— íŠ¹í™”ëœ ì„¤ì •ì´ë‹¤.)ë¥¼ ìº¡ìŠí™”í•œë‹¤.EJBì—ì„œ JMSë¥¼ ì‚¬ìš©í•˜ëŠ” ê²½ìš° ë²¤ë”ê°€ JMS ì¸í„°íŽ˜ì´ìŠ¤ì˜ êµ¬í˜„ì²´ë¥¼ ì œê³µí•˜ë¯€ë¡œ êµ¬í˜„ì²´ê°€ ì„ ì–¸ì ì¸ íŠ¸ëžœìž­ì…˜ ê´€ë¦¬ì— ì°¸ì—¬í•˜ê³  ì—°ê²°ê³¼ ì„¸ì…˜ì˜ í’€ë§ì„ ìˆ˜í–‰í•œë‹¤. ì´ êµ¬í˜„ì²´ë¥¼ ì‚¬ìš©í•˜ë ¤ë©´ Java EE ì»¨í…Œì´ë„ˆëŠ” ë³´í†µ EJBë‚´ì˜ resource-refë¡œ JMS ì»¤ë„¥ì…˜ íŒ©í† ë¦¬ë‚˜ ì„œë¸”ë¦­ ë°°í¬ ë””ìŠ¤í¬ë¦½í„°ë¥¼ ì„ ì–¸í•˜ë„ë¡ ìš”êµ¬í•œë‹¤. EJBì—ì„œ ì´ ê¸°ëŠ¥ê³¼ JmsTemplateë¥¼ í•¨ê»˜ ì‚¬ìš©í•˜ë ¤ë©´ í´ë¼ì´ì–¸íŠ¸ ì–´í”Œë¦¬ì¼€ì´ì…˜ì´ ConnectionFactoryì˜ ê´€ë¦¬ëœ êµ¬í˜„ì²´ë¥¼ ì°¸ì¡°í•œë‹¤ëŠ” ê²ƒì„ ë³´ìž¥í•´ì•¼ í•œë‹¤.
+í‘œì¤€ APIì—ëŠ” ë‹¤ìˆ˜ì˜ ì¤‘ê°„ê°ì²´ì˜ ìƒì„±í•˜ëŠ” APIê°€ í¬í•¨ë˜ì–´ ìžˆë‹¤. ë©”ì‹œì§€ë¥¼ ë³´ë‚´ë ¤ë©´ ë‹¤ìŒì˜ â€˜APIâ€™ê°€ ì‹¤í–‰ëœë‹¤.
+ConnectionFactoryì™€ Send ìž‘ì—…ì‚¬ì´ì—ëŠ” ìƒì„±ë˜ê³  ì†Œë©¸ë˜ëŠ” ì„¸ê°œì˜ ì¤‘ê°„ ê°ì²´ê°€ ìžˆë‹¤. ë¦¬ì†ŒìŠ¤ì˜ ì‚¬ìš©ì„ ìµœì í™”í•˜ê³  ì„±ëŠ¥ì„ ë†’ížˆê¸° ìœ„í•´ IConnectionFactoryì˜ ë‘ êµ¬í˜„ì²´ë¥¼ ì œê³µí•œë‹¤.
+ìŠ¤í”„ë§ì€ ConnectionFactory ì¸í„°íŽ˜ì´ìŠ¤ì˜ êµ¬í˜„ì²´ë¡œ SingleConnectionFactoryë¥¼ ì œê³µí•˜ê³  SingleConnectionFactoryëŠ” ëª¨ë“  createConnection() í˜¸ì¶œì—ì„œ ê°™ì€ Connectionì„ ë°˜í™˜í•˜ê³  close() í˜¸ì¶œì€ ë¬´ì‹œí•  ê²ƒì´ë‹¤. ì´ëŠ” ë‹¤ìˆ˜ì˜ íŠ¸ëžœìž­ì…˜ì´ ê±¸ì¹œ ì—¬ëŸ¬ JmsTemplate í˜¸ì¶œì— ê°™ì€ ì—°ê²°ì„ ì‚¬ìš©í•  ìˆ˜ ìžˆìœ¼ë¯€ë¡œ í…ŒìŠ¤íŠ¸ì™€ ë…ë¦½ì ì¸ í™˜ê²½ì— ìœ ìš©í•˜ë‹¤.SingleConnectionFactoryëŠ” ì¼ë°˜ì ìœ¼ë¡œ JNDIì—ì„œ ë°›ì€ í‘œì¤€ ConnectionFactoryì— ëŒ€í•œ ì°¸ì¡°ë¥¼ ë°›ëŠ”ë‹¤.
+CachingConnectionFactoryëŠ” SingleConnectionFactoryì˜ ê¸°ëŠ¥ì„ í™•ìž¥í•˜ê³  Session, MessageProducer, MessageConsumerì— ìºì‹±ì„ ì¶”ê°€í•œë‹¤. ì´ˆê¸° ìºì‹œí¬ê¸°ëŠ” 1ì´ê³  ìºì‹œë˜ëŠ” ì„¸ì…˜ì˜ ìˆ˜ë¥¼ ì¦ê°€ì‹œí‚¤ë ¤ë©´ SessionCacheSize í”„ë¡œí¼í‹°ë¥¼ ì‚¬ìš©í•´ë¼. ì‹¤ì œ ìºì‹œëœ ì„¸ì…˜ì˜ ìˆ˜ëŠ” ìŠ¹ì¸ ëª¨ë“œ(acknowledgment mode)ì— ê¸°ë°˜í•´ì„œ ìºì‹œëœ ì„¸ì…˜ì˜ ìˆ˜ë³´ë‹¤ ë§Žì„ ê²ƒì´ë¯€ë¡œ SessionCacheSizeë¥¼ 1ë¡œ ì„¤ì •í•œ ê²½ìš°(ê° AcknowledgementModeë§ˆë‹¤ 1) ìºì‹œëœ ì„¸ì…˜ ì¸ìŠ¤í„´ìŠ¤ëŠ” 4ê¹Œì§€ ë  ìˆ˜ ìžˆë‹¤. MessageProducerì™€ MessageConsumerëŠ” ì´ë“¤ì´ ì†Œìœ í•œ ì„¸ì…˜ì— ìºì‹œë˜ê³  ìºì‹±í•  ë•Œ ìƒì‚°ìž(producer)ì™€ ì†Œë¹„ìž(consumer)ì˜ ìœ ì¼í•œ í”„ë¡œí¼í‹°ë¥¼ ê³ ë ¤í•œë‹¤. MessageProducerëŠ” ëª©ì ì§€ì— ê¸°ë°˜í•´ì„œ ìºì‹œëœë‹¤. MessageConsumerëŠ” ëª©ì ì§€, ì…€ë ‰í„°, noLocal deliver í”Œëž˜ê·¸, (durable consumerë¥¼ ìƒì„±í•œë‹¤ë©´)ìž¥ê¸° êµ¬ë… ì´ë¦„(durable subscription name)ë¡œ êµ¬ì„±ëœ í‚¤ì— ê¸°ë°˜í•œ ìºì‹œëœë‹¤.
+ConnectionFactoryê°™ì€ ëª©ì ì§€ëŠ” JNDIë¡œ ì €ìž¥í•˜ê³  íšë“í•  ìˆ˜ ìžˆëŠ” JMSê°€ ê´€ë¦¬í•˜ëŠ” ê°ì²´ë‹¤. ìŠ¤í”„ë§ ì–´í”Œë¦¬ì¼€ì´ì…˜ ì»¨í…ìŠ¤íŠ¸ë¥¼ ì„¤ì •í•  ë•Œ JMS ëª©ì ì§€ì— ëŒ€í•œ ê°ì²´ì˜ ì°¸ì¡°ì— ì˜ì¡´ì„± ì£¼ìž…ì„ í•˜ê¸° ìœ„í•´ JNDI íŒ°í† ë¦¬ í´ëž˜ìŠ¤ JndiObjectFactoryBean / ë¥¼ ì‚¬ìš©í•  ìˆ˜ ìžˆë‹¤. í•˜ì§€ë§Œ ì–´í”Œë¦¬ì¼€ì´ì…˜ì— ì•„ì£¼ ë§Žì€ ëª©ì ì§€ê°€ ìžˆê±°ë‚˜ JMS í”„ë¡œë°”ì´ë”ì— íŠ¹í™”ë˜ ê³ ê¸‰ ëª©ì ì§€ ê´€ë¦¬ê¸°ëŠ¥ì´ ìžˆë‹¤ë©´ ì´ ì „ë ¥ì„ ë‹¤ë£¨ê¸° ì–´ë ¤ìš¸ ìˆ˜ ìžˆë‹¤. ê³ ê¸‰ ëª©ì ì§€ ê´€ë¦¬ì—ëŠ” ë™ì  ëª©ì ì§€ ìƒì„±ì´ë‚˜ ëª©ì ì§€ì˜ ê³„ì¸µì  ë„¤ìž„ìŠ¤íŽ˜ì´ìŠ¤ ì§€ì›ë“±ì´ ìžˆë‹¤. JmsTemplateì€ ëª©ì ì§€ ì²˜ë¦¬ë¥¼ JMS ëª©ì ì§€ ê°ì²´ë‚˜ DestinationResolver ì¸í„°íŽ˜ì´ìŠ¤ì˜ êµ¬í˜„ì²´ì— ìœ„ìž„í•œë‹¤. JmsTemplateì´ ê¸°ë³¸ êµ¬í˜„ì²´ë¡œ DynamicDestinationResolverë¥¼ ì‚¬ìš©í•˜ê³  ë™ì  ëª©ì ì§€ë¥¼ ì²˜ë¦¬í•œë‹¤. ì œê³µëœ JndiDestinationResolverëŠ” JNDIì— ìžˆëŠ” ëª©ì ì§€ì˜ ì„œë¹„ìŠ¤ ë¡œì¼€ì´í„°ì²˜ëŸ¼ ë™ìž‘í•˜ê³  ì„ íƒì ìœ¼ë¡œ DynamicDestinationResolverì˜ ë™ìž‘ìœ¼ë¡œ ìž¥ì•  ë³µêµ¬ë¥¼ í•œë‹¤.ë“œë¬¼ê¸°ëŠ” í•˜ì§€ë§Œ JMS ì–´í”Œë¦¬ì¼€ì´ì…˜ì´ ìƒìš”í•˜ëŠ” ëª©ì ì§€ë¥¼ ëŸ°íƒ€ìž„ì—ì„œë§Œ ì•Œ ìˆ˜ ìžˆëŠ” ê²½ìš°ì—ëŠ” ì–´í”Œë¦¬ì¼€ì´ì…˜ì„ ë°°í¬í•  ë•Œ ìƒì„±í•  ìˆ˜ ì—†ë‹¤. ì´ëŸ¬í•œ ìƒí™©ì€ ìƒí˜¸ìž¥ìš©í•˜ëŠ” ì‹œìŠ¤í…œ ì»´í¬ë„ŒíŠ¸ê°€ ìž˜ ì•Œë ¤ì§„ ìž‘ëª…ê´€ë¡€ì— ë”°ë¼ ëŸ°íƒ€ìž„ì—ì„œ ëª©ì ì§€ë¥¼ ìƒì„±í•˜ê³  ì´ ì‹œìŠ¤í…œ ì»´í¬ë„ŒíŠ¸ê°„ì— ì–´í”Œë¦¬ì¼€ì´ì…˜ ë¡œì§ì„ ê³µìœ í•˜ê¸° ë•Œë¬¸ì— ë°œìƒí•œë‹¤. ë™ì  ëª©ì ì§€ìƒì„±ì´ JMS ëª…ì„¸ì— ë‚˜ì™€ìžˆì§€ ì•Šì§€ë§Œ ëŒ€ë¶€ë¶„ì˜ ë²¤ë”ëŠ” ì´ ê¸°ëŠ¥ì„ ì œê³µí•˜ê³  ìžˆë‹¤. ë™ì  ëª©ì  ëª©ì ì§€ëŠ” ìž„ì‹œ ëª©ì ì§€ì™€ êµ¬ë³„í•  ìˆ˜ ìžˆëŠ” ì‚¬ìš©ìžê°€ ì •ì˜í•œ ì´ë¦„ìœ¼ë¡œ ìƒì„±ë˜ê³  JNDIì— ë“±ë¡ë˜ì§€ ì•Šê¸°ë„ í•œë‹¤. ëª©ì ì§€ì™€ ê´€ë ¨ëœ í”„ë¡œí¼í‹°ê°€ ë²¤ë”ì— íŠ¹í™”ë˜ì–´ ìžˆìœ¼ë¯€ë¡œ ë™ì  ëª©ì ì§€ë¥¼ ìƒì„±í•˜ëŠ” APIëŠ” í”„ë¡œë°”ì´ë”ë§ˆë‹¤ ë‹¤ì–‘í•˜ë‹¤. í•˜ì§€ë§Œ ë²¤ë”ê°€ ë§Œë“  ê°„ë‹¨í•œ êµ¬í˜„ì²´ëŠ” JMS ëª…ì„¸ì˜ ê²½ê³ ë¥¼ ë¬´ì‹œí•˜ê³  TopicSession ë©”ì„œë“œ createTopic(String topicName)ë‚˜ QueueSession ë©”ì„œë“œ createQueue(String queueName)ë¥¼ ê¸°ë³¸ ëª©ì ì§€ í”„ë¡œí¼í‹°ë¡œ ìƒˆë¡œìš´ ëª©ì ì§€ë¥¼ ìƒì„±í•˜ëŠ”ë° ì‚¬ìš©í•œë‹¤. ë²¤ë” êµ¬í˜„ì²´ì— ë”°ë¼ì„œëŠ” DynamicDestinationResolverê°€ ëª©ì ì§€ë¥¼ ì²˜ë¦¬í•˜ëŠ” ê²ƒì´ ì•„ë‹Œ ë¬¼ë¦¬ì ì¸ ëª©ì ì§€ë¥¼ ìƒì„±í•˜ê¸°ë„ í•œë‹¤.ë¶ˆë¦¬ì–¸ í”„ë¡œí¼í‹°ì¸ pubSubDomainë¥¼ JmsTemplateì´ ì–´ë–¤ JMS ë„ë©”ì¸ì„ ì‚¬ìš©í•˜ëŠ”ì§€ ì„¤ì •í•˜ëŠ”ë° ì‚¬ìš©í•œë‹¤. ì´ í”„ë¡œí¼í‹°ì˜ ê¸°ë³¸ê°’ì€ falseë¡œ point-to-point ë„ë©”ì¸ì¸ Queueë¥¼ ì‚¬ìš©í•  ê²ƒìž„ì„ ë‚˜íƒ€ë‚¸ë‹¤. JmsTemplateì´ ì‚¬ìš©í•˜ëŠ” ì´ í”„ë¡œí¼í‹°ëŠ” DestinationResolver ì¸í„°íŽ˜ì´ìŠ¤ì˜ êµ¬í˜„ì²´ë¡œ ë™ì  ëª©ì ì§€ ì²˜ë¦¬ì˜ ë™ìž‘ì„ ê²°ì •í•œë‹¤.defaultDestination í”„ë¡œí¼í‹°ë¥¼ ì‚¬ìš©í•´ì„œ ê¸°ë³¸ ëª©ì ì§€ë¡œ JmsTemplateë¥¼ ì„¤ì •í•  ìˆ˜ë„ ìžˆë‹¤. ê¸°ë³¸ ëª©ì ì§€ëŠ” ëª©ì ì§€ë¥¼ ëª…ì‹œí•˜ì§€ ì•Šì€ ë³´ë‚´ê¸°/ë°›ê¸° ìž‘ì—…ì— ì‚¬ìš©í•  ê²ƒì¸ë‹¤.
+EJBì—ì„œ JMS ë©”ì‹œì§€ì˜ ê°€ìž¥ ì¼ë°˜ì ì¸ ê²½ìš°ëŠ” ë©”ì‹œì§€ì£¼ë„ ë¹ˆ(MDB, message-driven beans)ë¥¼ ì‚¬ìš©í•˜ëŠ” ê²ƒì´ë‹¤. ìŠ¤í”„ë§ì€ ì‚¬ìš©ìžê°€ EJB ì»¨í…Œì´ë„ˆì— ì˜ì¡´í•˜ì§€ ì•ŠëŠ” ë°©ë²•ìœ¼ë¡œ ë©”ì‹œì§€ ì£¼ë„ POJO(MDP, message-driven POJO)ë¥¼ ìƒì„±í•˜ëŠ” ë°©ë²•ì„ ì œê³µí•œë‹¤. (ìŠ¤í”„ë§ì˜ MDP ì§€ì›ì˜ ìžì„¸í•œ ë‚´ìš©ì€ Section 22.4.2, â€œë¹„ë™ê¸° ìˆ˜ì‹  - ë©”ì‹œì§€ ì£¼ë„ POJOâ€ë¥¼ ì°¸ê³ í•´ë¼.)ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆëŠ” JMS ë©”ì‹œì§€ íì—ì„œ ë©”ì‹œì§€ë¥¼ ë°›ê³  íì— ì£¼ìž…í•  MessageListenerë¥¼ ìƒì„±í•˜ëŠ”ë° ì‚¬ìš©í•œë‹¤. ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆëŠ” ë©”ì‹œì§€ ì ‘ìˆ˜ì™€ ì²˜ë¦¬í•  ë¦¬ìŠ¤ë„ˆë¡œ ë””ìŠ¤íŒ¨ì¹˜í•˜ëŠ” ëª¨ë“  ìŠ¤ë ˆë“œë¥¼ ì±…ìž„ì§„ë‹¤. ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆëŠ” MDPì™€ ë©”ì‹œì§€ í”„ë¡œë°”ì´ë” ì‚¬ì´ì˜ ì¤‘ê°œìžì˜ ì—­í• ì„ í•˜ê³  ë°›ì€ ë©”ì‹œì§€ì˜ ë“±ë¡, íŠ¸ëž™ìž­ì…¤ ì°¸ì—¬, ë¦¬ì†ŒìŠ¤ íšë“ê³¼ ë¦´ë¦¬ì¦ˆ, ì˜ˆì™¸ ë³€í™˜ë“±ì„ ë‹´ë‹¹í•œë‹¤. ì´ë¥¼ í†µí•´ì„œ ì–´í”Œë¦¬ì¼€ì´ì…˜ ê°œë°œìžëŠ” ë©”ì‹œì§€ë¥¼ ë°›ëŠ”(ê·¸ë¦¬ê³  ì‘ë‹µì„ í•´ì•¼í•  ìˆ˜ë„ ìžˆë‹¤) ë¹„ì¦ˆë‹ˆìŠ¤ ë¡œì§(ë³µìž¡í•  ìˆ˜ë„ ìžˆë‹¤.)ì„ ìž‘ì„í•  ìˆ˜ ìžˆê³  JMS ì¸í”„ë¼ìŠ¤íŠ¸ëŸ­ì²˜ì˜ ë³´ì¼ëŸ¬í”Œë ˆì´íŠ¸ì— ëŒ€í•œ ê±±ì •ì„ í”„ë ˆìž„ì›Œí¬ì— ìœ„ìž„í•  ìˆ˜ ìžˆë‹¤.ìŠ¤í”„ë§ì—ëŠ” ë‘ê°œì˜ í‘œì¤€ JMS ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆê°€ ìžˆê³  ê° ì»¨í…Œì´ë„ˆëŠ” ì „ë¬¸í™”ëœ ê¸°ëŠ¥ì„ ê°€ì§„ë‹¤.
+ì´ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆëŠ” ë‘ í‘œì¤€ë³´ë‹¤ ê°„ë‹¨í•˜ë‹¤. êµ¬ë™í•  ë•Œ ê³ ì •ëœ ìˆ˜ì˜ JSM ì„¸ì…˜ê³¼ ì»¨ìŠˆë¨¸ë¥¼ ìƒì„±í•˜ê³  í‘œì¤€ JMS MessageConsumer.setMessageListener() ë©”ì„œë“œë¥¼ ì‚¬ìš©í•´ì„œ ë¦¬ìŠ¤ë„ˆë¥¼ ë“±ë¡í•˜ê³  JMS í”„ë¡œë°”ì´ë”ë‚˜ ë¦¬ìŠ¤ë„ˆ ì½œë°±ì„ ì‹¤í–‰í•˜ë„ë¡ í•œë‹¤. ì´ ì»¨í…Œì´ë„ˆëŠ” ë™ì ìœ¼ë¡œ ëŸ°íƒ€ìž„ ìš”êµ¬ì‚¬í•­ì— ë§žì¶œ ìˆ˜ ì—†ê³  ì™¸ë¶€ì—ì„œ ê´€ë¦¬í•˜ëŠ” íŠ¸ëžœìž­ì…˜ì— ì°¸ì—¬í•  ìˆ˜ëŠ” ì—†ë‹¤. í˜¸í™˜ì„±ì„ ìœ„í•´ì„œ ë…ë¦½ì ì¸ JMS ëª…ì„¸ì„œì— ì•„ì£¼ ê°€ê¹ì§€ë§Œ ë³´í†µ Java EEì˜ JMS ì œì•½ì‚¬í•­ì—ëŠ” í˜¸í™˜ë˜ì§€ ì•ŠëŠ”ë‹¤.
+ì´ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆëŠ” ê°€ìž¥ ë§Žì´ ì‚¬ìš©í•˜ëŠ” ê²ƒ ì¤‘ í•˜ë‚˜ì´ë‹¤. SimpleMessageListenerContainerì™€ëŠ” ë‹¬ë¦¬ ëŸ°íƒ€ìž„ ìš”êµ¬ì‚¬í•­ì„ ë™ì ìœ¼ë¡œ ë§žì¶œ ìˆ˜ ìžˆê³  ì™¸ë¶€ì—ì„œ ê´€ë¦¬í•˜ëŠ” íŠ¸ëžœìž­ì…˜ì— ì°¸ì—¬í•  ìˆ˜ ìžˆë‹¤. JtaTransactionManagerë¥¼ ì„¤ì •í•œ ê²½ìš° ë°›ëŠ” ê°ê°ì˜ ë©”ì‹œì§€ë¥¼ XA íŠ¸ëžœìž­ì…˜ì— ë“±ë¡í•˜ë¯€ë¡œ ì²˜ë¦¬í•  ë•Œ XA íŠ¸ëžœìž­ì…˜ì˜ ìž¥ì ì„ ê°€ì§ˆ ìˆ˜ ìžˆë‹¤. ì´ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆëŠ” JMS í”„ë¡œë°”ì´ì €ì˜ ë‚®ì€ ìš”êµ¬ì‚¬í•­ê³¼ íŠ¸ëžœìž­ì…˜ ì°¸ì—¬ê°™ì€ ê³ ê¸‰ ê¸°ëŠ¥ê³¼ Java EE í™˜ê²½ì— í˜¸í™˜ì„± ê°„ì˜ ê· í˜•ì„ ìž˜ ë§žì¶”ê³  ìžˆë‹¤.
+ìŠ¤í”„ë§ì€ ë‹¨ì¼ JMS ConnectionFactoryì˜ íŠ¸ëžœìž­ì…˜ì„ ê´€ë¦¬í•˜ëŠ” JmsTransactionManagerë¥¼ ì œê³µí•œë‹¤. JmsTransactionManagerëŠ” Chapter 11, íŠ¸ëžœìž­ì…˜ ê´€ë¦¬ì—ì„œ ì„¤ëª…í•œ ìŠ¤í”„ë§ì´ ê´€ë¦¬í•˜ëŠ” íŠ¸ëžœìž­ì…˜ ê¸°ëŠ¥ì„ JMS ì–´í”Œë¦¬ì¼€ì´ì…˜ì´ ì‚¬ìš©í•˜ë„ë¡ í•œë‹¤. JmsTransactionManagerëŠ” ë¡œì»¬ ë¦¬ì†ŒìŠ¤ íŠ¸ëžœìž­ì…˜ì„ ìˆ˜í–‰í•˜ê³  JMS ì—°ê²°/ì„¸ì…˜ ìŒì„ ì§€ì •í•œ ConnectionFactoryì—ì„œ ìŠ¤ë ˆë“œë¡œ ë°”ì¸ë”©í•œë‹¤. JmsTemplateëŠ” ìžë™ìœ¼ë¡œ ì´ëŸ¬í•œ íŠ¸ëžœìž­ì…˜ì´ ê°€ëŠ¥í•œ ë¦¬ì†ŒìŠ¤ë¥¼ íƒì§€í•´ì„œ ì ì ˆí•˜ê²Œ ë¦¬ì†ŒìŠ¤ìƒì—ì„œ ìž‘ì—…ì„ ì‹¤í–‰í•œë‹¤.Java EE í™˜ê²½ì—ì„œ ConnectionFactoryëŠ” ì—°ê²°ê³¼ ì„¸ì…˜ì˜ í’€ì„ ì‚¬ìš©í•˜ë¯€ë¡œ ì´ëŸ¬í•œ ë¦¬ì†ŒìŠ¤ë¥¼ íŠ¸ëžœìž­ì…˜ì‚¬ì´ì—ì„œ íš¨ìœ¨ì ìœ¼ë¡œ ìž¬ì‚¬ìš©í•œë‹¤. ë…ë¦½ì ì¸ í™˜ê²½ì—ì„œ ìŠ¤í”„ë§ì˜ SingleConnectionFactoryë¥¼ ì‚¬ìš©í•˜ë©´ ê³µìœ ëœ JMS Connectionë¥¼ ì‚¬ìš©í•˜ê²Œ ë˜ê³  ê° íŠ¸ëžœìž­ì…˜ì€ ìžì‹ ë§Œì˜ ë…ë¦½ì ì¸ Sessionì„ ê°–ê²Œ ëœë‹¤. ì•„ë‹ˆë©´ ActiveMQì˜ PooledConnectionFactory í´ëž˜ìŠ¤ì²˜ëŸ¼ í”„ë¡œë°”ì´ë”ì— íŠ¹í™”ëœ í’€ë§(pooling) ì–´ëŒ‘í„°ë¥¼ ì‚¬ìš©í•˜ëŠ” ê²ƒì„ ê³ ë ¤í•´ ë´ë¼.JmsTemplateë¥¼ JtaTransactionManagerë‚˜ ë¶„ì‚° íŠ¸ëžœìž­ì…˜ì„ ìœ„í•´ì„œ XA ê¸°ëŠ¥ì„ ê°€ì§„ JMS ConnectionFactoryì™€ í•¨ê»˜ ì‚¬ìš©í•  ìˆ˜ë„ ìžˆë‹¤. ì´ ê²½ìš° XAë¡œ ìž˜ ì„¤ì •í•œ ConnectionFactoryê°™ì€ JTA íŠ¸ëžœìž­ì…˜ ê´€ë¦¬ìžë¥¼ ì‚¬ìš©í•´ì•¼ í•œë‹¤! (ì‚¬ìš©í•˜ëŠ” Java EE ì„œë²„ë‚˜ JMS í”„ë¡œë°”ì´ë”ì˜ ë¬¸ì„œë¥¼ ì°¸ê³ í•´ë¼.)Connectionì—ì„œ Sessionì„ ìƒì„±í•˜ë ¤ê³  JMS APIë¥¼ ì‚¬ìš©í•˜ëŠ” ê²½ìš° ê´€ë¦¬í•˜ëŠ” íŠ¸ëžœìž­ì…˜ í™˜ê²½ê³¼ ê´€ë¦¬í•˜ì§€ ì•ŠëŠ” íŠ¸ëžœìž­ì…˜ í™˜ê²½ì‚¬ì´ì—ì„œ ì½”ë“œë¥¼ ìž¬ì‚¬ìš©í•˜ëŠ” ê²ƒì´ í˜¼ëž€ìŠ¤ëŸ¬ìš¸ ìˆ˜ ìžˆë‹¤. ì´ëŠ” JMS APIê°€ Sessionì„ ìƒì„±í•˜ëŠ” íŒ©í† ë¦¬ ë©”ì„œë“œë¥¼ ë”± í•˜ë‚˜ë§Œ ê°€ì§€ê³  ìžˆê³  íŠ¸ëžœìž­ì…˜ê³¼ ìŠ¹ë‚™(acknowledgement) ëª¨ë“œì— ëŒ€í•œ ê°’ì„ í•„ìš”ë¡œ í•˜ê¸° ë•Œë¬¸ì´ë‹¤. ê´€ë¦¬ë˜ëŠ” í™˜ê²½ì—ì„œëŠ” í•´ë‹¹ í™˜ê²½ì˜ íŠ¸ëžœìž­ì…˜ ì¸í”„ë¼ê°€ ì´ëŸ¬í•œ ê°’ì„ ì„¤ì •í•˜ë¯€ë¡œ JMS ì—°ê²°ì„ ê°ì‹¸ëŠ” ë²¤ë”ì˜ ëž©í¼ëŠ” ì´ëŸ¬í•œ ê°’ì„ ë¬´ì‹œí•œë‹¤. ê´€ë¦¬ë˜ì§€ ì•ŠëŠ” í™˜ê²½ì—ì„œ JmsTemplateì„ ì‚¬ìš©í•˜ëŠ” ê²½ìš° sessionTransactedì™€ sessionAcknowledgeMode í”„ë¡œí¼í‹°ë¥¼ ì‚¬ìš©í•´ì„œ ì´ëŸ¬í•œ ê°’ì„ ì§€ì •í•  ìˆ˜ ìžˆë‹¤. PlatformTransactionManagerì™€ JmsTemplateë¥¼ ê°™ì´ ì‚¬ìš©í•˜ëŠ” ê²½ìš° í…œí”Œë¦¿ì€ í•­ìƒ íŠ¸ëžœìž­ì…˜ì´ ê°€ëŠ¥í•œ JMS Sessionì„ ê°€ì§ˆ ê²ƒì´ë‹¤.
+JmsTemplateì—ëŠ” ë©”ì‹œì§€ ì „ì†¡ê³¼ ê´€ë ¨í•´ì„œ íŽ¸ë¦¬í•œ ë©”ì„œë“œê°€ ë§Žì´ ìžˆë‹¤. javax.jms.Destination ê°ì²´ë¡œ ëª©ì ì§€ë¥¼ ì§€ì •í•˜ëŠ” ì „ì†¡ë©”ì„œë“œì™€ JNDI ê²€ìƒ‰ì— ì‚¬ìš©í•˜ëŠ” ë¬¸ìžì—´ë¡œ ëª©ì ì§€ë¥¼ ì§€ì •í•˜ëŠ” ì „ì†¡ë©”ì„œë“œê°€ ìžˆë‹¤. ëª©ì ì§€ ì¸ìžë¥¼ ë°›ì§€ ì•ŠëŠ” ì „ì†¡ ë©”ì„œë“œëŠ” ê¸°ë³¸ ëª©ì ì§€ë¥¼ ì‚¬ìš©í•œë‹¤. 1.0.2 êµ¬í˜„ì²´ë¥¼ ì‚¬ìš©í•´ì„œ íì— ë©”ì‹œì§€ë¥¼ ë³´ë‚´ëŠ” ì˜ˆì œê°€ ë‹¤ìŒì— ë‚˜ì™€ ìžˆë‹¤.
+ì´ ì˜ˆì œëŠ” ì œê³µëœ Session ê°ì²´ì—ì„œ í…ìŠ¤íŠ¸ ë©”ì‹œì§€ë¥¼ ìƒì„±í•˜ê¸° ìœ„í•´ MessageCreator ì½œë°±ì„ ì‚¬ìš©í•œë‹¤. ConnectionFactoryì— ëŒ€í•œ ì°¸ì¡°ë¥¼ ì „ë‹¬í•´ì„œ JmsTemplateì„ ìƒì„±í•œë‹¤. ì•„ë‹ˆë©´ ì¸ìžê°€ ì—†ëŠ” ìƒì„±ìžì™€ connectionFactoryë¥¼ ì œê³µí•˜ë©´ JavaBean í˜•ì‹ì˜ ì¸ìŠ¤í„´ìŠ¤ë¥¼ ìƒì„±í•˜ëŠ”ë° ì‚¬ìš©í•  ìˆ˜ ìžˆë‹¤.(BeanFactoryë‚˜ ì¼ë°˜ì ì¸ ìžë°”ì½”ë“œë¥¼ ì‚¬ìš©í•´ì„œ) ë˜ëŠ” ìŠ¤í”„ë§ì˜ JmsGatewaySupport ê¸°ìž” í´ëž˜ìŠ¤ì—ì„œ ìƒì„±í•˜ëŠ” ê²ƒì„ ìƒê°í•´ ë³¼ ìˆ˜ ìžˆëŠ”ë° JmsGatewaySupportëŠ” JMS ì„¤ì •ì— ëŒ€í•œ ë¹ˆ í”„ë¡œí¼í‹°ë¥¼ ë¯¸ë¦¬ ë§Œë“¤ì–´ì„œ ì œê³µí•œë‹¤.send(String destinationName, MessageCreator creator) ë©”ì„œë“œë¡œ ëª©ì ì§€ì˜ ë¬¸ìžì—´ ì´ë¦„ì„ ì‚¬ìš©í•´ì„œ ë©”ì‹œì§€ë¥¼ ì „ì†¡í•  ìˆ˜ ìžˆë‹¤. ì´ ëª©ì ì§€ ì´ë¦„ì´ JNDIì— ë“±ë¡ë˜ì–´ ìžˆëŠ” ê²½ìš° JndiDestinationResolver ì¸ìŠ¤í„´ìŠ¤ì— í…œí”Œë¦¿ì˜ destinationResolver í”„ë¡œí¼í‹°ë¥¼ ì„¤ì •í•´ì•¼ í•œë‹¤.JmsTemplateë¥¼ ìƒì„±í•˜ê³  ê¸°ë³¸ ëª©ì ì§€ë¥¼ ì§€ì •í–ˆë‹¤ë©´ send(MessageCreator c)ëŠ” ì´ ëª©ì ì§€ë¡œ ë©”ì‹œì§€ë¥¼ ì „ì†¡í•œë‹¤.
+ë„ë©”ì¸ ëª¨ë¸ ê°ì²´ë¥¼ ì „ì†¡í•˜ê¸° ì‰½ë„ë¡ JmsTemplateì—ëŠ” ë©”ì‹œì§€ì˜ ë°ì´í„° ë‚´ìš©ì— ëŒ€í•œ ìžë°” ê°ì²´ë¥¼ ì¸ìžë¡œ ë°›ëŠ” ë‹¤ì–‘í•œ ì „ì†¡ ë©”ì„œë“œê°€ ìžˆë‹¤. JmsTemplateì—ì„œ ì˜¤ë²„ë¡œë“œëœ convertAndSend()ì™€ receiveAndConvert()ëŠ” ë³€í™˜ ê³¼ì •ì„ MessageConverter ì¸í„°íŽ˜ì´ìŠ¤ì˜ ì¸ìŠ¤í„´ìŠ¤ë¡œ ìœ„ìž„í•œë‹¤. MessageConverter ì¸í„°íŽ˜ì´ìŠ¤ëŠ” ìžë°” ê°ì²´ì™€ JMS ë©”ì‹œì§€ê°„ì˜ ë³€í™˜ì— ëŒ€í•œ ê°„ë‹¨í•œ ì¡°ê±´ì„ ì •ì˜í•˜ê³  ìžˆë‹¤. ê¸°ë³¸ êµ¬í˜„ì²´ SimpleMessageConverterëŠ” Stringê³¼ TextMessage, byte[]ì™€ BytesMesssage, java.util.Mapì™€ MapMessageê°„ì˜ ë³€í™˜ì„ ì§€ì›í•œë‹¤.ì»¨ë²„í„°ë¥¼ ì‚¬ìš©í•¨ìœ¼ë¡œì¨ JMSë¡œ ë³´ë‚´ê³  ë°›ëŠ” ë¹„ì¦ˆë‹ˆìŠ¤ ê°ì²´ì—ë§Œ ì§‘ì¤‘í•  ìˆ˜ ìžˆê³  JMS ë©”ì‹œì§€ë¡œ ì–´ë–»ê²Œ í‘œí˜„ë˜ëŠ”ì§€ì— ëŒ€í•œ ìžì„¸í•œ ë‚´ìš©ì€ ì‹ ê²½ì“°ì§€ ì•Šì•„ë„ ëœë‹¤.ìµœê·¼ì˜ ìƒŒë“œë°•ìŠ¤ì—ëŠ” ìžë°”ë¹ˆê³¼ MapMessageë¥¼ ë³€í™˜í•˜ëŠ”ë° ë¦¬í”Œë ‰ì…˜ì„ ì‚¬ìš©í•˜ëŠ” MapMessageConverterê°€ í¬í•¨ë˜ì–´ ìžˆë‹¤. ì§ì ‘ êµ¬í˜„í˜ˆë§Œí•œ ë‹¤ë¥¸ êµ¬í˜„ì²´ ì¤‘ì—ì„œ ì¸ê¸°ìžˆëŠ” ê²ƒì€ ê°ì²´ë¥¼ ë‚˜íƒ€ë‚´ëŠ” TextMessageë¥¼ ìƒì„±í•˜ëŠ”ë° JAXB, Castor, XMLBeans, XStreamê°™ì€ ì´ë¯¸ ì¡´ìž¬í•˜ëŠ” XML ë§ˆìƒ¬ë§ íŒ¨í‚¤ì§€ë¥¼ ì‚¬ìš©í•˜ëŠ” ì»¨ë²„í„°ì´ë‹¤.ì¼ë°˜ì ìœ¼ë¡œ ì»¨ë²„í„° í´ëž˜ìŠ¤ë‚´ì— ìº¡ìŠí™”ë  ìˆ˜ ì—†ëŠ” ë©”ì‹œì§€ì˜ í”„ë¡œí¼í‹°, í—¤ë”, ë°”ë””ë¥¼ ì„¤ì •í•˜ê¸° ìœ„í•´ì„œ MessagePostProcessor ì¸í„°íŽ˜ì´ìŠ¤ëŠ” ë©”ì‹œì§€ê°€ ë³€í™˜ë˜ê³  ë‚˜ì„œ ì „ì†¡ë˜ê¸° ì „ì— ì ‘ê·¼í•  ìˆ˜ ìžˆê²Œ í•´ì¤€ë‹¤. ì•„ëž˜ ì˜ˆì œëŠ” java.util.Mapê°€ ë©”ì‹œì§€ë¡œ ë³€í™˜ëœ í›„ì— ë©”ì‹œì§€ í—¤ë”ì™€ í”„ë¡œí¼í‹°ë¥¼ ì–´ë–»ê²Œ ìˆ˜ì •í•˜ëŠ”ì§€ ë³´ì—¬ì¤€ë‹¤.
+ì´ëŠ” ë©”ì‹œì§€ í˜•ì‹ì´ ëœë‹¤.
+ì „ì†¡ ìž‘ì—…ì´ ë‹¤ìˆ˜ì˜ ì¼ë°˜ì ì¸ ì‚¬ìš©ì‚¬ë¡€ë¥¼ ë‹¤ë£° ìˆ˜ ìžˆì§€ë§Œ JMS Sessionì´ë‚˜ MessageProducerì—ì„œ ë‹¤ìˆ˜ì˜ ìž‘ì—…ì„ ìˆ˜í–‰í•˜ê³ ìž í•˜ëŠ” ê²½ìš°ê°€ ìžˆë‹¤.SessionCallbackì™€ ProducerCallbackëŠ” JMS Sessionê³¼ Session / MessageProducer ìŒì„ ê°ê° ë…¸ì¶•í•œë‹¤. JmsTemplateì˜ execute() ë©”ì„œë“œëŠ” ì´ëŸ¬í•œ ì½œë°± ë©”ì„œë“œë¥¼ ì‹¤í–‰í•œë‹¤.
+JMSê°€ ë³´í†µ ë¹„ë™ê¸° ì²˜ë¦¬ì™€ ê´€ë ¨ë˜ì–´ ìžˆì§€ë§Œ ë™ê¸°ì ìœ¼ë¡œ ë©”ì‹œì§€ë¥¼ ì²˜ë¦¬í•  ìˆ˜ë„ ìžˆë‹¤. receive(..) ë©”ì„œë“œë¥¼ ì˜¤ë²„ë¡œë“œí•´ì„œ ë™ê¸°ì ìœ¼ë¡œ ì²˜ë¦¬í•  ìˆ˜ ìžˆë‹¤.ë™ê¸°ì ìœ¼ë¡œ ë©”ì‹œì§€ë¥¼ ë°›ëŠ” ë™ì•ˆ í˜¸ì¶œí•˜ëŠ” ìŠ¤ë ˆë“œëŠ” ë©”ì‹œì§€ë¥¼ ì´ìš©í•  ìˆ˜ ìžˆì„ ë•Œê¹Œì§€ ë¸”ëŸ­í‚¹ëœë‹¤. í˜¸ì¶œí•˜ëŠ” ìŠ¤ë ˆë“œê°€ ë¶ˆëª…í™•í•˜ê²Œ ë¸”ëŸ­í‚¹ë  ê°€ëŠ¥ì„±ì´ ìžˆìœ¼ë¯€ë¡œ ì´ëŠ” ìœ„í—˜í•œ ìž‘ì—…ì´ ë  ìˆ˜ ìžˆë‹¤. receiveTimeout í”„ë¡œí¼í‹°ëŠ” ë¦¬ì‹œë²„ê°€ ë©”ì‹œì§€ë¥¼ ì–¼ë§ˆë‚˜ ì˜¤ëž«ë™ì•ˆ ê¸°ë‹¤ë ¤ì•¼ í•˜ëŠ”ì§€ë¥¼ ì§€ì •í•œë‹¤.
+EJBì˜ ë©”ì‹œì§€ ì£¼ë„ ë¹ˆ(MDB, Message-Driven Bean)ê³¼ ë¹„ìŠ·í•œ ë°©ë²•ìœ¼ë¡œ ë©”ì‹œì§€ ì£¼ë„ POJO(MDP, Message-Driven POJO)ëŠ” JMS ë©”ì‹œì§€ì— ëŒ€í•´ì„œ ë¦¬ì‹œë²„ë¡œ ë™ìž‘í•œë‹¤. javax.jms.MessageListener ì¸í„°íŽ˜ì´ìŠ¤ë¥¼ ë°˜ë“œì‹œ êµ¬í˜„í•´ì•¼ í•œë‹¤ëŠ” ì ì´ MDPê°€ ê°€ì§„ í•˜ë‚˜ì˜ ì œì•½ì‚¬í•­(í•˜ì§€ë§Œ ì•„ëž˜ì˜ MessageListenerAdapter í´ëž˜ìŠ¤ì— ëŒ€í•œ ë…¼ì˜ë¥¼ ì°¸ê³ í•´ë¼.)ì´ë‹¤. POJOê°€ ì—¬ëŸ¬ ìŠ¤ë ˆë“œì—ì„œ ë©”ì‹œì§€ë¥¼ ë°›ëŠ” ê²½ìš°ë¼ë©´ ìŠ¤ë ˆë“œì„¸ì´í”„í•˜ê²Œ êµ¬í˜„í•´ì•¼ í•œë‹¤ëŠ” ì ì´ ì¤‘ìš”í•˜ë‹¤ëŠ” ê²ƒì„ ê¸°ì–µí•´ì•¼ í•œë‹¤.ì•„ëž˜ëŠ” MDP êµ¬í˜„ì²´ì˜ ê°„ë‹¨í•œ ì˜ˆì‹œì´ë‹¤.
+MessageListenerë¥¼ êµ¬í˜„í–ˆìœ¼ë©´ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆë¥¼ ë§Œë“¤ ì°¨ë¡€ë‹¤.ìŠ¤í”„ë§ì´ ì œê³µí•˜ëŠ” ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆì¤‘ í•˜ë‚˜ë¥¼ ì–´ë–»ê²Œ ì •ì˜í•˜ê³  ì„¤ì •í–ˆëŠ”ì§€ ì•„ëž˜ ì˜ˆì œë¥¼ ì°¸ê³ í•´ë¼.(ì´ ê²½ìš°ì—ëŠ” DefaultMessageListenerContainer)
+ë‹¤ì–‘í•œ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆì˜ ê° êµ¬í˜„ì²´ê°€ ì§€ì›í•˜ëŠ” ê¸°ëŠ¥ê³¼ ìžì„¸í•œ ë‚´ìš©ì€ ìŠ¤í”„ë§ ìžë°”ë…ì„ ì°¸ê³ í•´ë¼.
+SessionAwareMessageListener ì¸í„°íŽ˜ì´ìŠ¤ëŠ” ìŠ¤í”„ë§ì— íŠ¹í™”ëœ ì¸í„°íŽ˜ì´ìŠ¤ë¡œ JMS MessageListenerì™€ ë¹„ìŠ·í•œ ê³„ì•½(contract)ì„ ì œê³µí•˜ì§€ë§Œ Messageë¥¼ ë°›ì€ JMS Sessionì— ì ‘ê·¼í•´ì„œ ë©”ì‹œì§€ë¥¼ ì²˜ë¦¬í•  ìˆ˜ ìžˆëŠ” ë©”ì„œë“œë„ ì œê³µí•œë‹¤.
+êµ¬í˜„í•œ MDPê°€ ì–´ë–¤ ë©”ì‹œì§€ì—ë„ ì‘ë‹µí•  ìˆ˜ ìžˆê¸°ë¥¼ (onMessage(Message, Session) ë©”ì„œë“œì—ì„œ ì œê³µëœ Sessionì„ ì‚¬ìš©í•´ì„œ) ì›í•œë‹¤ë©´ MDPê°€ ì´ ì¸í„°íŽ˜ì´ìŠ¤ (í‘œì¤€ JMS MessageListener ì¸í„°íŽ˜ì´ìŠ¤ë¥¼ ì„ í˜¸í•˜ëŠ” ê²½ìš°)ë¥¼ êµ¬í˜„í•˜ë„ë¡ í•  ìˆ˜ ìžˆë‹¤. ìŠ¤í”„ë§ì´ ì œê³µí•˜ëŠ” ëª¨ë“  ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆ êµ¬í˜„ì²´ëŠ” MessageListenerë‚˜ SessionAwareMessageListener ì¸í„°íŽ˜ì´ìŠ¤ë¥¼ êµ¬í˜„í•œ MDPë¥¼ ì§€ì›í•œë‹¤. SessionAwareMessageListenerë¥¼ êµ¬í˜„í•œ í´ëž˜ìŠ¤ëŠ” ì´ ì¸í„°íŽ˜ì´ìŠ¤ë¡œ ìŠ¤í”„ë§ì— ì˜ì¡´ì„±ì„ ê°€ì§„ë‹¤ëŠ” ê²ƒì„ ìœ ì˜í•´ì•¼ í•œë‹¤. ì´ë¥¼ ì‚¬ìš©í•  ê²ƒì¸ì§€ ì•„ë‹Œì§€ëŠ” ì–´í”Œë¦¬ì¼€ì´ì…˜ ê°œë°œìžë‚˜ ì•„í‚¤í…ì³ì˜ ì„ íƒì´ë‹¤.SessionAwareMessageListener ì¸í„°íŽ˜ì´ìŠ¤ì˜ â€˜onMessage(..)â€™ ë©”ì„œë“œê°€ JMSExceptionë¥¼ ë˜ì§„ë‹¤ëŠ” ê²ƒì„ ê¸°ì–µí•´ë¼. í‘œì¤€ JMS MessageListener ì¸í„°íŽ˜ì´ìŠ¤ì™€ëŠ” ë‹¬ë¦¬ SessionAwareMessageListener ì¸í„°íŽ˜ì´ìŠ¤ë¥¼ ì‚¬ìš©í–ˆì„ ë•Œ ë˜ì €ì§„ ì˜ˆì™¸ë¥¼ ì²˜ë¦¬í•˜ëŠ” ê²ƒì€ í´ë¼ì´ì–¸íŠ¸ ì½”ë“œì˜ ëª«ì´ë‹¤.
+MessageListenerAdapter í´ëž˜ìŠ¤ëŠ” ìŠ¤í”„ë§ì—ì„œ ë¹„ë™ê¸° ë©”ì‹œì§€ë¥¼ ì§€ì›í•˜ëŠ” ë§ˆì§€ë§‰ ì»´í¬ë„ŒíŠ¸ë‹¤. ê°„ë‹¨ížˆ ë§í•˜ë©´ ì´ í´ëž˜ìŠ¤ëŠ” ê±°ì˜ ëª¨ë“  í´ëž˜ìŠ¤ë¥¼ MDPë¡œ ë…¸ì¶œí•˜ë„ë¡ í•´ì¤€ë‹¤. (ë¬¼ë¡  ëª‡ê°€ì§€ ì œì•½ì‚¬í•­ì´ ìžˆë‹¤.)ë‹¤ìŒì˜ ì¸í„°íŽ˜ì´ìŠ¤ ì •ì˜ë¥¼ ë³´ìž. ì´ ì¸í„°íŽ˜ì´ìŠ¤ê°€ MessageListenerë‚˜ SessionAwareMessageListenerë¥¼ ìƒì†í•˜ì§€ ì•Šì•˜ìŒì—ë„ MessageListenerAdapterë¥¼ ì‚¬ìš©í•´ì„œ MDPë¡œ ì‚¬ìš©í•  ìˆ˜ ìžˆë‹¤. ë‹¤ì–‘í•œ ë©”ì‹œì§€ ì²˜ë¦¬ ë©”ì„œë“œê°€ ì–´ë–»ê²Œ ë°›ì•„ì„œ ì²˜ë¦¬í•  ìˆ˜ ìžˆëŠ” ë‹¤ì–‘í•œ Messageì˜ ë‚´ìš©ì— ë”°ë¼ íƒ€ìž…ì„ ì§€ì •í•˜ëŠ”ì§€ë„ ì°¸ê³ í•´ë¼.
+íŠ¹ížˆ MessageDelegate ì¸í„°íŽ˜ì´ìŠ¤ì˜ êµ¬í˜„ì²´ (ìœ„ì˜ DefaultMessageDelegate í´ëž˜ìŠ¤)ê°€ ì–´ë–»ê²Œ JSMì— ëŒ€í•œ ì˜ì¡´ì„±ì€ ì „í˜€ ê°–ì§€ ì•ŠëŠ”ì§€ ë´ë¼. ì´ëŠ” ë‹¤ìŒì˜ ì„¤ì •ìœ¼ë¡œ MDPë¡œ ë§Œë“¤ POJOë‹¤.
+ë‹¤ìŒì€ ë˜ë‹¤ë¥¸ MDPì˜ ì˜ˆì‹œë¡œ JMS TextMessage ë©”ì‹œì§€ë§Œ ë°›ì•„ì„œ ì²˜ë¦¬í•  ìˆ˜ ìžˆë‹¤. ì–´ë–»ê²Œ ë©”ì‹œì§€ ì²˜ë¦¬ ë©”ì„œë“œê°€ ì‹¤ì œë¡œëŠ” â€˜receiveâ€™ë¡œ (MessageListenerAdapterì˜ ë©”ì‹œì§€ ì²˜ë¦¬ ë©”ì„œë“œì˜ ì´ë¦„ì€ ê¸°ë³¸ì ìœ¼ë¡œ â€˜handleMessageâ€™ì´ë‹¤.) í˜¸ì¶œë˜ê²Œ ì„¤ì •í•˜ëŠ”ì§€ ì°¸ê³ í•´ë¼. â€˜receive(..)â€™ ë©”ì„œë“œê°€ JMS TextMessage ë©”ì‹œì§€ì—ë§Œ ë°›ê³  ì‘ë‹µí•˜ë„ë¡ íƒ€ìž…ì„ ì§€ì •í•˜ëŠ” ë°©ë²•ë„ ì°¸ê³ í•´ë¼.
+MessageListenerAdapterì˜ ì„¤ì •ì€ ë‹¤ìŒê³¼ ê°™ì„ ê²ƒì´ë‹¤.
+ìœ„ì˜ â€˜messageListenerâ€™ê°€ TextMessageê°€ ì•„ë‹Œ ë‹¤ë¥¸ íƒ€ìž…ì˜ JMS Messageë¥¼ ë°›ëŠ”ë‹¤ë©´ IllegalStateExceptionê°€ ë˜ì ¸ì§ˆ ê²ƒì´ë‹¤.(ê·¸ë¦¬ê³  ì´ì–´ì§„ ë©”ì‹œì§€ëŠ” ë¬´ì‹œí•  ê²ƒì´ë‹¤.) í•¸ë“¤ëŸ¬ ë©”ì„œë“œê°€ voidê°€ ì•„ë‹Œ ê°’ì„ ë°˜í™˜í•˜ëŠ” ê²½ìš° ìžë™ì ìœ¼ë¡œ ì‘ë‹µ Messageë¥¼ ë‹¤ì‹œ ë³´ë‚´ëŠ” ê²ƒì€ MessageListenerAdapterí´ëž˜ìŠ¤ì˜ ë˜ë‹¤ë¥¸ ê¸°ëŠ¥ì´ë‹¤. ë‹¤ìŒ ì¸í„°íŽ˜ì´ìŠ¤ì™€ í´ëž˜ìŠ¤ë¥¼ ë³´ìž.
+ìœ„ì˜ DefaultResponsiveTextMessageDelegateë¥¼ MessageListenerAdapterì™€ í•¨ê»˜ ì‚¬ìš©í•œ ê²½ìš° â€˜receive(..)â€™ ë©”ì„œë“œì˜ ì‹¤í–‰í›„ ë°˜í™˜ëœ nullì´ ì•„ë‹Œ ëª¨ë“  ê°’ì€ TextMessageë¡œ ë³€í™˜ë  ê²ƒì´ë‹¤.(ê¸°ë³¸ ì„¤ì •ì— ë”°ë¼) ê·¸ ë‹¤ìŒ ë³€í™˜ëœ TextMessageëŠ” ì›ëž˜ì˜ Messageì˜ JMS Reply-To í”„ë¡œí¼í‹°ì— ì •ì˜ëœ(ì¡´ìž¬í•˜ëŠ” ê²½ìš°) Destinationì´ë‚˜ MessageListenerAdapterì— ì„¤ì •ëœ ê¸°ë³¸ Destination(ì„¤ì •ë˜ì—ˆë‹¤ë©´)ìœ¼ë¡œ ë³´ë‚´ì§„ë‹¤. Destinationê°€ ì—†ë‹¤ë©´ InvalidDestinationExceptionê°€ ë˜ì ¸ì§ˆ ê²ƒì´ë‹¤.(ì´ ì˜ˆì™¸ëŠ” ë¬´ì‹œë˜ì§€ ì•Šê³  í˜¸ì¶œ ìŠ¤íƒì— ì¶”ê°€ë  ê²ƒì´ë‹¤.)
+íŠ¸ëžœìž­ì…˜ì—ì„œ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆë¥¼ í˜¸ì¶œí•˜ë ¤ë©´ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆë§Œ ìž¬ì„¤ì •í•˜ë©´ ëœë‹¤.ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆ ì •ì˜ì˜ sessionTransacted í”Œëž˜ê·¸ë¡œ ë¡œì»¬ ë¦¬ì†ŒìŠ¤ íŠ¸ëžœìž­ì…˜ì€ í™œì„±í™”í•  ìˆ˜ ìžˆë‹¤. ë¡œì»¬ ë¦¬ì†ŒìŠ¤ íŠ¸ëžœìž­ì…˜ì„ í™œì„±í™”í•˜ë©´ í™œì„±í™”ëœ JMS íŠ¸ëžœìž­ì…˜ë‚´ì—ì„œ ê° ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ í˜¸ì¶œì„ í•  ìˆ˜ ìžˆê³  ë¦¬ìŠ¤ë„ˆ ì‹¤í–‰ì´ ì‹¤íŒ¨í•œ ê²½ìš° ë©”ì‹œì§€ ìˆ˜ì‹ ì´ ë¡¤ë°±ëœë‹¤. ì‘ë‹µ ë©”ì‹œì§€ ì „ì†¡ (SessionAwareMessageListenerë¡œ)ë„ ê°™ì€ ë¡œì»¬ íŠ¸ëžœìž­ì…˜ì— í¬í•¨ë˜ì–´ ìžˆì§€ë§Œ ë‹¤ë¥¸ ë¦¬ì†ŒìŠ¤ì— ëŒ€í•œ ìž‘ì—…(ë°ì´í„°ë² ì´ìŠ¤ ì ‘ê·¼ ê°™ì€)ì€ ë…ë¦½ì ìœ¼ë¡œ ìˆ˜í–‰ë  ê²ƒì´ë‹¤. ì´ëŠ” ë°ì´í„°ë² ì´ìŠ¤ ì²˜ë¦¬ëŠ” ì»¤ë°‹ë˜ì—ˆì§€ë§Œ ë©”ì‹œì§€ ì²˜ë¦¬ëŠ” ì»¤ë°‹ì´ ì‹¤íŒ¨í•œ ê²½ìš°ë¥¼ í¬í•¨í•´ì„œ ë¦¬ìŠ¤ë„ˆ êµ¬í˜„ì²´ì—ì„œ ì¤‘ë³µ ë©”ì‹œì§€ íƒì§€ë¥¼ í•´ì•¼ í•œë‹¤.
+ì™¸ë¶€ì—ì„œ ê´€ë¦¬í•˜ëŠ” íŠ¸ëžœìž­ì…˜ì— ì°¸ì—¬í•˜ë ¤ë©´ íŠ¸ëžœìž­ì…˜ ê´€ë¦¬ìžë¥¼ ì„¤ì •í•˜ê³  ì™¸ë¶€ ê´€ë¦¬ íŠ¸ëžœìž­ì…˜ì„ ì§€ì›í•˜ëŠ” ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆ(ë³´í†µ DefaultMessageListenerContainer)ë¥¼ ì‚¬ìš©í•´ì•¼ í•œë‹¤.XA íŠ¸ëžœìž­ì…˜ì— ì°¸ê°€í•˜ë„ë¡ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆë¥¼ ì„¤ì •í•˜ë ¤ë©´ JtaTransactionManager(ì´ íŠ¸ëžœìž­ì…˜ ê´€ë¦¬ìžëŠ” ê¸°ë³¸ì ìœ¼ë¡œ Java EE ì„œë²„ì˜ íŠ¸ëžœìž­ì…˜ í•˜ìœ„ì‹œìŠ¤í…œì— ìœ„ìž„í•œë‹¤.)ë¥¼ ì„¤ì •í•´ì•¼ í•œë‹¤. ì—¬ê¸°ì„œ ì˜ì¡´ JMS ConnectionFactoryëŠ” XA ê¸°ëŠ¥ì´ ìžˆì–´ì•¼ í•˜ê³  JTA íŠ¸ëžœìž­ì…˜ ì½”ë””ë„¤ì´í„°(JTA transaction coordinator)ê°€ ì ì ˆížˆ ë“±ë¡ë˜ì–´ ìžˆì–´ì•¼ í•œë‹¤! (Java EE ì„œë²„ì˜ JNDI ë¦¬ì†ŒìŠ¤ ì„¤ì •ì„ í™•ì¸í•´ë¼.) ì´ëŠ” ë©”ì‹œì§€ ìˆ˜ì‹ ì´ ë°ì´í„°ë² ì´ìŠ¤ ì ‘ê·¼ê³¼ í•¨ê»˜ ê°™ì€ íŠ¸ëžœìž­ì…˜ì— ìžˆë„ë¡ í•œë‹¤.(í†µì¼ëœ ì»¤ë°‹ ê°œë…ì„ ê°€ì§€ì§€ë§Œ XA íŠ¸ëžœìž­ì…˜ ë¡œê·¸ ë¹„ìš©ì´ í¬ë‹¤.)
+ì•žì—ì„œ ë³¸ ì»¨í…Œì´ë„ˆ ì„¤ì •ì— ìœ„ ë¶€ë¶„ì„ ì¶”ê°€í•˜ë©´ ëœë‹¤. ì»¨í…Œì´ë„ˆê°€ ë‚˜ë¨¸ì§€ë¥¼ ê´€ë¦¬í•  ê²ƒì´ë‹¤.
+ìŠ¤í”„ë§ 2.5ë¶€í„° JCAì— ê¸°ë°˜í•œ MessageListener ì»¨í…Œì´ë„ˆë„ ì§€ì›í•˜ê¸° ì‹œìž‘í–ˆë‹¤. JmsMessageEndpointManagerëŠ” í”„ë¡œë°”ì´ë”ì˜ ResourceAdapter í´ëž˜ìŠ¤ ì´ë¦„ìœ¼ë¡œ ActivationSpec í´ëž˜ìŠ¤ ì´ë¦„ì„ ìžë™ì ìœ¼ë¡œ ê²°ì •í•˜ë ¤ê³  í•  ê²ƒì´ë‹¤. ê·¸ëž˜ì„œ ë‹¤ìŒ ì˜ˆì œì—ì„œ ë³´ë“¯ì´ ìŠ¤í”„ë§ì˜ ì§€ë„¤ë¦­ JmsActivationSpecConfigì„ ì œê³µí•˜ëŠ” ê²ƒì´ ë³´í†µ ê°€ëŠ¥í•˜ë‹¤.
+ë˜ëŠ” ì£¼ì–´ì§„ ActivationSpec ê°ì²´ì— JmsMessageEndpointManagerë¥¼ ì„¤ì •í•  ìˆ˜ ìžˆë‹¤. ActivationSpec ê°ì²´ë„ JNDI ê²€ìƒ‰ (ë¥¼ ì‚¬ìš©í•´ì„œ)ì—ì„œ ì˜¬ ê²ƒì´ë‹¤.
+ì˜ˆì œì—ì„œ ì„¤ëª…í•œëŒ€ë¡œ ìŠ¤í”„ë§ì˜ ResourceAdapterFactoryBeanë¥¼ ì‚¬ìš©í•˜ë©´ ë¡œì»¬ë¡œ ëŒ€ìƒ ResourceAdapterë¥¼ ì„¤ì •í•œë‹¤.
+ì§€ì •í•œ WorkManagerë„ í™˜ê²½ì— íŠ¹í™”ëœ ìŠ¤ë ˆë“œ í’€ì„ ê°€ë¦¬í‚¬ ê²ƒì´ë‹¤.(ë³´í†µ SimpleTaskWorkManagerâ€™s â€œasyncTaskExecutorâ€ í”„ë¡œí¼í‹°ë¥¼ í†µí•´ì„œ) ë‹¤ì¤‘ ì•„ë‹µí„°ë¥¼ ì‚¬ìš©í•œë‹¤ë©´ ëª¨ë“  ResourceAdapter ì¸ìŠ¤í„´ìŠ¤ì— ê³µìœ  ìŠ¤ë ˆë“œ í’€ì„ ì •ì˜í•˜ëŠ” ê²ƒì„ ê³ ë ¤í•´ ë´ë¼.ì¼ë¶€ í™˜ê²½(WebLogic 9 ì´ìƒ ë“±)ì—ì„œëŠ” JNDI (ë¥¼ ì‚¬ìš©í•´ì„œ)ì—ì„œ ì „ì²´ ResourceAdapter ê°ì²´ë¥¼ ê°€ì ¸ì˜¬ ê²ƒì´ë‹¤. ìŠ¤í”„ë§ ê¸°ë°˜ì˜ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆëŠ” ì„œë²„ê°€ ì œê³µí•˜ëŠ” ResourceAdapterì™€ ìƒí˜¸ìž‘ìš©í•  ìˆ˜ ìžˆê³  ì„œë²„ì— ë‚´ìž¥ëœ WorkManagerë„ ì‚¬ìš©í•  ìˆ˜ ìžˆë‹¤.ìžì„¸í•œ ë‚´ìš©ì€ JmsMessageEndpointManager, JmsActivationSpecConfig, ResourceAdapterFactoryBeanì˜ JavaDocë¥¼ ì°¸ê³ í•´ë¼.ìŠ¤í”„ë§ì€ JMSì— ì˜ì¡´í•˜ì§€ ì•ŠëŠ” ì¼ë°˜ì ì¸ JCA ë©”ì‹œì§€ ì—”íŠ¸í¬ì¸íŠ¸ ê´€ë¦¬ìž org.springframework.jca.endpoint.GenericMessageEndpointManagerë„ ì œê³µí•œë‹¤. ì´ ì»´í¬ë„ŒíŠ¸ë¡œ ëª¨ë“  ì¢…ë¥˜ì˜ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ(CCI MessageListenerë“±)ì™€ í”„ë¡œë°”ì´ë”ì— íŠ¹í™”ëœ ActivationSpec ê°ì²´ë¥¼ ì‚¬ìš©í•  ìˆ˜ ìžˆë‹¤. ì‚¬ìš©í•˜ëŠ” ì»¤ë„¥í„°ì˜ ì‹¤ì œ ê¸°ëŠ¥ì€ JCA í”„ë¡œë°”ì´ë”ì˜ ë¬¸ì„œë¥¼ ì°¸ê³ í•˜ê³  ìŠ¤í”„ë§ì— íŠ¹í™”ëœ ìžì„¸í•œ ì„¤ì •ì€ GenericMessageEndpointManager JavaDocì„ ì°¸ê³ í•´ë¼.
+NoteJCA ê¸°ë°˜ì˜ ë©”ì‹œì§€ ì—”ë“œí¬ì¸íŠ¸ ê´€ë¦¬ëŠ” EJB 2.1 ë©”ì‹œì§€ ì£¼ë„ ë¹ˆê³¼ ì•„ì£¼ ë¹„ìŠ·í•˜ë‹¤. JCA ê¸°ë°˜ì˜ ë©”ì‹œì§€ ì—”ë“œí¬ì¸íŠ¸ ê´€ë¦¬ë„ ê°™ì€ ì˜ì¡´ ë¦¬ì†ŒìŠ¤ í”„ë¡œë°”ì´ë” ê·œì•½ì„ ì‚¬ìš©í•œë‹¤. EJB 2.1 MDBì—ì„œì²˜ëŸ¼ JCA í”„ë¡œë°”ì´ë”ê°€ ì§€ì›í•˜ëŠ” ëª¨ë“  ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì¸í„°íŽ˜ì´ìŠ¤ëŠ” ìŠ¤í”„ë§ ì»¨í…ìŠ¤íŠ¸ì—ì„œë„ ì‚¬ìš©í•  ìˆ˜ ìžˆë‹¤. í•˜ì§€ë§Œ JMSê°€ JCA ì—”ë“œí¬ì¸íŠ¸ ê´€ë¦¬ ê·œì•½ì—ì„œ ì‚¬ìš©í•˜ëŠ” ê°€ìž¥ ì¼ë°˜ì ì¸ ì—”ë“œí¬ì¸íŠ¸ APIì´ë¯€ë¡œ ìŠ¤í”„ë§ì˜ JMS ì§€ì›ì´ í™•ì‹¤ížˆ â€˜íŽ¸ë¦¬í•˜ë‹¤â€™.
+ìŠ¤í”„ë§ 2.5ì—ëŠ” JMS ì„¤ì •ì„ ê°„ëžµížˆ í•  ìˆ˜ ìžˆëŠ” XML ë„¤ìž„ìŠ¤íŽ˜ì´ìŠ¤ê°€ ë„ìž…ë˜ì—ˆë‹¤. JMS ë„¤ìž„ìŠ¤íŽ˜ì´ìŠ¤ ìš”ì†Œë¥¼ ì‚¬ìš©í•˜ë ¤ë©´ JMS ìŠ¤í‚¤ë§ˆë¥¼ ì°¸ì¡°í•´ì•¼ í•œë‹¤.
+ë„¤ìž„ìŠ¤íŽ˜ì´ìŠ¤ëŠ” ë‘ê°œì˜ ìµœìƒìœ„ ìš”ì†Œì™€ë¡œ êµ¬ì„±ë˜ì–´ ìžˆê³  ë‘˜ ë‹¤ í•˜ë‚˜ ì´ìƒì˜ìžì‹ ìš”ì†Œë¥¼ ê°€ì§ˆ ê²ƒì´ë‹¤. ë‹¤ìŒì€ ë‘ ë¦¬ìŠ¤í„°ì˜ ê¸°ë³¸ ì„¤ì •ì— ëŒ€í•œ ì˜ˆì œì´ë‹¤.
+ìœ„ì˜ ì˜ˆì œëŠ” Section 22.4.4, â€œMessageListenerAdapterâ€ì—ì„œ ë³´ì—¬ì¤€ ë‘ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆ ë¹ˆ ì •ì˜ì™€ ë‘ MessageListenerAdapter ë¹ˆ ì •ì˜ë¥¼ ìƒì„±í•˜ëŠ” ì˜ˆì œì™€ ê°™ë‹¤. ìœ„ì—ì„œ ë³´ì—¬ì¤€ ì†ì„±ì„ ì¡°ê¸ˆ ë” ì„¤ëª…í•˜ìžë©´ listener ìš”ì†ŒëŠ” ì—¬ëŸ¬ê°€ì§€ ì„ íƒì ì¸ ê°’ì„ í¬í•¨í•  ìˆ˜ ìžˆë‹¤. ë‹¤ìŒ í‘œì— ì‚¬ìš©ê°€ëŠ¥í•œ ëª¨ë“  ì†ì„±ì´ ë‚˜ì™€ ìžˆë‹¤.
+<listener-container/>ìš”ì†Œë„ ì—¬ëŸ¬ê°€ì§€ ì„ íƒì ì¸ ì†ì„±ì„ ë°›ëŠ”ë‹¤. ê·¸ëž˜ì„œ ê¸°ë³¸ JMS ì„¤ì •ê³¼ ë¦¬ì†ŒìŠ¤ ì°¸ì¡°, ë‹¤ì–‘í•œ ì „ëžµ(ì˜ˆë¥¼ ë“¤ë©´ taskExecutorì™€ destinationResolver)ì„ ì»¤ìŠ¤í„°ë§ˆì´ì§•í•  ìˆ˜ ìžˆë‹¤. ì´ëŸ¬í•œ ì†ì„±ì„ ì‚¬ìš©í•´ì„œ íŽ¸ë¦¬í•œ ë„¤ìž„ìŠ¤íŽ˜ì´ìŠ¤ì˜ ìž¥ì ì„ ì´ìš©í•˜ë©´ì„œ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆë¥¼ ì»¤ìŠ¤í„°ë§ˆì´ì§•í•´ì„œ ì •ì˜í•  ìˆ˜ ìžˆë‹¤.
+ë‹¤ìŒ í‘œì— ì‚¬ìš©í•  ìˆ˜ ìžˆëŠ” ëª¨ë“  ì†ì„±ì´ ë‚˜ì™€ ìžˆë‹¤. ê° í”„ë¡œí¼í‹°ì˜ ìžì„¸í•œ ë‚´ìš©ì€ AbstractMessageListenerContainerì™€ ê·¸ í•˜ìœ„ í´ëž˜ìŠ¤ì˜ í´ëž˜ìŠ¤ ìˆ˜ì¤€ JavaDocì„ ì°¸ê³ í•´ë¼. Javadocì—ëŠ” íŠ¸ëžœìž­ì…˜ ì„ íƒê³¼ ë©”ì‹œì§€ ë°˜í™˜ ì‹œë‚˜ë¦¬ì˜¤ì— ëŒ€í•œ ë…¼ì˜ë„ ë‚˜ì™€ ìžˆë‹¤.
+â€œjmsâ€ ìŠ¤í‚¤ë§ˆë¥¼ ì§€ì›í•˜ëŠ” JCA ê¸°ë°˜ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆë¥¼ ì„¤ì •í•˜ëŠ” ê²ƒì€ ì•„ì£¼ ë¹„ìŠ·í•˜ë‹¤.
+ë‹¤ì–‘í•œ JCAì—ì„œ ì‚¬ìš©í•  ìˆ˜ ìžˆëŠ” ì„¤ì • ì˜µì…˜ì€ ë‹¤ìŒ í‘œì— ë‚˜ì™€ ìžˆë‹¤.
+Tags:Java
+Updated:August 8, 2022
+January 13, 2025
+Slack API ë¥¼ ì—°ë™í•œ ìŠ¤ë ˆë“œ ì´ëª¨ì§€ ë…¸í‹° ì–´í”Œë¦¬ì¼€ì´ì…˜
+January 13, 2025
+Slack API ë¥¼ ì—°ë™í•œ ìŠ¤ë ˆë“œ ì´ëª¨ì§€ ë…¸í‹° ì–´í”Œë¦¬ì¼€ì´ì…˜
+January 5, 2024
+AWS ë¥¼ ì´ìš©í•˜ì—¬ Github Repository ìžë™ë°°í¬í•˜ê¸°
+January 5, 2024
+EC2 ìƒì„±í•˜ê¸°…(¨sC*}–°“–‰ZfØ€„˜%ƒ›ÎC2 ˆ^!ÜAÁÉR`R#ˆ>Kô	Í43l@CÌŒÁ@¥Û‰AÑg	P¹™àf(0)#Ç‚`á°ÐFAÐW‡PÑ‚‚ŠÁ þÃÄ "ºÃÁé€Á,ƒ¤Ap¥Ð;—Aô!-‚,w–€fÞ Tb @=5ÈÜ ‚è³„«”MP6˜”Y7hƒ¸ BŠŒK‚…ÌÂâ?Kàf ´Â#Ç‚`á°ðG¾ôT‚VØa
+*øC0 È°7¹³kÀÁ@°¼ù­AÑ‰\™›¹	( €C0 XÌ7ó³pðÁ,ƒÄAªT KÈd@ýø½Ñ›€€qAYÀ°1€…þÀÀpC ?`0Ë q\9˜`9ô7/³ÝT &dîÑTX`“ÙG7Pq`“ÙG7Pa¡NfÉ“@nT'†¼ ƒé† _„Y:€…€ÄJ 7®dOa¸!€0è‡Ä¼¸Žë¸N3^æu^§õ;°s2ý°—Ø‰“é‡Ä½ÈŽìœLþAL7´sôCb_j§vj§üb;¶Ó2ýè—Û¹–é‡„¿àî´L‚AL7èNÓ»ƒàÇtƒÀ;ù1KPÐAõ
+g@t¯0PaáôÂ+T |@÷ñ
+ ‡\ð"pAÝpCP+d0Ý@:6ËpxT˜Áv­€­BP&š FAÀÈ€ ¨Y #‚˜%ØƒœNvºÑ˜nä& À¤ÌØÁtÃ36¥Ag 02 ˆ^!hÁtCcŽ¡lý¡5 D¯À ˜nÞ@¡ bÌ1ÁÝ Œ¢WfL7u QP1æŒ€o¨ FÑ+6¦‚=°(¨sF:³vÐ*7ƒf"ÀÌ2œ‚)Ë…ÿÿÿÿ +ÃpCG`0Ë{T dØ¡³|0
+o’AÌ2€BèÇ,ƒüt¡
+LJŸ%ü¦††6 ¡ f	ô ÏcC„ÁèÀ,Ì2„‚(ÈA¯ð èBðTŒ9†Ò	t¨WPP1æ†€vz…pÄcŽal§WŠPP1æ† wú,Ñ:d$‘Ñ°0K }–p2šÊhØ€d§ f	ô`–J!®úÉ€ z…
+A'KII ú,Q;l°Ñ°0K ÉDŸ%nÇ76 ‚Ý)€Y=¨ "S Ï 2 ˆ>KèNqDI18–ÿ€…Ó
+‚¾:ìTð6 †` ¡'nÂ	fNÁ‚«âé†
+Håt!Ÿ.‚èB©Xî,A*Ì2°B+˜É@ ¢Á)d«AôYB}B)%
+LÊ,Ã*¨BB…10–ÿ˜…Û
+0Ä–`*Ì@P$FŽ%ÁÂ?`a·Â!è©ü ‚JTð6 †` A)nê	fP!‚
+`aP!‚è‡Dý¼Ò+ Œø†ˆ! ,^
+†‚—ƒY†V`…`–á\á$*€ÅÔ4h…¢ûcK¶P 0.6 †` °°)nl
+f^ÁÜœ‚€á†€UÀ`–ê  ÃA8™˜@nÆ	¦@)fbA‚C—°Ò“u‘bf	la ¨hUXÈ€ z*ñBçœcÄÀpB,üCü+6 †` HÏÂpCàN`0Ë@³ôÕa†ØÉ  bŒN‚…¨ÂˆÃÄÀ,- ÂV00ÜäÌ2ü‚,#†‚`à
+'öVn5Ü€/oE³¿Á@`®A,\¸AôT‚‡è) '
+*”Ü@Ñ+„;
+†ˆ €Y\¸…×éB¿}u£}B(¨ÃÄÀ,.à¢W00ÜœÌ2Ô‚-À ,Vô7¸M@$ka¸!0)0˜%Ø…Ã	A0p­Ðn(@‹f~!‚
+€eƒ\_˜eà_(0 ¸1à2 ˆ^! R@AÅÈ‚ z…°Jü‡ˆ!€Y_è…¦W3Cô
+f
+*ü‡ˆ"€Y_@H¶``¸!ø+0˜eÐ…]èÜÂpC°S`0ËPà®	„á† §À`ÄÀXB,üƒäŒŒNlvKuÈFf	Âa ðÛ Â€fÆAŠ¢¯§Vc–€0dà2 ˆ^! M@AÅÈ„ f	Èa ‚ÆA‡ŒÊHüƒ‡ü1À%ð10–ÿPRúê@KmU0 ­7¸³åÁpCïÄWœÉÀO7ÄT Ì2„9ÃcC_`pz3_zäÃ7’òC½Bø§ Í‡ z… h>;$D¯†àÖÇ‡$‚èô
+!pÔ‚èBJø><$Ä¹’ÅÝ‰Áá‰A²SÃÎ1äÓý¤Ö,Á9T 6˜CœŒÝ›@n^¦~ÒfÖj90ÜÈÌ2¨C:iDO%ò)¶‚Ø¢ bÌ¬&Ÿ\ðAÑ+š
+(¨³ë0ÐQ1é ¨‹ç@i'†‚ÞƒY†v`‡ #‚è«ÃHñV@AÅ@#ÿY‚v¨¨vpÖZN 7ä³îp±œ@nÌ¦È ‚90Ü¤L7(Ó¡TfÂtCÜÏÐ+4¦ÐŒ•+Ä@ìÂpC_`@f'†‚ùƒé† ¬†Y†w˜‡`˜hƒ{¸xp‹xxy¸ƒ$‚èPP1Î¹`¢WO@AÅÀÀìðŸ%ˆ‡ŠJ€>x‡›î@2 ˆ^!pã´=.È€ z…°TñÇ% ÿYy¨¨„x …w¸oŸ$‚èTŒ3ƒ’Æ 2 ˆ^!œA@AÅÀÀ\ðŸ%¸‡a îá.èÁ-êá-ìáÔà$‚èÂTŒ‹ƒYÜ 2 ˆ^!ÈA@AÅÀÀ… üg	êa ¢èA$æáì@$‚èÂTŒë_ô 2 ˆ^!øA@AÅÀÀ\ðŸ%°‡ŠJ¨˜‡Ÿ’¢W«PP1.ÄJ.0È€ z… 
+Cüq	À–àZ*¹xT¹˜Áä¢ýÂpCÐg`€ƒ^‰ÿtC@´~a¸!50˜eÀ‡}ˆÿÂpC0j`0Ëúä=D¯ê(  b`ZâI þ³ûpü`V’Aô
+a
+*§%þøà?K°•“‚>€Á=P
+a¸!ˆ50˜eà‡ˆ0ÜÌÌ2ôƒ?yÑ+„S
+†ˆà€Y‚‘¸”+É€ z… JÁ°(0K0#F‚`ÐðGj.‘úÕ³#È‚`@
+óì˜ŽåÑ` †‚]ƒY† ‰`Ž&^Ææ‚‚±9†@§`l–@$æXL&xmŽ!X)›c~ŠÆæŸ¢±Y‘¨ð$„ÈëÙƒA0øÁ10ƒ6Á Ötb–`$'~†–ƒY’8‡`ÄÀh@Ú`ps¥£A0hƒÀ-–FŒÁ F0¨5Ó10ƒ6Á ÖNkÄÀh@Ú`C-ˆ    [
+#ˆâ^¶IP/[†%¨—-ÃØË–!
+ìeKqñBÜË–
+}Ù2ˆA±/[2(øeË`E¿lÐ ð—-ƒÿ²e`ƒd¶nP„Ì–
+‘Ù2ÈA12[:(HfË`EÉlð 0™-ƒ'³eàƒe¶~P¤Ì–
+•Ù2ˆB±2[R(XfË`
+EËl)r!ˆâ^¶¿äË–A¤·ÙR C/Ä½lÜ!°—-C<ù²e¨	n¶`Äq/[
+´â…¸—-…]ñBÜË–A6‚wÙRøF/Ä½lÎ#x—-zï²eHà]¶ê¼Ë–a>‚wÙ2ÐGð.[†úÞeË`Á»lH$¨—-Ã˜Hq³e¸“À^¶}äË–aT‚|Ù2¤J/[†W	òeËp+’Ülz%°—-Ã¯ö²e— _¶æäË–!]‚|Ù2°K/[†w	ìeËP/½lð%°—-C¿ö²e ™ _¶"äË–¡d¤¹Ù2¼L`/[†˜	ìeË€3A¾lt&È—-CÏHt³e›à]¶c¼Ë–Ál¤ºÙ2¬Mð.[†¶	ÞeË 7’ÝlèFº›-EÞñBÜË–Âo‚x!îeK:A¼÷²ePŸÀ^¶ñäË–á~‚|Ù2ôO/[†
+òeË°BÞld(°—-ö²e¸¡À^¶<äË–á‡‚|Ù2ˆQ/[†2
+òeË€F½lÖ(°—-ƒö²e¨£À^¶yØË–Á{Ù2„R/[†Q
+òeË`JRÞld)°—--ö²eØ¥ _¶½äË–œ$½Ù2Sð.[s
+ÞeËNÒÞlÜ)x—-<ï²e˜'‰o¶ö$õÍ–âž‚x!îeË@RA¾lL*È—-ÅIñBÜË–a¥‚|Ù2´T/[†˜’üfË€SA¾lz*È—-CXù²e« _¶f%ýÍ–á­$ÐÙ2ÜU/[½
+òeËÀWA¾l@+È—-Chù²e­ _¶§%…Î–µ‚x!îeK±ZA¼÷²e¨­ _¶»äË–¼‚|Ù2œ—$:[Šâ…¸—-ƒ‹ù²e ± _¶7Äq/[òeKfA¼÷²¥³ ^ˆ{ÙR˜Y/Ä½l)Ü,ˆâ^¶xäË–¡Ï‚|Ù2”Z/[UòeË kA¾ln-È—-Ã¯ù²e · _¶ìäË–!Þ‚|Ù2ä[/[òeK1rA¼÷²¥8¹ ^ˆ{ÙR¨\/Ä½l^.È—-ƒÍù²¥Ø¹ ^ˆ{ÙRø\/Ä½lÆ.È—-Úù²¥h» ^ˆ{Ù2€ž4:     a   °  ÿ     0P$PDPePÅA3 c Ì1ÌÉœ¼ùŒ Ì PÕÀh Í PÅ‚ 
+# c}ß²¸F# „1@# d20‚ ‚‚ 
+ ‚ (€ ‚ @R3 49   ñ0  $   +¸Á™œY1ÄÎäÌ
+AnpfÅ078“3+ºÁ™œY1ÔÎäÌŠÁnp&gVwƒ39³bÀœÉ™CÞàLÎ¬ôgrfÅ°78“3+¾Á™œY1ôÎäÌŠÁop&gVƒ39³B œY1„ÎäÌŠAtp&gV£ƒ3+ÒÁ™œY1”ÎäÌŠÁtp&g  3w¼E(ÌDäð£0±À[ŒÂLÄ] o
+3w¼E(ÌDÜð¡0ÑÀ[„ÂLD_ o
+3}¼E(ÌDüð¢0À[ˆÂLÄI o1
+3'¼Å(ÌD´ð¤@6"†y ƒY!HTD A¥‚ 2 ˆ92èaŽ!Ö€VÅ \ B¬bP.°™%*#P` Â`w *#€ôD 7!”&a¸!	0˜n ‡`d8è`¦@¸@‘NR˜BI˜†iˆ £“¨p¨¥AÀè$…*¤„j¨†_P 0:IÁ
++Á¬q ŒNR¸BK¸†k€ £“°ð°¡AÀè$…,Ä„lÈkPP1:IA3A´±TŒNBØBMØ†lP 0:	7µAÀè$„.ä„n¸ £“¼°¼q ŒNBøBOølP 0:	?·AÀè$„8„…xÄ £“ä0ä! ŒNB˜CY˜lP 0:	g±AÀè$„:¤…zÈ £“ì°ì! ŒNB¸C[¨‡{P 0:	oÁêAÀè$„<Ä…{¤ £“ô0ð1 ŒNBØC]ÈyP 0:	wAäAÀè$„>ä…} £“ü°ø1 ŒNBøC_èxP 0:	Á¿AÀè$„H„†  £“$1 ² ŒNB˜Diˆ{P 0:	§A"æAÀè$„J¤†‰Ô £“,±(Â ŒNB¸Dk¨ÈˆP 0:	¯Á"#BÀè·E<ÄFlÄFlŒ‚A°i;b`4 mÐ.¥d<4ìˆÑ€ ´»˜FÐo‹x Ú Ú10ƒ6x—ÓúmµQµQ#F‚`Ðð‚A¿-âÁ6lÃ6lcÄÀh@Ú ^R#è½D<ÜÆmÜÆˆÑ€ ´¼¬DÐ{‰xÀÜÀ£A0hƒya‰ ÷ñ¹‘#F‚`ÐôÒAÆCÃŽ‚AÔË_;b`4 m`/µœ+è^)è(ð^ôRØ„á†€<Â€âF 7æ³Ä :ØDML7¤C@Çc‚·
+e‚Çf‚”7a¸!h0˜%p* \"‚è¹K´GÐÃDp€ÃšÀÀpC#`0Ë0Á±Ão‚Ç
+o‚Ó{ 'ÒtCœÐADx#†‚ü ƒ1„~Xê0ÜðÐè„á†À?À`º!8‹HG 7!ÓZ´:a¸! 0˜nÚb˜e8Œ`º!B¡$2 ¾!¤F@Á™%8*6ÁÀ•b–!A¤é=•È€@ú†àd– ¨ØD\ŽY†EY¦B!^"éÂllY‚e bvIfæ¦DAh"énD.d– ¨ÀF_–#‡0¢S@@è4P Î@2 ˆ. <áÈa$‚èBPp!h~ÂpC &`0Ë EÁ@ [Ã@D¿-TCM5Q“a"p“ è·Åj¬‰°&á1l@o ý¶`6Ø<†ˆ N ß­Ñ&D›ˆÇ°ÄI ôÛb5Ü¤p76 9	€~[°Æ›oRÃD0'Ðo‹Ö€“NÈcØ€è$ úmáq‚Ä‰yA@¿-\CN9‘“a"°“ è·ÅkÌ‰2'é1l@w ý¶€:Yè=†ˆ O ß±Q'L¨Ç°äI ôÛ"6ì¤±;6 =	€~[ÈÆ8wÒÃD°'Ðo‹ÙÀ“OØcØ€ø$ úmAyå‰{AŸÀ,ôÀBßpCO¢a" ˜%€z/Q{"íÉ°üI ô^¢6ødâ“a" • è½Dmô	Õ'ÃD*Ð‹Úð“ÊOüdØ€ÌC úoabýI}Áy@ÿ-nT.P¡a"@è¿n„
+*ö1l@é! =˜ÀQÉDeØ€ÔC pnÜf
+'8Wx‹š%* !ò‰f–šÀà`!.f–€¨ „IÆ¤ØANÀ¹@€3äB®(¹@€KÐA‰¹@€cèAnY¹@€1„ÝX‘1„Ù`‘C˜9!€1„zÐ•ræ2"ˆ~!”I0ËPY¾q>HÑ/„!Hƒ ú… ³W*Ñ/„#8å$‚èÂÌ\˜`1Ñ@nÚ²#ˆ. ÌI0Ë€eÃIá!D†€rH 7ôyDŽ ƒÉn°‘€˜%Ðr#ˆ. ,A“;K TFæ`›‘YØ@ÅLƒQ+	„á† dÀ`ºÁ_Š ]~Œ!ôÈÜrÛHÑ+Q	’¢W¬Ì2p[Š¤DÒAô
+ÁU‚^!Ã,Awrð’AdD¯f%8Ÿ°É€ z…0³Ý@…m7PA`›Ãõ
+Á	h ÆpCp;a0Ý ÔG@ï0¦‚úòMvÄÀh@Ú Žn&¸-wî‘Œ“†10ƒ6À#	nÀ!TÃÁØ€Á,ƒ÷ý°“°	[9¹é‡žŒÍØÜÊáHø\?$ô¤lÊfWú!±'fc6f3l@è3 Ã„°#0l@Ã F1 ³ß,C€Á™ôCbOÎælxåD£w¤}’6iÓ+&â¢ýø“µY›pé‡¨°Û°Í°¸Ï ÂiÀ°A0l@Å Ì„ÁpœÀMÜ›”‹7rÓÁ®c¡q.Ã›ý“@nî¦hf¦ˆÀnððfvAÂ'‘@7:TNa¸!ø0è‡D¬ôMßôMúÆöCbVþæoê¥´: C/ý¨•Ð	{I‘©Ü8£“/Ýd ÒÑ—0¶„éìK²AL7¨Ã7¤ë€±”@n\ú!.¬Ã:¬Ó	qiÖ™~HŒ‹ë¸ŽÈôC‚\^çuH&a ¦b'ˆƒé†Øè—Û¸1¡;2I!¹1‘¡;2Y!¹¡¡;i!!˜ÃAï€ÁGxìpCð;`pàÑ{Á°Ãø€Á‡yìpC@>`}QÃ†ù€Átùtú0Ý@•Ï>ÌŒÁ@Æbð”Á@ÅLà†,e0P±ñ†e0PÐb KÌ2”ÀÁê ³g0P±cpº0P1Êœ„.T`Î<ºpEÀpC`d0Ë0»T\³°ûÀ×+¬Á;°Á@Åµ
+k0l0PqÂÜ´‹áþÿÿÿŒ( FAj 02 Z€‘A Œb–à*0IÜ€*fbtÁÈ` bû]p2¨ ROØ€*€ÔÓ’È`–ØÀfÒ@XŠ1ÇP6ÁõáÐ
+.ÄÃðM¿”½¡àBÌ1Aßô¡ù
+.ÄÃ„Î,ÁÐ+\ˆ9¸	\ˆXáBÌ1é+\ˆ9!0j…1Ç ©3K°² ¥ þ1†ØÐ‚Ð:cëŒ!®3K`Ô #‚èÂL7¿p\€‘Aô‚é†€Ø‚Aä 02 ˆ~!¤A0Ý¤C<Pp! FÑ/7¦w°
+.Ä,4áT¡íq 
+³¡@¾0BáÿÿÿÿÐNÀ0ÜìÌ2´Á€yf@¸Á,ÌAjd@³r4Ñw;èˆÐw<Ø‡Ðw=(Ø‡Ðw>8Þ‡ÐoÞá£„øhØ€ è·Eïô‘ÒGó3l@G ôÛÂwühñ#ù6 # úmñ;ÄüýA ³nÐ„Phº€¬¡Ã*P º€P¬¡Ç*P úm‘>©d¥R* ý¶PUºT	„†ˆà€~[¬Ï*a«ô?ÃD`@¿-Ø‡•2V
+¡a"(`–ÀnÉ€ º€ ¡Â	Q º€@œ¡†
+Q ²¢ßøƒK.áÒ°$Ðo‹üÉ%!—^hØ€ è·…þèÒ K.4l@G ôÛbv‰Ø%6 # f	ÜàxADà‚ºâ„·‘ÜFŽ(™%°ƒ
+ÿÿÿÿ€Ÿ†á† ¥À`–!ì ¨ T5 ¢.¸›¹Ànä„º‘#Üf.h™e¸> ‘Y<Øƒ°¸b3H º€0+áŠ¿¢·P .È€ º€°+áš±€¢¿P ò"ˆ~[ä?üÄOÃDð@¿-t¨Ÿ„~š£a"` ß;äOƒ?ÉÑ°$Ðoú'âŸèhØ€Œ è¹P„. ˜‹D@èº@„. ¨‹C@è·¡TƒR(5l@H ôÛ¢ŒRÊI©?6 ‚# úmaF*õ¨” ý¶8£•‚V
+”†ˆ €‚èB»„#ƒÞ¢ñP ü2 ˆ. ÔK@@86È€ º€/¡ßv´S`°S;5l@N ôÛâŽx*xJ–†ˆ`	€~[àQO‰AOÅÒ° Ðo‹<ò©1ð©Y6 ‚" fò@hãîÀ ‚èB¿\ˆ#Î2 ˆ~!„L@Á…86 ‚èBÉ\ˆcf2 ˆ~!¤L@Á…è¿…)½¼Õ[# ý·8%¸ª¸2§a"X ÿ¨WvWå4l@ˆ ôß"•äêäêœ†ˆ €Y‚:8[ø›¹ ä‚V€¢_3Pp!úoKyåy•WÃD @ÿ-bI¯þ@¯àiØ€è¿…,í(ìÕ;! ý·˜%¾
+¾Š§a"(`– Tg.p!¹@à’x®\g.8!¹€ ‚èÛ„$‚è½Ä8¥VZÃD0@Ü¦ @ ô^¢œX‹`­a" ‚è‚Û„ÞK l!°5l@B dCýBp›€‚Ñƒ	u¢-†¶†ˆ@€Y‚:˜eèP`‘|‚èßLnß}À-
+Bß~€)
+Bß
+€)
+Bß˜)
+BòAôÛÂŸÂ+¯ð6 ‚$ úmñOâ%ˆN ý¶ ©ñÆë¦†ˆà€~[„yä•SÃD`@RÊ`rûÎ¤ÄyQ úÎ0¬ÄOQ úÎP´ÄOQ úÎp¼„XQ úm±Rïõ¼×{ ý¶`)ø‚àË¬†ˆà€~[´T|EñUVÃD`@¿-\J¾$ù:«a"( Y‚ º€@;A“Ûw† 'ì‹Ðw†A'ÜŠÐw†‚'ÜŠÐw†Ã'âŠÐo‹œò/Ï¿ükØ€ è·…Ný×÷_u5l@G ôÛb§@@Œ®†ˆÀ€~[ðTˆ…AˆÙÕ°0Ëàp'™Ñ/„ß	2¨Ü8gQb\ˆ8iÑW\ˆ8kÑW\ˆ8mZ\ˆþ[U‹µA‹µØ° Ð‹²r17p1Ò6 ‚C úoaV/ö/6ZÃD`@ÿ-Î
+Æà ÆJkØ€
+˜%¨ƒ£‹šÒ2 ˆ~!ÀO@Á…è¿E[Ù˜Ø˜  ý·p«»ƒk­a" ÿo…cx€c¬5l@„ ôß®r,rÌµ†ˆ €Y‚:¸¾8£9¿8£9Á. ‚è	„ä‚è½Ä^…YfÃD0@L¨ @ ô^¢¯ÈŒ ³a"à¿€¢'P z/Zi–¤Ù°pOh@Ñ/
+(¸=˜ -7sÜlØ€˜%¨ƒY†Q…R¨ Î@À;…¢ß±gAœÅaŽ¼‚9ë·mÑAgêE@˜cöê·ÅmÝÙqgëE@˜c‚öê·…né™¢gïE@˜c‚ø10–ÿ°…×FŽ%ÁÂ?`Aö‚ ï½õgƒü‡ˆ! œþ†‚vƒY†Q…`ŽÁ¼b…Ôæ‚YÙ¯9† VôkŽ!¸þ10–ÿ˜…Ý.UNî2 ˆ~!°NåÎ”Â,Ã-àBÛT <ŒÂ‹ØBÑo‹÷zµàÕ^0Çà_A¬õÛB¾d5£@ Ì1ŠõÛ¢¾jí¨µ£@ Ì1ÁŠõÛ¿pMÁµ£@ Ì1Á‹K‚…ØBû³´`
+"Óo‹üâ5‡×x0Ç°b¯õÛ‚¿~-úµ£@ Ì1ÁõÛâ¿Ä7£@ Ì1ŽõÛBÄÊí*7£@ Ì1õÛbÄÐMC7t£@ Ì1ÜX ný¶0±uëÖ-Ì(sC0fý¶H1ww3
+ÂÃY¿-X,ÞÆ ÞÌŒ0Ç0hÖo£73 7z£@ Ì1ŒY`oý¶˜±{Kƒ{k3
+ÂÃ¼Y¿-lLßØ@ßÜŒ0Ç0pÖo‹ë·7è79£@ Ì1õßâÆ@N@ä(¸sdˆ\ÿ-tläê`äòŒ‚1Ç0{Ö‹39<09=£àBÌ1ŸõßÌRnRÎÏ(¸sC j½—03–ó–£@ ô^ÂÌ\\ŽÐ{‰4ƒ9Q€9
+B&ÐLæHAæ(¸#Æ‚`á¶`†AŒK‚… ‚Èˆ±„ Xø*¼a°O³¬p
+x3Ë°
+¨`7³ª
+®“Dâˆÿ,+ŒK‚…Ì†øÏ°y#þ³¬0PR1©À¨‚°
+Œ)”TJ*@ª ­d
+%f@¥¢
+Ô*P¦0b`,!þ
+xˆÔˆ±„ Xø*äaðŒK‚…ØÂb0Ë ­`:³¯à
+g5Ç`j…Ø2§&kÓ1Zþ*ˆÿƒªf7È¬š­MGÇiùÇt«s…Aþ³´0ÇðjÏÚ2°¶kÈ‚øÏ1ÈÚãvƒÁ¬ùÚtÃ¬z…þ³´0Ë@±ð:³³ q5Çàkc wƒÁ¯‰ÛtC(ë3b`,!þa§¸AøÏ1ìšvwƒ¯ÛtD°á– ˆÿÃ¯m{7È€ÛºMGoùÇtC¸¨…E þ³´0b`,!þ
+¹üÔC¹¡7È˜[¼!:á?Ç€nh@zƒAºÑøÏ1¬œÞ CÀn÷6ÝÀnÁl!€ÿ,-Ô˜x”xÀ‚(¸¼&Â,Ì2ØB-¼„10–ÿ˜pñŸ%°…
+3j¡…ƒc	A°ðX Ç %‚žKÀ[ìDìQP10ÀØ€‚À“ˆÁ †‚ÿƒYR(…` XnÁRÈ€ ú!Ñn¸‡{ ã?‚ab ``¸!ÀÁ fpá‚Y]È…0¨ –\àC2 ˆ~HÌÛïý^@À¸`”`Ø€‚Àân~0 ƒY]È…àÈ‡œ ÉGnÚfÊà‚
+ …0¿2¨Øx3ý+ƒŠ™àÍ ô¯*0Â@ÿÊ€n2ÃÁû…ÁpƒaKd0Ýäœ0ËÀ`ôCbäÞïýÞ/ácû!Qrñg×	““?ù3»~HœÜüÍÚ%ÝUn‚ú[»n2Øý±]ÛÿÚ.}‰ ú!ñrú§ú×	˜Û¿ý‹»~HÄÿñÜõCBæú¯ÿä.ý‰ îÕø0¸ƒµ:ä^Íƒ;X»Ã@îÔ@1¸Cµ<$Á«É7@q„áaƒ0nX0 ƒá†°jÁ ¦V0hÖiºƒI˜nZ0¦Z,ïfl¸áÍd0 ƒ³1Ûá†€08«±½`Øá†à0¸Û±nr0 ƒá†;ÓÁ †ŒÀ`– *0_à…ï'*fBx!%~b b3^(‰Ÿ¨ Ôö1ø‰zJ. -¸ ƒn@Ž¦@0²é† õØi–áÆA¨ hALQ‡Š+Ä!Æa â*q(‡q¨¸BAra*®>‡V‡v!<½ÀÈ€  FAq 02 ’€‘AÌ˜Ã,8„ÃCØ…˜c ½@ƒ~!héGÁ…˜c‚õëB§~\ˆ9†!`¿~!€ûQp!æ† þf	ÄXáBÌ1ü^Ð‡¥Â…˜c‚ú£T¸sBP¤
+bŽAðo–@2dA!üc!(Å`Aà¿1„aÿÆˆþ›%ðÒ€‘AôA‚é†€Ô€‚A½ 02 ˆ~!ÜA0Ý„ÃPp!( FÑ/>¦s 
+.•ÀÈ€ ú…
+ÁtC°y@Á…˜%ð…& ˆB,´ba–Á$â!F(üÿÿÿ x2 †á†@%0˜e s* R|(‡Y†sp\È€ fÖFk–!ÔAúÎ
+Á8„¾3¬Â°ƒ¡ï­Pì`@@è;Ã+>P úm±‚Á:É:ë ý¶`Á€…1†ˆà€~[´`ÐŽÁÒŽAÃD`@¿-\0pÇ€qÇ`ƒa"(`– úmñ‚Á;Í;ïÁ<Ðoà1pà10Ã`Ø€è1€~[Ä`ÁAÃDPA ôÛBy yÎ06 {`– fØ¡d¡¸u!P
+BU @ t¡P
+BU @ ôÛ‚~4~ø16 $ úmÑƒA?[?sÁ ý¶ðÁÀÎ9†ˆÀ€~[ü`ðA÷ÃDPÀ,A9ôÛ<@26 ’ ßa„dð…dp‡Á°”d ý¶Ã@$0ÉÀƒa"0É  úm1†ÁHa0’ÃDp’A Ì”Ã,Ã;ÀÃ8ÜàŸd@]@X‡€ÐÁ
+B?(]@0B1 @ dD¿-Þ0xÉ xÉà%ƒa"H ßpÀd Àd`ŠÁ° Ðo‹8b2b2(Å`Ø€Ž è·…22œb0l@F Ì”CÊAôÛ‚ššh26 œ ßuÔd Ôd°ŠÁ°äd ý¶°ÃÀ&ƒÁ&U†ˆ@'ƒ è·Å77°b0l@;À,A9¤>ÄéCúÉíúÉñÃïÉ,Á<T	~*ìÃÂøäÃBKI,"á§>ø©pKH, 1P%€ª°	?è{I,%±ˆ¨
+ø ªÂ=€ª *€Ä@• ªÂ>üÀïA>ˆª@KI$"!ª>ˆªp¢*„„¨
+ 1B±ÿÿÿÿÀ›07ª€Á,ƒIÌC0P!ˆ|Š<T$Äƒ"‚Éñ ÈÃ@ ºB<(òpÁýÍö''ÔŸá~sAûÉ,=ô¨Í2Ôƒ>¨Ä,ƒ=äÃN\Á¤@]@˜¹€pÅÿAÑ„›(—Ðd@]@Ø¹€pÍ]@Ñ„Ÿ(yD¿-r1àË àË€/ƒa"x ßºôe ôe0Á°0Ðo‹]ü2ü2Ç`Ø€’ è·/Ðc0l@F tì(
+BÌN¢@ tí 
+BÔÎ¡@ ôÛ‚ÔÔP36 $ úmQŽAjNjÿÁ ý¶0Ç@5ƒG5†ˆÀ€~[œc°š´šHÃDP@†At¡í
+Â‘AAt!î
+Â¡l@Ñ„º(ÇµDò. @ ôÛÂƒÝÀ`7ƒÝ†ˆÀ	€~[ÜcÀ›Aðf “Á°,Ðo|z3ƒÞb26 $ úm‘ocà›ÁLÃDP …m †‚ñÀ`–áð!¸<0È€ ú…ðwâˆ4 ‚èÂè\ˆCÌ2 ˆ~!œ^@Á…8&= ‚èÂê\ˆþ[ dŸÄgŸÁ°8Ð‹”ä3¸ùÐ26 ‚E úo¡’Á|x0ŸÁYÃD€@ÿ-V2 Ï è3HË`Ø€
+˜%‡³æ=ä‚W€¢_µPp!úo!“Á~ °ŸÁ~ÃD @ÿ-f2àÏ ø3Ë`Ø€è¿MýˆBq! ý·¨ÉÀ?ƒQðÏ`.ƒa"(`–@<X0˜`1xn€Å@.ð¸ò€Á`.HÅ@.ðHƒ º€à~!Í z/Q–ÁŠÁŠÃD0@à¯ @ ô^â,†ˆ@€d¢ðP z/¡–ŒˆŒÃD @6Ñ/ø(¸=˜`ËÀFÆFƒa"`–@†ìAG0Hz ˆY†}à¡ßvähäh£Á°ôh ý¶¸Ë@GAGØ†ˆÀGƒ è·^;;¼f0l@?@¿-ò2àÑ€àÑ 6ƒa" Ó  úm‘—AE=A˜Ðo½|40|4 Í`Ø€Ä4€~[ìeð£Áñ£ÁlÃD0¦A ôÛ‚/00j36 2 ß|„i„i¦Á°”i ý¶èË@LELÜ†ˆÀLƒ è·…_c,cÜf0l@g@¿-þ2 Ó€!Ó 7ƒa"@Ó  úoÁ—A™M™eAkÐ‹¾Ì4pÌ4àÍ`Ø€\3€þ[øep¦Ás¦ÁnÃDðš ôßâ/4 4z36 Ø`–@z/1šAšQšÃDÐ¦A ô^b45$5†ˆÀMƒ è½ÄhkLkÁ›Ðƒ	ÑØ4 Ø46 Ú`–@füa$Zd¸a%à4 ƒY†‰ Q‚ º€PƒAÁäö!È‰8(}gv"=
+BßŠžHÏ€Ðw†ã'Ø3 @ dMD¿-n3ÐÓ ÐÓ@Oƒa"H ß¸ìi ìiŸÁ° Ðo‹Üø4ø4€Ï`Ø€Ž è·…n}}Èg0l@F tA(ƒÉí;C€ P úÎ0¨~„¾3lŸ¡ï‡[ìg@@è·y¨<¨ j0l@H ôÛ¢<ƒT Tþ36 ‚# úmažª‘ªþ ý¶8Ï`UiU†ˆ €,‚èBA“Ûw†à.^5 @ ôaÈ‹(}g(öâD
+BßŽ¾PÑ€Ðoùn5ðn5¸Õ`Ø€ è·Å|¸|¸¸h0l@G ôÛ‚>ƒ\À Wƒ†ˆÀ€~[Ôg «Aèjð¢Á°@=„á†àW0˜e ‰’.¢_zTnÔ ×€‚Ñ‡A5p4 àBtÀ¡`(¸p8\cG
+.Dÿ-þ3@×àÐ5@×`Ø€è¿ˆéÀAº?Á! ý·Ñ@]ƒ8P×ÀGƒa"0 ÿ"¬k ë€i0l@… ÌÈÃµ
+>si@Ñ/„U
+.Dÿ-P4ˆ× â5ˆ×`Ø€è¿EŠòä¼hÁ  ý·PÑ`^=˜×àLƒa"  ÿ+Ðk°ô¤i0l@… ÌÈÃÙŠHs·"’ÁœAtáƒ€·A½—°Ñ€_ƒ€_ƒa" á„ÞKàhð¯ñ¯Á°pKn@Ñq
+Bï%x4 Ù !Ù`Ø€„ ¸‡7 ‚èÂ8¢?¤là¤l0l@‚ ÌÈÃpÃy´l y1Ë@%!ôÛ"M––X66 ˜ ßj´l ´l0ªÁ°Äl ý¶XÓÀeƒÁeQ†ˆ@fƒ è·›//j0l@3@¿-Ø4€Ù €Ù fƒa" Ù  úmÑ¦AÌFÌ§AÍÐo7d68d60Õ`Ø€l6€~[¼i0³2³ªÃDp³A ôÛâMššh66 œ ßpÔl Ôl°ªÁ°äl ý¶ˆÓÀfƒÅfU†ˆ@gƒ è·…œ707°j0l@;@ÿ-Þ4ÀÙ ÁÙ gƒa" Õ@ úo§AÎNÎ¯A¨Ð‹8t6xt6pÕ`Ø€D5€þ[Èi°³´³¬ÃD0ª ÌÈCï%ì4àÙ âÙ`Ø€À6€ÞKØiÐ³Ô³Á°„m ½—°ÓÀgƒÉgƒa"Û  z0Q§ÁÏÔÏÃDpª ÌÈÃ,Jœ„]Àœ„è&‘AôÛBT±±Ä6 @ Ì1ÄjmÐo‹RÊ6 Ê6ØÕ€0Ç0½ôÛU´´x5 @ Ì1¯ý¶XÕ`memp(sC ®Áˆ±„ Xø‡-€rŒK‚…ÀÂ(AÐwWà6x(¨à?l@Á à¿7¾€Á,JœD0Çp«ËÔm0ÇÀ»sÌ¬k0ÇÐL»#Æ‚`á³ÀÊA@ñ„á†Ào08žÙÙ€§x6@1¸°áßà2 ˆ~!„bd`¹³*1ËÀ=!†Á@`‚J¼ÈNd@ý¶ ×€tƒ€tÒ(só¦ôÛâ\ƒÓˆÓú5 @ Ì1Á¿ý¶P×@uƒCu(sC ²A¿-Ú5hÝ@iÝ@d
+ÂÃl0b`,!þaâ³9±V¿-Ü5ˆÝÀ‰Ý v
+ÂÈÁìý¶ˆ×€vƒˆv•(sCÀ²A¿-è5¸Ý€ºÝ`e
+ÂÃ´lÐo‹{t7¸t7xÙ€0Ç01ôÛ_ƒÞ´Þz7 @ Ì1°lünÐo‹}À7èÀ7°Ù€0Ç08ôÛÂ_ƒñÀ`|ƒ›(sC³A¿-B60ß`Ì7ØÙ€0Ç0=ôÛ¢dƒôÌ }ƒô(s8ëôÛeöÒ€}±(sC@¶A¿-V6xß€Þ7Û€0Ç0eôÛÂeùÞ@~ƒ³(sC¶Aÿ-X6¨ß@ê7¨ß€‚1Ç³Ap¿Aÿ-^6Àß ð7pÛ€‚1Ç0pôßBfƒýð`ƒ·(¸sC·Aÿ-j6ðß`ü7˜Û€‚1Ç0uô^bgƒü „
+Bï%v6á F8 @ ô^ÂgƒD¡„
+B&z68á€N8 àBŒK‚…ØÂNm0b`,!þ
+c #Æ‚`á¨@Ö|³1Áø3Ë -a?³/áõ“Dâˆÿ,ALŒK‚…ÌBX†øÏÄ+$þ³11PR1.Á¼„ ÌJ”TŠK@/Á´%f@¹òLP+1b`,!þ
+mÜg0b`,!þ
+n<#Æ‚`á¶€ÖÌ2Ô„L˜Ð,MÌs{72|œn0xøª þs;2 ¬n0|øÇtCèšà?Ks¤<`2¥Àn€,ˆÿÃéÏƒê³L7 n¼i€þ³91Ë6ñB³8qfÌ1Ìn0g2´Ün0Ý
+K‚…Ø_îBþs°hl2±ðn0l­øøÏ1Ðn°Áq0ÈÔn ¾ÁtDÀÅjàÓ¶}`€ÿ,ANŒK‚… ‚k4Ì1ènØq0Èìn`¾¢Cþs½ AƒïéàˆÿøhÀÇÁ C¾ûÓá¨ €ÿ,ANÔ˜x¨xÔ„(ÌÐvNÌ2ì„N„10–ÿ˜…ÚñŸ%Ø‰
+3tÉ‰ƒc	A°ðXÈí€%‚žK”o`ÊÁH˜r@AÅÀ` ÿab OÂ¤nè9 ƒY†”P‰` XxG‡”È€ ú!!¾A+­ Œæ2€ab ‹–``¸!hé fz‚'‚Y†Ÿð‰T¨ Ÿ0Ó¡'2 ˆ~H o@Ë- ã¼`Ø€‚À‚¦nh: ƒY†Ÿð‰ ûÈ¦nF3 ƒY°è…€t<ÃÁ/`@$„á† œ0˜nðã fÂB,‚ûÍà§½Â3P4€Y³¨ *²@Õ,2 ˆžKpPÎAPÎcÄÀpB,üCø;†ˆ! Âó@ 7ì€Á,YŒEÐwÔ90(¨#†‚`áªâA0l@Á Ì*jÀÀpC€ÓÌ2¼…X#†‚`à
+%´uÀÖÁpÃ{mÁ,Ã[¤E0PˆëZd@=—ˆá@žƒ@ž
+*”Ü@Ñ+„:‚a"(`–-ÎÂeƒ^!Ðg ôÝá†ƒ|
+*Æ°10K€¸àu ÃY`0ËPfT ƒZè¯Pìu€Ãed@°„á†€¤0˜%X‹Ã	A0p@;øë`¸¡ðë€fÞ"-‚
+ e‡´·˜e`·(0 ¸1à2 ˆ^!˜rPP1² ˆ^!¤rPP10 ÀØ€‚˜ep‹¶hz… ¢Ñ+„
+*ü‡ˆ"€Y·@¶nü: ƒYµX‹€Ê=ÃAN`0ËPp­a¸!Øé FŒ%ÁÂ?XÎƒ.GƒÜôF5ØÑ@f	âb ÐÛ.Â€.fæB.Š¢ï|øtPP1f	è	C.0 ‚èÂ#‚˜% ‹
+B˜I.2*c. ¹ðòÇ –ð10–ÿPQ‚¾;¤r°ÖA1l@Â  ”Þ7·€Á,C]ÄE0Ü@«Á{apý¸tÀÓ/Â,ƒØE0Ü £|`pqÄw ·«Áœ’éD¿ú9²W‚è‚`¯²È@Ñ/„!8qj7¢_HÐ/„ TƒŒ×€ º€pÒA€æÔq Äíq0ÆA"@‚mPgÆÁˆº4ìƒ=ï v0Kp v±^ýAö„á†Àµ0˜nî9Øfö/bù@ 7±€Á,ƒ^äEAô\âØØ(¨³{	ÈÀ` D¯f:(¨³{1ÐQ1y!èˆwAh„á†€·0˜eè¾2"ˆ¾;äs°ÛA@AÅ@#ÿY‚¾¨¨¾pö‚X>ÃÁx`0ËàñÐÊa¸!(ï ¦À<èß ˜n05æ0Ü¤w Óeà®AÐ4¦z90ó`˜n8óÀ—â1úù@ 7ð€•} †ùÀ`º!Øé`˜eø‹Ñ†I 7ˆ» ··sÚ@2 ˆ~!<"ƒ
+¼Fä2 ˆ. DaÄÀX@,üh>08Ä¿ üg	Bc ¢@þâ¸<¢_]@Á…È oó¹@ƒ¢_@@10ÿ@±ñÇ& ÿYÑ¨¨„Ðà…¿85hç@2 ˆ~!¬A@Á…È /ä9Ð 2 ˆ. ´A@@10ÿ@¸ñÇ& ÿY‚ø¸X`ç`NÂ9˜évr=°ƒé†pt=¸ƒévv=Àƒé^Þ9Èƒ3™nðõàƒ=8$épÎ9èƒK&Ä!>î‚4Üb6ÞB<NÂA2 ˆ~!ŒB@Á…È /ÌA. È€ º€P
+a–!6JnZ9(€¢8„³àAn
+ ‚èÂ¡= „óîA ‚è‚‚JP¤‚‚@nJ= RAA Ð
+a¸!@õ FŒÁÂ?Pá÷ƒiÄÀX@,üÀ?`ãàd‡VÀàŒc/v¸!xõ fRÃ4‚K˜nb= ƒYÔ8 ¡
+D%ÿY‚Ô@…%Ä– 5:*ë4Ô°Jc £2NCC­4FŒÁÂ?P¡ýƒ;FŒÁÂ?PÁýƒmÄÀX@,üÞ?@ƒY†ÖPg–5V£Â€ÚAA 7¼€Át‰E€þ³²†"þ†‚@nÂ= ƒé†– üg	dc¸á"÷ fdÃ5‚YØxnÄÀX@,üö?Pl‚ðÇ BCA 7é€ÁtCŒR€þ³²1b`, þ
+"( r€TþdâOo(„á† Þ0˜nÀñ@0 À–@6FŒÁÂ?P!Q˜%šJˆ6X1`;hé5ØÀ Äk" ÿY‚Ù¨¨Ù`“Ñ8™xÉ€ ú…0"ƒ
+¼˜ ¹ & ‚èBM„Yð ˜¸qÈ9p ‚è:áÌÁ/äÆ!€¢ç„. ´s€P ÎJCÈ€ ú… ÎA@Á… Zé¢ †‚šÀ€tQô‹‚@np> ƒcA°ðTxCa10ÿ@8ø9¸Ùá†€ç08ãØ†n~> ƒYÜ¨àf‡‚°À`–á6l#H¨Q	Ä– 7PáñŸ%ÀŽÊ²á6,Úè¨ÛÐnC£cA°ðTèCá¤ƒcA°ðTðCa10ÿ@…?Ð`–7rÃ™eØÝ¨0 ÄŸÖQÃÛ`0Ý@ëA`@€ÿ,Ax ¡ˆ?Á£ †‚¸À`º!×ƒ%À€ ÿY‚ðn¸è> ƒY†ðè`–á7|£10ÿ@…UÔ › ü1ˆÄŸðQÃAÞ`0Ýî`@€ÿ,AxŒ‚… ‚,
+8 „?™øÓ?
+a¸! ý ¦Ð=ÐðŸ%cA°ðTÈEAf	Âc ¦ÀƒtCvÃxCòâ70HñÇWÀ–@<**!<Xg4N<Ê<¢_ãPp!2¨À5äð€¢åP fÞc<ÀãæâÍ9¸ ‚è^áì‚Î¹¹ ‚èÂ]¡} „ó‹=äð"€¢_z\*KA Z
+a¸!(ÿ H-@o)„á† ý010ÿ@…¦cA°invalid type: string "[Java] JMS(Java Message Service) ëž€?\nAugust 8, 2022\nì´ ë¬¸ì„œëŠ” ê°œì¸ì ì¸ ëª©ì ì´ë‚˜ ë°°í¬í•˜ê¸° ìœ„í•´ì„œ ë³µì‚¬í•  ìˆ˜ ìžˆë‹¤. ì¶œë ¥ë¬¼ì´ë“  ë””ì§€í„¸ ë¬¸ì„œë“  ê° ë³µì‚¬ë³¸ì— ì–´ë–¤ ë¹„ìš©ë„ ì²­êµ¬í•  ìˆ˜ ì—†ê³  ëª¨ë“  ë³µì‚¬ë³¸ì—ëŠ” ì´ ì¹´í”¼ë¼ì´íŠ¸ ë¬¸êµ¬ê°€ ìžˆì–´ì•¼ í•œë‹¤.\nìŠ¤í”„ë§ì€ JDBC APIë¥¼ í†µí•©í–ˆë“¯ì´ JMS APIë„ ì‚¬ìš©í•˜ê¸° ì‰½ê²Œ JMS í†µí•© í”„ë ˆìž„ì›Œí¬ë¥¼ ì œê³µí•œë‹¤.JMSëŠ” ê¸°ëŠ¥ì ìœ¼ë¡œ ëŒ€ëžµ ë‘ ë¶€ë¶„ìœ¼ë¡œ ë‚˜ëˆŒ ìˆ˜ ìžˆëŠ”ë° ë©”ì‹œì§€ì˜ ìƒì‚°(production)ê³¼ ì†Œë¹„(consumption)ì´ë‹¤. JmsTemplate í´ëž˜ìŠ¤ëŠ” ë©”ì‹œì§€ ìƒì‚°ê³¼ ë™ê¸°ì ì¸ ë©”ì‹œì§€ ìˆ˜ì‹ ì— ì‚¬ìš©í•œë‹¤. Java EEì˜ ë©”ì‹œì§€ì£¼ë„ ë¹ˆ(bean) ë°©ì‹ê³¼ ìœ ì‚¬í•œ ë¹„ë™ê¸°ì ì¸ ìˆ˜ì‹ ì— ëŒ€í•´ì„œ ìŠ¤í”„ë§ì€ ë©”ì‹œì§€ì£¼ë„ POJO(MDP, Message-Driven POJOs)ë¥¼ ìƒì„±í•˜ëŠ”ë° ì‚¬ìš©í•˜ëŠ” ë‹¤ìˆ˜ì˜ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆë¥¼ ì œê³µí•œë‹¤.org.springframework.jms.core íŒ¨í‚¤ì§€ëŠ” JMS ì‚¬ìš©ì— í•µì‹¬ì ì¸ ê¸°ëŠ¥ì„ ì œê³µí•œë‹¤. ì´ íŒ¨í‚¤ì§€ì— JdbcTemplateê°€ JDBCì— í•˜ë“¯ì´ ë¦¬ì†ŒìŠ¤ì˜ ìƒì„±ê³¼ ì†Œë©¸ì„ ë‹¤ë¤„ì¤Œìœ¼ë¡œì¨ JMSë¥¼ ê°„íŽ¸í•˜ê²Œ ì‚¬ìš©í•˜ê²Œ í•˜ëŠ” JMS í…œí”Œë¦¿ í´ëž˜ìŠ¤ê°€ ìžˆë‹¤. ìŠ¤í”„ë§ í…œí”Œë¦¿ í´ëž˜ìŠ¤ì™€ ê³µí†µë˜ëŠ” ì„¤ê³„ ì›ë¦¬ëŠ” ë” ì„¸ë ¨ëœ ì‚¬ìš©ë°©ë²•ì„ ìœ„í•´ì„œ ê³µí†µë˜ëŠ” ìž‘ì—…ì„ ìˆ˜í–‰í•˜ëŠ” í—¬í¼ ë©”ì„œë“œë¥¼ ì œê³µí•˜ê³  ìž‘ì—…ì„ ì²˜ë¦¬í•˜ëŠ” ë¶€ë¶„ì„ ì½œë°± ì¸í„°íŽ˜ì´ìŠ¤ë¥¼ êµ¬í˜„í•œ ì‚¬ìš©ìžì—ê²Œ ë§¡ê¸°ëŠ” ê²ƒì´ë‹¤. ì´ í´ëž˜ìŠ¤ëŠ” ë™ê¸°ì ìœ¼ë¡œ ë©”ì‹œì§€ë¥¼ ë³´ë‚´ê³  ë©”ì‹œì§€ë¥¼ ì†Œë¹„í•˜ê³  JMS ì„¸ì…˜ì™€ ë©”ì‹œì§€ ìƒì‚°ìž(producer)ë¥¼ ì‚¬ìš©ìžì—ê²Œ ë…¸ì¶œí•˜ëŠ” ë‹¤ì–‘í•œ íŽ¸ì˜ ë©”ì„œë“œë¥¼ ì œê³µí•œë‹¤.org.springframework.jms.support íŒ¨í‚¤ì§€ëŠ” JMSException ë³€í™˜ ê¸°ëŠ¥ì„ ì œê³µí•œë‹¤. ì´ ë³€í™˜ê¸°ëŠ¥ì€ ì²´í¬ë“œ JMSException ê³„ì¸µì„ ë™ì¼í•œ ê³„ì¸µì˜ ì–¸ì²´í¬ë“œ ì˜ˆì™¸ë¡œ ë³€í™˜í•œë‹¤. í”„ë¡œë°”ì´ë”ì— íŠ¹í™”ëœ ì²´í¬ë“œ javax.jms.JMSExceptionì˜ í•˜ìœ„í´ëž˜ìŠ¤ê°€ ìžˆë‹¤ë©´ ì´ ì˜ˆì™¸ëŠ” ì–¸ì²´í¬ë“œ UncategorizedJmsExceptionë¡œ ê°ì‹¸ì§„ë‹¤.org.springframework.jms.support.converter íŒ¨í‚¤ì§€ëŠ” Java ê°ì²´ì™€ JMS ë©”ì‹œì§€ê°„ì— ë³€í™˜ì„ í•˜ëŠ” MessageConverter ì¶”ìƒí™”ë¥¼ ì œê³µí•œë‹¤.org.springframework.jms.support.destination íŒ¨í‚¤ì§€ëŠ” JNDIì— ì €ìž¥ëœ ëª©ì ì§€ì— ëŒ€í•œ ì„œë¹„ìŠ¤ ë¡œì¼€ì´í„°ë¥¼ ì œê³µí•˜ë“¯ì´ JMS ëª©ì ì§€ë¥¼ ê´€ë¦¬í•˜ëŠ” ë‹¤ì–‘í•œ ì „ëžµì„ ì œê³µí•œë‹¤.ë§ˆì§€ë§‰ìœ¼ë¡œ org.springframework.jms.connection íŒ¨í‚¤ì§€ëŠ” ë…ë¦½ ì–´í”Œë¦¬ì¼€ì´ì…˜ì—ì„œ ì‚¬ìš©í•˜ëŠ”ë° ì í•©í•œ ConnectionFactoryì˜ êµ¬í˜„ì²´ë¥¼ ì œê³µí•œë‹¤. ì´ íŒ¨í‚¤ì§€ì—ëŠ” JMSë¥¼ ìœ„í•œ ìŠ¤í”„ë§ PlatformTransactionManagerì˜ êµ¬í˜„ì²´ë„ ìžˆë‹¤.(ì´ ì´ë¦„ì€ JmsTransactionManagerì´ë‹¤) ì´ëŠ” JMSë¥¼ íŠ¸ëžœìž­ì…˜ ë¦¬ì†ŒìŠ¤ì²˜ëŸ¼ ìŠ¤í”„ë§ì˜ íŠ¸ëžœìž­ì…˜ ê´€ë¦¬ ë©”ì¹´ë‹ˆì¦˜ìœ¼ë¡œ ì–´ë ¤ì›€ì—†ì´ í†µí•©í•  ìˆ˜ ìžˆê²Œ í•œë‹¤.\nJmsTemplate í´ëž˜ìŠ¤ëŠ” JMS ì½”ì–´ íŒ¨í‚¤ì§€ì˜ í•µì‹¬ í´ëž˜ìŠ¤ë‹¤. JmsTemplate í´ëž˜ìŠ¤ëŠ” ë©”ì‹œì§€ë¥¼ ë³´ë‚´ê±°ë‚˜ ë™ê¸°ì ìœ¼ë¡œ ë©”ì‹œì§€ë¥¼ ë°›ì„ ë•Œ ë¦¬ì†Œë¥´ë¥¼ ìƒì„±í•˜ê³  ì œê±°í•˜ëŠ” ì²˜ë¦¬ë¥¼ í•´ì£¼ë¯€ë¡œ JMSì˜ ì‚¬ìš©ì„ ê°„ë‹¨í•˜ê²Œ í•´ì¤€ë‹¤.JmsTemplateì„ ì‚¬ìš©í•˜ëŠ” ì½”ë“œëŠ” ê³ ìˆ˜ì¤€ì˜ ê³„ì•½ì„ ëª…í™•í•˜ê²Œ ì •ì˜í•´ì£¼ëŠ” ì½œë°± ì¸í„°íŽ˜ì´ìŠ¤ë§Œ êµ¬í˜„í•˜ë©´ ëœë‹¤. MessageCreator ì½œë°± ì¸í„°íŽ˜ì´ìŠ¤ëŠ” JmsTemplateì—ì„œ ì½”ë“œë¥¼ í˜¸ì¶œí•´ì„œ ì œê³µí•œ Sessionì˜ ë©”ì‹œì§€ë¥¼ ìƒì„±í•œë‹¤. JMS APIì˜ ë” ë³µìž¡í•œ ì‚¬ìš©ì„ ìœ„í•´ì„œ SessionCallback ì½œë°±ì€ JMS ì„¸ì…˜ì„ ê°€ì§„ ì‚¬ìš©ìžì™€ Sessionê³¼ MessageProducer ìŒì„ ë…¸ì¶œí•˜ëŠ” ProducerCallback ì½œë°±ì„ ë…¸ì¶œí•œë‹¤.JMS APIëŠ” ë‘ ì¢…ë¥˜ì˜ send ë©”ì„œë“œë¥¼ ë…¸ì¶œí•˜ëŠ”ë° í•˜ë‚˜ëŠ” ì „ì†¡ëª¨ë“œ, ì¤‘ìš”ë„, ì„œë¹„ìŠ¤í’ˆì§ˆ (QOS, Quality of Service)ë¡œ time-to-liveë¥¼ ë°›ê³  í•˜ë‚˜ëŠ” QOS íŒŒë¼ë¯¸í„°ë¥¼ ë°›ì§€ ì•Šê³  ê¸°ë³¸ê°’ì„ ì‚¬ìš©í•œë‹¤. JmsTemplateì— ë‹¤ìˆ˜ì˜ send ë©”ì„œë“œê°€ ìžˆìœ¼ë¯€ë¡œ QOS íŒŒë¼ë¯¸í„°ë¥¼ ì„¤ì •í•˜ëŠ” ê²ƒì€ ë‹¤ìˆ˜ì˜ send ë©”ì„œë“œì˜ ì¤‘ë³µì„ í”¼í•˜ê¸° ìœ„í•´ ë¹ˆ í”„ë¡œí¼í‹°ë¡œ ë…¸ì¶œëœë‹¤. ë¹„ìŠ·í•˜ê²Œ ë™ê¸°ì ì¸ receive í˜¸ì¶œì˜ íƒ€ìž„ì•„ì›ƒê°’ì€ setReceiveTimeout í”„ë¡œí¼í‹°ë¡œ ì„¤ì •í•œë‹¤.ì¼ë¶€ JMS í”„ë¡œë°”ì´ë”ëŠ” ê´€ë¦¬ìƒ(administratively) ConnectionFactoryì˜ ì„¤ì •ìœ¼ë¡œ ê¸°ë³¸ QOS ê°’ì„ ì„¤ì •í•  ìˆ˜ ìžˆê²Œ í•œë‹¤. MessageProducerì˜ send ë©”ì„œë“œ send(Destination destination, Message message)ë¥¼ í˜¸ì¶œí•´ì„œ JMS ëª…ì„¸ì„œì— ë‚˜ì˜¨ ê²ƒê³¼ëŠ” ë‹¤ë¥¸ QOS ê¸°ë³¸ê°’ì„ ì‚¬ìš©í•˜ê²Œ í•  ê²ƒì´ë‹¤. ì¼ê´€ëœ QOS ê°’ì˜ ê´€ë¦¬ë¥¼ ìœ„í•´ì„œ JmsTemplateì€ íŠ¹ížˆ isExplicitQosEnabled í”„ë¡œí¼í‹°ë¥¼ trueë¡œ ì„¤ì •í•´ì„œ ìžì‹ ë§Œì˜ QOS ê°’ì„ ì‚¬ìš©í•˜ë„ë¡ ë˜ì–´ì•¼ í•œë‹¤.\nNoteJmsTemplate í´ëž˜ìŠ¤ì˜ ì¸ìŠ¤í„´ìŠ¤ëŠ” ì„¤ì •ë˜ê³  ë‚˜ë©´ ìŠ¤ë ˆë“œ ì„¸ì´í”„í•˜ë‹¤. ì´ëŠ” í•˜ë‚˜ì˜ JmsTemplate ì¸ìŠ¤í„´ìŠ¤ë¥¼ ì„¤ì •í•´ì„œ ê³µìœ ë˜ëŠ” ì°¸ì¡°ë¡œ ì—¬ëŸ¬ í˜‘ë ¥ê°ì²´ì— ì•ˆì „í•˜ê²Œ ì£¼ìž…í•  ìˆ˜ ìžˆë‹¤ëŠ” ì˜ë¯¸ì´ë¯€ë¡œ ì¤‘ìš”í•˜ë‹¤. ì¢€ ë” ë¶„ëª…í•˜ê²Œ JmsTemplateì€ ìƒíƒœë¥¼ ê°€ì§€ì§€ë§Œ(ConnectionFactoryì— ëŒ€í•œ ì°¸ì¡°ë¥¼ ìœ ì§€í•œë‹¤ëŠ” ì ì—ì„œ) ì´ ìƒíƒœëŠ” ëŒ€í™”ì‹ ìƒíƒœëŠ” ì•„ë‹ˆë‹¤.\nJmsTemplateëŠ” ConnectionFactoryì— ëŒ€í•œ ì°¸ì¡°ë¥¼ í•„ìš”ë¡œ í•œë‹¤.ConnectionFactoryëŠ” JMS ëª…ì„¸ì— í¬í•¨ë˜ì–´ ìžˆê³  JMSì™€ ë™ìž‘í•˜ëŠ” ì§„ìž…ì ìœ¼ë¡œ ì œê³µëœë‹¤. í´ë¼ì´ì–¸íŠ¸ ì–´í”Œë¦¬ì¼€ì´ì…˜ì´ ConnectionFactoryë¥¼ JMS í”„ë¡œë°”ì´ë”ì˜ ì—°ê²°ì„ ìƒì„±í•˜ëŠ” íŒ©í† ë¦¬ë¡œ ì‚¬ìš©í•˜ê³  ë‹¤ì–‘í•œ ì„¤ì • íŒŒë¼ë¯¸í„°(ëŒ€ë¶€ë¶„ì€ SSL ì„¤ì •ì˜µì…˜ ê°™ì€ ë²¤ë”ì— íŠ¹í™”ëœ ì„¤ì •ì´ë‹¤.)ë¥¼ ìº¡ìŠí™”í•œë‹¤.EJBì—ì„œ JMSë¥¼ ì‚¬ìš©í•˜ëŠ” ê²½ìš° ë²¤ë”ê°€ JMS ì¸í„°íŽ˜ì´ìŠ¤ì˜ êµ¬í˜„ì²´ë¥¼ ì œê³µí•˜ë¯€ë¡œ êµ¬í˜„ì²´ê°€ ì„ ì–¸ì ì¸ íŠ¸ëžœìž­ì…˜ ê´€ë¦¬ì— ì°¸ì—¬í•˜ê³  ì—°ê²°ê³¼ ì„¸ì…˜ì˜ í’€ë§ì„ ìˆ˜í–‰í•œë‹¤. ì´ êµ¬í˜„ì²´ë¥¼ ì‚¬ìš©í•˜ë ¤ë©´ Java EE ì»¨í…Œì´ë„ˆëŠ” ë³´í†µ EJBë‚´ì˜ resource-refë¡œ JMS ì»¤ë„¥ì…˜ íŒ©í† ë¦¬ë‚˜ ì„œë¸”ë¦­ ë°°í¬ ë””ìŠ¤í¬ë¦½í„°ë¥¼ ì„ ì–¸í•˜ë„ë¡ ìš”êµ¬í•œë‹¤. EJBì—ì„œ ì´ ê¸°ëŠ¥ê³¼ JmsTemplateë¥¼ í•¨ê»˜ ì‚¬ìš©í•˜ë ¤ë©´ í´ë¼ì´ì–¸íŠ¸ ì–´í”Œë¦¬ì¼€ì´ì…˜ì´ ConnectionFactoryì˜ ê´€ë¦¬ëœ êµ¬í˜„ì²´ë¥¼ ì°¸ì¡°í•œë‹¤ëŠ” ê²ƒì„ ë³´ìž¥í•´ì•¼ í•œë‹¤.\ní‘œì¤€ APIì—ëŠ” ë‹¤ìˆ˜ì˜ ì¤‘ê°„ê°ì²´ì˜ ìƒì„±í•˜ëŠ” APIê°€ í¬í•¨ë˜ì–´ ìžˆë‹¤. ë©”ì‹œì§€ë¥¼ ë³´ë‚´ë ¤ë©´ ë‹¤ìŒì˜ â€˜APIâ€™ê°€ ì‹¤í–‰ëœë‹¤.\nConnectionFactoryì™€ Send ìž‘ì—…ì‚¬ì´ì—ëŠ” ìƒì„±ë˜ê³  ì†Œë©¸ë˜ëŠ” ì„¸ê°œì˜ ì¤‘ê°„ ê°ì²´ê°€ ìžˆë‹¤. ë¦¬ì†ŒìŠ¤ì˜ ì‚¬ìš©ì„ ìµœì í™”í•˜ê³  ì„±ëŠ¥ì„ ë†’ížˆê¸° ìœ„í•´ IConnectionFactoryì˜ ë‘ êµ¬í˜„ì²´ë¥¼ ì œê³µí•œë‹¤.\nìŠ¤í”„ë§ì€ ConnectionFactory ì¸í„°íŽ˜ì´ìŠ¤ì˜ êµ¬í˜„ì²´ë¡œ SingleConnectionFactoryë¥¼ ì œê³µí•˜ê³  SingleConnectionFactoryëŠ” ëª¨ë“  createConnection() í˜¸ì¶œì—ì„œ ê°™ì€ Connectionì„ ë°˜í™˜í•˜ê³  close() í˜¸ì¶œì€ ë¬´ì‹œí•  ê²ƒì´ë‹¤. ì´ëŠ” ë‹¤ìˆ˜ì˜ íŠ¸ëžœìž­ì…˜ì´ ê±¸ì¹œ ì—¬ëŸ¬ JmsTemplate í˜¸ì¶œì— ê°™ì€ ì—°ê²°ì„ ì‚¬ìš©í•  ìˆ˜ ìžˆìœ¼ë¯€ë¡œ í…ŒìŠ¤íŠ¸ì™€ ë…ë¦½ì ì¸ í™˜ê²½ì— ìœ ìš©í•˜ë‹¤.SingleConnectionFactoryëŠ” ì¼ë°˜ì ìœ¼ë¡œ JNDIì—ì„œ ë°›ì€ í‘œì¤€ ConnectionFactoryì— ëŒ€í•œ ì°¸ì¡°ë¥¼ ë°›ëŠ”ë‹¤.\nCachingConnectionFactoryëŠ” SingleConnectionFactoryì˜ ê¸°ëŠ¥ì„ í™•ìž¥í•˜ê³  Session, MessageProducer, MessageConsumerì— ìºì‹±ì„ ì¶”ê°€í•œë‹¤. ì´ˆê¸° ìºì‹œí¬ê¸°ëŠ” 1ì´ê³  ìºì‹œë˜ëŠ” ì„¸ì…˜ì˜ ìˆ˜ë¥¼ ì¦ê°€ì‹œí‚¤ë ¤ë©´ SessionCacheSize í”„ë¡œí¼í‹°ë¥¼ ì‚¬ìš©í•´ë¼. ì‹¤ì œ ìºì‹œëœ ì„¸ì…˜ì˜ ìˆ˜ëŠ” ìŠ¹ì¸ ëª¨ë“œ(acknowledgment mode)ì— ê¸°ë°˜í•´ì„œ ìºì‹œëœ ì„¸ì…˜ì˜ ìˆ˜ë³´ë‹¤ ë§Žì„ ê²ƒì´ë¯€ë¡œ SessionCacheSizeë¥¼ 1ë¡œ ì„¤ì •í•œ ê²½ìš°(ê° AcknowledgementModeë§ˆë‹¤ 1) ìºì‹œëœ ì„¸ì…˜ ì¸ìŠ¤í„´ìŠ¤ëŠ” 4ê¹Œì§€ ë  ìˆ˜ ìžˆë‹¤. MessageProducerì™€ MessageConsumerëŠ” ì´ë“¤ì´ ì†Œìœ í•œ ì„¸ì…˜ì— ìºì‹œë˜ê³  ìºì‹±í•  ë•Œ ìƒì‚°ìž(producer)ì™€ ì†Œë¹„ìž(consumer)ì˜ ìœ ì¼í•œ í”„ë¡œí¼í‹°ë¥¼ ê³ ë ¤í•œë‹¤. MessageProducerëŠ” ëª©ì ì§€ì— ê¸°ë°˜í•´ì„œ ìºì‹œëœë‹¤. MessageConsumerëŠ” ëª©ì ì§€, ì…€ë ‰í„°, noLocal deliver í”Œëž˜ê·¸, (durable consumerë¥¼ ìƒì„±í•œë‹¤ë©´)ìž¥ê¸° êµ¬ë… ì´ë¦„(durable subscription name)ë¡œ êµ¬ì„±ëœ í‚¤ì— ê¸°ë°˜í•œ ìºì‹œëœë‹¤.\nConnectionFactoryê°™ì€ ëª©ì ì§€ëŠ” JNDIë¡œ ì €ìž¥í•˜ê³  íšë“í•  ìˆ˜ ìžˆëŠ” JMSê°€ ê´€ë¦¬í•˜ëŠ” ê°ì²´ë‹¤. ìŠ¤í”„ë§ ì–´í”Œë¦¬ì¼€ì´ì…˜ ì»¨í…ìŠ¤íŠ¸ë¥¼ ì„¤ì •í•  ë•Œ JMS ëª©ì ì§€ì— ëŒ€í•œ ê°ì²´ì˜ ì°¸ì¡°ì— ì˜ì¡´ì„± ì£¼ìž…ì„ í•˜ê¸° ìœ„í•´ JNDI íŒ°í† ë¦¬ í´ëž˜ìŠ¤ JndiObjectFactoryBean / ë¥¼ ì‚¬ìš©í•  ìˆ˜ ìžˆë‹¤. í•˜ì§€ë§Œ ì–´í”Œë¦¬ì¼€ì´ì…˜ì— ì•„ì£¼ ë§Žì€ ëª©ì ì§€ê°€ ìžˆê±°ë‚˜ JMS í”„ë¡œë°”ì´ë”ì— íŠ¹í™”ë˜ ê³ ê¸‰ ëª©ì ì§€ ê´€ë¦¬ê¸°ëŠ¥ì´ ìžˆë‹¤ë©´ ì´ ì „ë ¥ì„ ë‹¤ë£¨ê¸° ì–´ë ¤ìš¸ ìˆ˜ ìžˆë‹¤. ê³ ê¸‰ ëª©ì ì§€ ê´€ë¦¬ì—ëŠ” ë™ì  ëª©ì ì§€ ìƒì„±ì´ë‚˜ ëª©ì ì§€ì˜ ê³„ì¸µì  ë„¤ìž„ìŠ¤íŽ˜ì´ìŠ¤ ì§€ì›ë“±ì´ ìžˆë‹¤. JmsTemplateì€ ëª©ì ì§€ ì²˜ë¦¬ë¥¼ JMS ëª©ì ì§€ ê°ì²´ë‚˜ DestinationResolver ì¸í„°íŽ˜ì´ìŠ¤ì˜ êµ¬í˜„ì²´ì— ìœ„ìž„í•œë‹¤. JmsTemplateì´ ê¸°ë³¸ êµ¬í˜„ì²´ë¡œ DynamicDestinationResolverë¥¼ ì‚¬ìš©í•˜ê³  ë™ì  ëª©ì ì§€ë¥¼ ì²˜ë¦¬í•œë‹¤. ì œê³µëœ JndiDestinationResolverëŠ” JNDIì— ìžˆëŠ” ëª©ì ì§€ì˜ ì„œë¹„ìŠ¤ ë¡œì¼€ì´í„°ì²˜ëŸ¼ ë™ìž‘í•˜ê³  ì„ íƒì ìœ¼ë¡œ DynamicDestinationResolverì˜ ë™ìž‘ìœ¼ë¡œ ìž¥ì•  ë³µêµ¬ë¥¼ í•œë‹¤.ë“œë¬¼ê¸°ëŠ” í•˜ì§€ë§Œ JMS ì–´í”Œë¦¬ì¼€ì´ì…˜ì´ ìƒìš”í•˜ëŠ” ëª©ì ì§€ë¥¼ ëŸ°íƒ€ìž„ì—ì„œë§Œ ì•Œ ìˆ˜ ìžˆëŠ” ê²½ìš°ì—ëŠ” ì–´í”Œë¦¬ì¼€ì´ì…˜ì„ ë°°í¬í•  ë•Œ ìƒì„±í•  ìˆ˜ ì—†ë‹¤. ì´ëŸ¬í•œ ìƒí™©ì€ ìƒí˜¸ìž¥ìš©í•˜ëŠ” ì‹œìŠ¤í…œ ì»´í¬ë„ŒíŠ¸ê°€ ìž˜ ì•Œë ¤ì§„ ìž‘ëª…ê´€ë¡€ì— ë”°ë¼ ëŸ°íƒ€ìž„ì—ì„œ ëª©ì ì§€ë¥¼ ìƒì„±í•˜ê³  ì´ ì‹œìŠ¤í…œ ì»´í¬ë„ŒíŠ¸ê°„ì— ì–´í”Œë¦¬ì¼€ì´ì…˜ ë¡œì§ì„ ê³µìœ í•˜ê¸° ë•Œë¬¸ì— ë°œìƒí•œë‹¤. ë™ì  ëª©ì ì§€ìƒì„±ì´ JMS ëª…ì„¸ì— ë‚˜ì™€ìžˆì§€ ì•Šì§€ë§Œ ëŒ€ë¶€ë¶„ì˜ ë²¤ë”ëŠ” ì´ ê¸°ëŠ¥ì„ ì œê³µí•˜ê³  ìžˆë‹¤. ë™ì  ëª©ì  ëª©ì ì§€ëŠ” ìž„ì‹œ ëª©ì ì§€ì™€ êµ¬ë³„í•  ìˆ˜ ìžˆëŠ” ì‚¬ìš©ìžê°€ ì •ì˜í•œ ì´ë¦„ìœ¼ë¡œ ìƒì„±ë˜ê³  JNDIì— ë“±ë¡ë˜ì§€ ì•Šê¸°ë„ í•œë‹¤. ëª©ì ì§€ì™€ ê´€ë ¨ëœ í”„ë¡œí¼í‹°ê°€ ë²¤ë”ì— íŠ¹í™”ë˜ì–´ ìžˆìœ¼ë¯€ë¡œ ë™ì  ëª©ì ì§€ë¥¼ ìƒì„±í•˜ëŠ” APIëŠ” í”„ë¡œë°”ì´ë”ë§ˆë‹¤ ë‹¤ì–‘í•˜ë‹¤. í•˜ì§€ë§Œ ë²¤ë”ê°€ ë§Œë“  ê°„ë‹¨í•œ êµ¬í˜„ì²´ëŠ” JMS ëª…ì„¸ì˜ ê²½ê³ ë¥¼ ë¬´ì‹œí•˜ê³  TopicSession ë©”ì„œë“œ createTopic(String topicName)ë‚˜ QueueSession ë©”ì„œë“œ createQueue(String queueName)ë¥¼ ê¸°ë³¸ ëª©ì ì§€ í”„ë¡œí¼í‹°ë¡œ ìƒˆë¡œìš´ ëª©ì ì§€ë¥¼ ìƒì„±í•˜ëŠ”ë° ì‚¬ìš©í•œë‹¤. ë²¤ë” êµ¬í˜„ì²´ì— ë”°ë¼ì„œëŠ” DynamicDestinationResolverê°€ ëª©ì ì§€ë¥¼ ì²˜ë¦¬í•˜ëŠ” ê²ƒì´ ì•„ë‹Œ ë¬¼ë¦¬ì ì¸ ëª©ì ì§€ë¥¼ ìƒì„±í•˜ê¸°ë„ í•œë‹¤.ë¶ˆë¦¬ì–¸ í”„ë¡œí¼í‹°ì¸ pubSubDomainë¥¼ JmsTemplateì´ ì–´ë–¤ JMS ë„ë©”ì¸ì„ ì‚¬ìš©í•˜ëŠ”ì§€ ì„¤ì •í•˜ëŠ”ë° ì‚¬ìš©í•œë‹¤. ì´ í”„ë¡œí¼í‹°ì˜ ê¸°ë³¸ê°’ì€ falseë¡œ point-to-point ë„ë©”ì¸ì¸ Queueë¥¼ ì‚¬ìš©í•  ê²ƒìž„ì„ ë‚˜íƒ€ë‚¸ë‹¤. JmsTemplateì´ ì‚¬ìš©í•˜ëŠ” ì´ í”„ë¡œí¼í‹°ëŠ” DestinationResolver ì¸í„°íŽ˜ì´ìŠ¤ì˜ êµ¬í˜„ì²´ë¡œ ë™ì  ëª©ì ì§€ ì²˜ë¦¬ì˜ ë™ìž‘ì„ ê²°ì •í•œë‹¤.defaultDestination í”„ë¡œí¼í‹°ë¥¼ ì‚¬ìš©í•´ì„œ ê¸°ë³¸ ëª©ì ì§€ë¡œ JmsTemplateë¥¼ ì„¤ì •í•  ìˆ˜ë„ ìžˆë‹¤. ê¸°ë³¸ ëª©ì ì§€ëŠ” ëª©ì ì§€ë¥¼ ëª…ì‹œí•˜ì§€ ì•Šì€ ë³´ë‚´ê¸°/ë°›ê¸° ìž‘ì—…ì— ì‚¬ìš©í•  ê²ƒì¸ë‹¤.\nEJBì—ì„œ JMS ë©”ì‹œì§€ì˜ ê°€ìž¥ ì¼ë°˜ì ì¸ ê²½ìš°ëŠ” ë©”ì‹œì§€ì£¼ë„ ë¹ˆ(MDB, message-driven beans)ë¥¼ ì‚¬ìš©í•˜ëŠ” ê²ƒì´ë‹¤. ìŠ¤í”„ë§ì€ ì‚¬ìš©ìžê°€ EJB ì»¨í…Œì´ë„ˆì— ì˜ì¡´í•˜ì§€ ì•ŠëŠ” ë°©ë²•ìœ¼ë¡œ ë©”ì‹œì§€ ì£¼ë„ POJO(MDP, message-driven POJO)ë¥¼ ìƒì„±í•˜ëŠ” ë°©ë²•ì„ ì œê³µí•œë‹¤. (ìŠ¤í”„ë§ì˜ MDP ì§€ì›ì˜ ìžì„¸í•œ ë‚´ìš©ì€ Section 22.4.2, â€œë¹„ë™ê¸° ìˆ˜ì‹  - ë©”ì‹œì§€ ì£¼ë„ POJOâ€ë¥¼ ì°¸ê³ í•´ë¼.)ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆëŠ” JMS ë©”ì‹œì§€ íì—ì„œ ë©”ì‹œì§€ë¥¼ ë°›ê³  íì— ì£¼ìž…í•  MessageListenerë¥¼ ìƒì„±í•˜ëŠ”ë° ì‚¬ìš©í•œë‹¤. ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆëŠ” ë©”ì‹œì§€ ì ‘ìˆ˜ì™€ ì²˜ë¦¬í•  ë¦¬ìŠ¤ë„ˆë¡œ ë””ìŠ¤íŒ¨ì¹˜í•˜ëŠ” ëª¨ë“  ìŠ¤ë ˆë“œë¥¼ ì±…ìž„ì§„ë‹¤. ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆëŠ” MDPì™€ ë©”ì‹œì§€ í”„ë¡œë°”ì´ë” ì‚¬ì´ì˜ ì¤‘ê°œìžì˜ ì—­í• ì„ í•˜ê³  ë°›ì€ ë©”ì‹œì§€ì˜ ë“±ë¡, íŠ¸ëž™ìž­ì…¤ ì°¸ì—¬, ë¦¬ì†ŒìŠ¤ íšë“ê³¼ ë¦´ë¦¬ì¦ˆ, ì˜ˆì™¸ ë³€í™˜ë“±ì„ ë‹´ë‹¹í•œë‹¤. ì´ë¥¼ í†µí•´ì„œ ì–´í”Œë¦¬ì¼€ì´ì…˜ ê°œë°œìžëŠ” ë©”ì‹œì§€ë¥¼ ë°›ëŠ”(ê·¸ë¦¬ê³  ì‘ë‹µì„ í•´ì•¼í•  ìˆ˜ë„ ìžˆë‹¤) ë¹„ì¦ˆë‹ˆìŠ¤ ë¡œì§(ë³µìž¡í•  ìˆ˜ë„ ìžˆë‹¤.)ì„ ìž‘ì„í•  ìˆ˜ ìžˆê³  JMS ì¸í”„ë¼ìŠ¤íŠ¸ëŸ­ì²˜ì˜ ë³´ì¼ëŸ¬í”Œë ˆì´íŠ¸ì— ëŒ€í•œ ê±±ì •ì„ í”„ë ˆìž„ì›Œí¬ì— ìœ„ìž„í•  ìˆ˜ ìžˆë‹¤.ìŠ¤í”„ë§ì—ëŠ” ë‘ê°œì˜ í‘œì¤€ JMS ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆê°€ ìžˆê³  ê° ì»¨í…Œì´ë„ˆëŠ” ì „ë¬¸í™”ëœ ê¸°ëŠ¥ì„ ê°€ì§„ë‹¤.\nì´ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆëŠ” ë‘ í‘œì¤€ë³´ë‹¤ ê°„ë‹¨í•˜ë‹¤. êµ¬ë™í•  ë•Œ ê³ ì •ëœ ìˆ˜ì˜ JSM ì„¸ì…˜ê³¼ ì»¨ìŠˆë¨¸ë¥¼ ìƒì„±í•˜ê³  í‘œì¤€ JMS MessageConsumer.setMessageListener() ë©”ì„œë“œë¥¼ ì‚¬ìš©í•´ì„œ ë¦¬ìŠ¤ë„ˆë¥¼ ë“±ë¡í•˜ê³  JMS í”„ë¡œë°”ì´ë”ë‚˜ ë¦¬ìŠ¤ë„ˆ ì½œë°±ì„ ì‹¤í–‰í•˜ë„ë¡ í•œë‹¤. ì´ ì»¨í…Œì´ë„ˆëŠ” ë™ì ìœ¼ë¡œ ëŸ°íƒ€ìž„ ìš”êµ¬ì‚¬í•­ì— ë§žì¶œ ìˆ˜ ì—†ê³  ì™¸ë¶€ì—ì„œ ê´€ë¦¬í•˜ëŠ” íŠ¸ëžœìž­ì…˜ì— ì°¸ì—¬í•  ìˆ˜ëŠ” ì—†ë‹¤. í˜¸í™˜ì„±ì„ ìœ„í•´ì„œ ë…ë¦½ì ì¸ JMS ëª…ì„¸ì„œì— ì•„ì£¼ ê°€ê¹ì§€ë§Œ ë³´í†µ Java EEì˜ JMS ì œì•½ì‚¬í•­ì—ëŠ” í˜¸í™˜ë˜ì§€ ì•ŠëŠ”ë‹¤.\nì´ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆëŠ” ê°€ìž¥ ë§Žì´ ì‚¬ìš©í•˜ëŠ” ê²ƒ ì¤‘ í•˜ë‚˜ì´ë‹¤. SimpleMessageListenerContainerì™€ëŠ” ë‹¬ë¦¬ ëŸ°íƒ€ìž„ ìš”êµ¬ì‚¬í•­ì„ ë™ì ìœ¼ë¡œ ë§žì¶œ ìˆ˜ ìžˆê³  ì™¸ë¶€ì—ì„œ ê´€ë¦¬í•˜ëŠ” íŠ¸ëžœìž­ì…˜ì— ì°¸ì—¬í•  ìˆ˜ ìžˆë‹¤. JtaTransactionManagerë¥¼ ì„¤ì •í•œ ê²½ìš° ë°›ëŠ” ê°ê°ì˜ ë©”ì‹œì§€ë¥¼ XA íŠ¸ëžœìž­ì…˜ì— ë“±ë¡í•˜ë¯€ë¡œ ì²˜ë¦¬í•  ë•Œ XA íŠ¸ëžœìž­ì…˜ì˜ ìž¥ì ì„ ê°€ì§ˆ ìˆ˜ ìžˆë‹¤. ì´ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆëŠ” JMS í”„ë¡œë°”ì´ì €ì˜ ë‚®ì€ ìš”êµ¬ì‚¬í•­ê³¼ íŠ¸ëžœìž­ì…˜ ì°¸ì—¬ê°™ì€ ê³ ê¸‰ ê¸°ëŠ¥ê³¼ Java EE í™˜ê²½ì— í˜¸í™˜ì„± ê°„ì˜ ê· í˜•ì„ ìž˜ ë§žì¶”ê³  ìžˆë‹¤.\nìŠ¤í”„ë§ì€ ë‹¨ì¼ JMS ConnectionFactoryì˜ íŠ¸ëžœìž­ì…˜ì„ ê´€ë¦¬í•˜ëŠ” JmsTransactionManagerë¥¼ ì œê³µí•œë‹¤. JmsTransactionManagerëŠ” Chapter 11, íŠ¸ëžœìž­ì…˜ ê´€ë¦¬ì—ì„œ ì„¤ëª…í•œ ìŠ¤í”„ë§ì´ ê´€ë¦¬í•˜ëŠ” íŠ¸ëžœìž­ì…˜ ê¸°ëŠ¥ì„ JMS ì–´í”Œë¦¬ì¼€ì´ì…˜ì´ ì‚¬ìš©í•˜ë„ë¡ í•œë‹¤. JmsTransactionManagerëŠ” ë¡œì»¬ ë¦¬ì†ŒìŠ¤ íŠ¸ëžœìž­ì…˜ì„ ìˆ˜í–‰í•˜ê³  JMS ì—°ê²°/ì„¸ì…˜ ìŒì„ ì§€ì •í•œ ConnectionFactoryì—ì„œ ìŠ¤ë ˆë“œë¡œ ë°”ì¸ë”©í•œë‹¤. JmsTemplateëŠ” ìžë™ìœ¼ë¡œ ì´ëŸ¬í•œ íŠ¸ëžœìž­ì…˜ì´ ê°€ëŠ¥í•œ ë¦¬ì†ŒìŠ¤ë¥¼ íƒì§€í•´ì„œ ì ì ˆí•˜ê²Œ ë¦¬ì†ŒìŠ¤ìƒì—ì„œ ìž‘ì—…ì„ ì‹¤í–‰í•œë‹¤.Java EE í™˜ê²½ì—ì„œ ConnectionFactoryëŠ” ì—°ê²°ê³¼ ì„¸ì…˜ì˜ í’€ì„ ì‚¬ìš©í•˜ë¯€ë¡œ ì´ëŸ¬í•œ ë¦¬ì†ŒìŠ¤ë¥¼ íŠ¸ëžœìž­ì…˜ì‚¬ì´ì—ì„œ íš¨ìœ¨ì ìœ¼ë¡œ ìž¬ì‚¬ìš©í•œë‹¤. ë…ë¦½ì ì¸ í™˜ê²½ì—ì„œ ìŠ¤í”„ë§ì˜ SingleConnectionFactoryë¥¼ ì‚¬ìš©í•˜ë©´ ê³µìœ ëœ JMS Connectionë¥¼ ì‚¬ìš©í•˜ê²Œ ë˜ê³  ê° íŠ¸ëžœìž­ì…˜ì€ ìžì‹ ë§Œì˜ ë…ë¦½ì ì¸ Sessionì„ ê°–ê²Œ ëœë‹¤. ì•„ë‹ˆë©´ ActiveMQì˜ PooledConnectionFactory í´ëž˜ìŠ¤ì²˜ëŸ¼ í”„ë¡œë°”ì´ë”ì— íŠ¹í™”ëœ í’€ë§(pooling) ì–´ëŒ‘í„°ë¥¼ ì‚¬ìš©í•˜ëŠ” ê²ƒì„ ê³ ë ¤í•´ ë´ë¼.JmsTemplateë¥¼ JtaTransactionManagerë‚˜ ë¶„ì‚° íŠ¸ëžœìž­ì…˜ì„ ìœ„í•´ì„œ XA ê¸°ëŠ¥ì„ ê°€ì§„ JMS ConnectionFactoryì™€ í•¨ê»˜ ì‚¬ìš©í•  ìˆ˜ë„ ìžˆë‹¤. ì´ ê²½ìš° XAë¡œ ìž˜ ì„¤ì •í•œ ConnectionFactoryê°™ì€ JTA íŠ¸ëžœìž­ì…˜ ê´€ë¦¬ìžë¥¼ ì‚¬ìš©í•´ì•¼ í•œë‹¤! (ì‚¬ìš©í•˜ëŠ” Java EE ì„œë²„ë‚˜ JMS í”„ë¡œë°”ì´ë”ì˜ ë¬¸ì„œë¥¼ ì°¸ê³ í•´ë¼.)Connectionì—ì„œ Sessionì„ ìƒì„±í•˜ë ¤ê³  JMS APIë¥¼ ì‚¬ìš©í•˜ëŠ” ê²½ìš° ê´€ë¦¬í•˜ëŠ” íŠ¸ëžœìž­ì…˜ í™˜ê²½ê³¼ ê´€ë¦¬í•˜ì§€ ì•ŠëŠ” íŠ¸ëžœìž­ì…˜ í™˜ê²½ì‚¬ì´ì—ì„œ ì½”ë“œë¥¼ ìž¬ì‚¬ìš©í•˜ëŠ” ê²ƒì´ í˜¼ëž€ìŠ¤ëŸ¬ìš¸ ìˆ˜ ìžˆë‹¤. ì´ëŠ” JMS APIê°€ Sessionì„ ìƒì„±í•˜ëŠ” íŒ©í† ë¦¬ ë©”ì„œë“œë¥¼ ë”± í•˜ë‚˜ë§Œ ê°€ì§€ê³  ìžˆê³  íŠ¸ëžœìž­ì…˜ê³¼ ìŠ¹ë‚™(acknowledgement) ëª¨ë“œì— ëŒ€í•œ ê°’ì„ í•„ìš”ë¡œ í•˜ê¸° ë•Œë¬¸ì´ë‹¤. ê´€ë¦¬ë˜ëŠ” í™˜ê²½ì—ì„œëŠ” í•´ë‹¹ í™˜ê²½ì˜ íŠ¸ëžœìž­ì…˜ ì¸í”„ë¼ê°€ ì´ëŸ¬í•œ ê°’ì„ ì„¤ì •í•˜ë¯€ë¡œ JMS ì—°ê²°ì„ ê°ì‹¸ëŠ” ë²¤ë”ì˜ ëž©í¼ëŠ” ì´ëŸ¬í•œ ê°’ì„ ë¬´ì‹œí•œë‹¤. ê´€ë¦¬ë˜ì§€ ì•ŠëŠ” í™˜ê²½ì—ì„œ JmsTemplateì„ ì‚¬ìš©í•˜ëŠ” ê²½ìš° sessionTransactedì™€ sessionAcknowledgeMode í”„ë¡œí¼í‹°ë¥¼ ì‚¬ìš©í•´ì„œ ì´ëŸ¬í•œ ê°’ì„ ì§€ì •í•  ìˆ˜ ìžˆë‹¤. PlatformTransactionManagerì™€ JmsTemplateë¥¼ ê°™ì´ ì‚¬ìš©í•˜ëŠ” ê²½ìš° í…œí”Œë¦¿ì€ í•­ìƒ íŠ¸ëžœìž­ì…˜ì´ ê°€ëŠ¥í•œ JMS Sessionì„ ê°€ì§ˆ ê²ƒì´ë‹¤.\nJmsTemplateì—ëŠ” ë©”ì‹œì§€ ì „ì†¡ê³¼ ê´€ë ¨í•´ì„œ íŽ¸ë¦¬í•œ ë©”ì„œë“œê°€ ë§Žì´ ìžˆë‹¤. javax.jms.Destination ê°ì²´ë¡œ ëª©ì ì§€ë¥¼ ì§€ì •í•˜ëŠ” ì „ì†¡ë©”ì„œë“œì™€ JNDI ê²€ìƒ‰ì— ì‚¬ìš©í•˜ëŠ” ë¬¸ìžì—´ë¡œ ëª©ì ì§€ë¥¼ ì§€ì •í•˜ëŠ” ì „ì†¡ë©”ì„œë“œê°€ ìžˆë‹¤. ëª©ì ì§€ ì¸ìžë¥¼ ë°›ì§€ ì•ŠëŠ” ì „ì†¡ ë©”ì„œë“œëŠ” ê¸°ë³¸ ëª©ì ì§€ë¥¼ ì‚¬ìš©í•œë‹¤. 1.0.2 êµ¬í˜„ì²´ë¥¼ ì‚¬ìš©í•´ì„œ íì— ë©”ì‹œì§€ë¥¼ ë³´ë‚´ëŠ” ì˜ˆì œê°€ ë‹¤ìŒì— ë‚˜ì™€ ìžˆë‹¤.\nì´ ì˜ˆì œëŠ” ì œê³µëœ Session ê°ì²´ì—ì„œ í…ìŠ¤íŠ¸ ë©”ì‹œì§€ë¥¼ ìƒì„±í•˜ê¸° ìœ„í•´ MessageCreator ì½œë°±ì„ ì‚¬ìš©í•œë‹¤. ConnectionFactoryì— ëŒ€í•œ ì°¸ì¡°ë¥¼ ì „ë‹¬í•´ì„œ JmsTemplateì„ ìƒì„±í•œë‹¤. ì•„ë‹ˆë©´ ì¸ìžê°€ ì—†ëŠ” ìƒì„±ìžì™€ connectionFactoryë¥¼ ì œê³µí•˜ë©´ JavaBean í˜•ì‹ì˜ ì¸ìŠ¤í„´ìŠ¤ë¥¼ ìƒì„±í•˜ëŠ”ë° ì‚¬ìš©í•  ìˆ˜ ìžˆë‹¤.(BeanFactoryë‚˜ ì¼ë°˜ì ì¸ ìžë°”ì½”ë“œë¥¼ ì‚¬ìš©í•´ì„œ) ë˜ëŠ” ìŠ¤í”„ë§ì˜ JmsGatewaySupport ê¸°ìž” í´ëž˜ìŠ¤ì—ì„œ ìƒì„±í•˜ëŠ” ê²ƒì„ ìƒê°í•´ ë³¼ ìˆ˜ ìžˆëŠ”ë° JmsGatewaySupportëŠ” JMS ì„¤ì •ì— ëŒ€í•œ ë¹ˆ í”„ë¡œí¼í‹°ë¥¼ ë¯¸ë¦¬ ë§Œë“¤ì–´ì„œ ì œê³µí•œë‹¤.send(String destinationName, MessageCreator creator) ë©”ì„œë“œë¡œ ëª©ì ì§€ì˜ ë¬¸ìžì—´ ì´ë¦„ì„ ì‚¬ìš©í•´ì„œ ë©”ì‹œì§€ë¥¼ ì „ì†¡í•  ìˆ˜ ìžˆë‹¤. ì´ ëª©ì ì§€ ì´ë¦„ì´ JNDIì— ë“±ë¡ë˜ì–´ ìžˆëŠ” ê²½ìš° JndiDestinationResolver ì¸ìŠ¤í„´ìŠ¤ì— í…œí”Œë¦¿ì˜ destinationResolver í”„ë¡œí¼í‹°ë¥¼ ì„¤ì •í•´ì•¼ í•œë‹¤.JmsTemplateë¥¼ ìƒì„±í•˜ê³  ê¸°ë³¸ ëª©ì ì§€ë¥¼ ì§€ì •í–ˆë‹¤ë©´ send(MessageCreator c)ëŠ” ì´ ëª©ì ì§€ë¡œ ë©”ì‹œì§€ë¥¼ ì „ì†¡í•œë‹¤.\në„ë©”ì¸ ëª¨ë¸ ê°ì²´ë¥¼ ì „ì†¡í•˜ê¸° ì‰½ë„ë¡ JmsTemplateì—ëŠ” ë©”ì‹œì§€ì˜ ë°ì´í„° ë‚´ìš©ì— ëŒ€í•œ ìžë°” ê°ì²´ë¥¼ ì¸ìžë¡œ ë°›ëŠ” ë‹¤ì–‘í•œ ì „ì†¡ ë©”ì„œë“œê°€ ìžˆë‹¤. JmsTemplateì—ì„œ ì˜¤ë²„ë¡œë“œëœ convertAndSend()ì™€ receiveAndConvert()ëŠ” ë³€í™˜ ê³¼ì •ì„ MessageConverter ì¸í„°íŽ˜ì´ìŠ¤ì˜ ì¸ìŠ¤í„´ìŠ¤ë¡œ ìœ„ìž„í•œë‹¤. MessageConverter ì¸í„°íŽ˜ì´ìŠ¤ëŠ” ìžë°” ê°ì²´ì™€ JMS ë©”ì‹œì§€ê°„ì˜ ë³€í™˜ì— ëŒ€í•œ ê°„ë‹¨í•œ ì¡°ê±´ì„ ì •ì˜í•˜ê³  ìžˆë‹¤. ê¸°ë³¸ êµ¬í˜„ì²´ SimpleMessageConverterëŠ” Stringê³¼ TextMessage, byte[]ì™€ BytesMesssage, java.util.Mapì™€ MapMessageê°„ì˜ ë³€í™˜ì„ ì§€ì›í•œë‹¤.ì»¨ë²„í„°ë¥¼ ì‚¬ìš©í•¨ìœ¼ë¡œì¨ JMSë¡œ ë³´ë‚´ê³  ë°›ëŠ” ë¹„ì¦ˆë‹ˆìŠ¤ ê°ì²´ì—ë§Œ ì§‘ì¤‘í•  ìˆ˜ ìžˆê³  JMS ë©”ì‹œì§€ë¡œ ì–´ë–»ê²Œ í‘œí˜„ë˜ëŠ”ì§€ì— ëŒ€í•œ ìžì„¸í•œ ë‚´ìš©ì€ ì‹ ê²½ì“°ì§€ ì•Šì•„ë„ ëœë‹¤.ìµœê·¼ì˜ ìƒŒë“œë°•ìŠ¤ì—ëŠ” ìžë°”ë¹ˆê³¼ MapMessageë¥¼ ë³€í™˜í•˜ëŠ”ë° ë¦¬í”Œë ‰ì…˜ì„ ì‚¬ìš©í•˜ëŠ” MapMessageConverterê°€ í¬í•¨ë˜ì–´ ìžˆë‹¤. ì§ì ‘ êµ¬í˜„í˜ˆë§Œí•œ ë‹¤ë¥¸ êµ¬í˜„ì²´ ì¤‘ì—ì„œ ì¸ê¸°ìžˆëŠ” ê²ƒì€ ê°ì²´ë¥¼ ë‚˜íƒ€ë‚´ëŠ” TextMessageë¥¼ ìƒì„±í•˜ëŠ”ë° JAXB, Castor, XMLBeans, XStreamê°™ì€ ì´ë¯¸ ì¡´ìž¬í•˜ëŠ” XML ë§ˆìƒ¬ë§ íŒ¨í‚¤ì§€ë¥¼ ì‚¬ìš©í•˜ëŠ” ì»¨ë²„í„°ì´ë‹¤.ì¼ë°˜ì ìœ¼ë¡œ ì»¨ë²„í„° í´ëž˜ìŠ¤ë‚´ì— ìº¡ìŠí™”ë  ìˆ˜ ì—†ëŠ” ë©”ì‹œì§€ì˜ í”„ë¡œí¼í‹°, í—¤ë”, ë°”ë””ë¥¼ ì„¤ì •í•˜ê¸° ìœ„í•´ì„œ MessagePostProcessor ì¸í„°íŽ˜ì´ìŠ¤ëŠ” ë©”ì‹œì§€ê°€ ë³€í™˜ë˜ê³  ë‚˜ì„œ ì „ì†¡ë˜ê¸° ì „ì— ì ‘ê·¼í•  ìˆ˜ ìžˆê²Œ í•´ì¤€ë‹¤. ì•„ëž˜ ì˜ˆì œëŠ” java.util.Mapê°€ ë©”ì‹œì§€ë¡œ ë³€í™˜ëœ í›„ì— ë©”ì‹œì§€ í—¤ë”ì™€ í”„ë¡œí¼í‹°ë¥¼ ì–´ë–»ê²Œ ìˆ˜ì •í•˜ëŠ”ì§€ ë³´ì—¬ì¤€ë‹¤.\nì´ëŠ” ë©”ì‹œì§€ í˜•ì‹ì´ ëœë‹¤.\nì „ì†¡ ìž‘ì—…ì´ ë‹¤ìˆ˜ì˜ ì¼ë°˜ì ì¸ ì‚¬ìš©ì‚¬ë¡€ë¥¼ ë‹¤ë£° ìˆ˜ ìžˆì§€ë§Œ JMS Sessionì´ë‚˜ MessageProducerì—ì„œ ë‹¤ìˆ˜ì˜ ìž‘ì—…ì„ ìˆ˜í–‰í•˜ê³ ìž í•˜ëŠ” ê²½ìš°ê°€ ìžˆë‹¤.SessionCallbackì™€ ProducerCallbackëŠ” JMS Sessionê³¼ Session / MessageProducer ìŒì„ ê°ê° ë…¸ì¶•í•œë‹¤. JmsTemplateì˜ execute() ë©”ì„œë“œëŠ” ì´ëŸ¬í•œ ì½œë°± ë©”ì„œë“œë¥¼ ì‹¤í–‰í•œë‹¤.\nJMSê°€ ë³´í†µ ë¹„ë™ê¸° ì²˜ë¦¬ì™€ ê´€ë ¨ë˜ì–´ ìžˆì§€ë§Œ ë™ê¸°ì ìœ¼ë¡œ ë©”ì‹œì§€ë¥¼ ì²˜ë¦¬í•  ìˆ˜ë„ ìžˆë‹¤. receive(..) ë©”ì„œë“œë¥¼ ì˜¤ë²„ë¡œë“œí•´ì„œ ë™ê¸°ì ìœ¼ë¡œ ì²˜ë¦¬í•  ìˆ˜ ìžˆë‹¤.ë™ê¸°ì ìœ¼ë¡œ ë©”ì‹œì§€ë¥¼ ë°›ëŠ” ë™ì•ˆ í˜¸ì¶œí•˜ëŠ” ìŠ¤ë ˆë“œëŠ” ë©”ì‹œì§€ë¥¼ ì´ìš©í•  ìˆ˜ ìžˆì„ ë•Œê¹Œì§€ ë¸”ëŸ­í‚¹ëœë‹¤. í˜¸ì¶œí•˜ëŠ” ìŠ¤ë ˆë“œê°€ ë¶ˆëª…í™•í•˜ê²Œ ë¸”ëŸ­í‚¹ë  ê°€ëŠ¥ì„±ì´ ìžˆìœ¼ë¯€ë¡œ ì´ëŠ” ìœ„í—˜í•œ ìž‘ì—…ì´ ë  ìˆ˜ ìžˆë‹¤. receiveTimeout í”„ë¡œí¼í‹°ëŠ” ë¦¬ì‹œë²„ê°€ ë©”ì‹œì§€ë¥¼ ì–¼ë§ˆë‚˜ ì˜¤ëž«ë™ì•ˆ ê¸°ë‹¤ë ¤ì•¼ í•˜ëŠ”ì§€ë¥¼ ì§€ì •í•œë‹¤.\nEJBì˜ ë©”ì‹œì§€ ì£¼ë„ ë¹ˆ(MDB, Message-Driven Bean)ê³¼ ë¹„ìŠ·í•œ ë°©ë²•ìœ¼ë¡œ ë©”ì‹œì§€ ì£¼ë„ POJO(MDP, Message-Driven POJO)ëŠ” JMS ë©”ì‹œì§€ì— ëŒ€í•´ì„œ ë¦¬ì‹œë²„ë¡œ ë™ìž‘í•œë‹¤. javax.jms.MessageListener ì¸í„°íŽ˜ì´ìŠ¤ë¥¼ ë°˜ë“œì‹œ êµ¬í˜„í•´ì•¼ í•œë‹¤ëŠ” ì ì´ MDPê°€ ê°€ì§„ í•˜ë‚˜ì˜ ì œì•½ì‚¬í•­(í•˜ì§€ë§Œ ì•„ëž˜ì˜ MessageListenerAdapter í´ëž˜ìŠ¤ì— ëŒ€í•œ ë…¼ì˜ë¥¼ ì°¸ê³ í•´ë¼.)ì´ë‹¤. POJOê°€ ì—¬ëŸ¬ ìŠ¤ë ˆë“œì—ì„œ ë©”ì‹œì§€ë¥¼ ë°›ëŠ” ê²½ìš°ë¼ë©´ ìŠ¤ë ˆë“œì„¸ì´í”„í•˜ê²Œ êµ¬í˜„í•´ì•¼ í•œë‹¤ëŠ” ì ì´ ì¤‘ìš”í•˜ë‹¤ëŠ” ê²ƒì„ ê¸°ì–µí•´ì•¼ í•œë‹¤.ì•„ëž˜ëŠ” MDP êµ¬í˜„ì²´ì˜ ê°„ë‹¨í•œ ì˜ˆì‹œì´ë‹¤.\nMessageListenerë¥¼ êµ¬í˜„í–ˆìœ¼ë©´ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆë¥¼ ë§Œë“¤ ì°¨ë¡€ë‹¤.ìŠ¤í”„ë§ì´ ì œê³µí•˜ëŠ” ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆì¤‘ í•˜ë‚˜ë¥¼ ì–´ë–»ê²Œ ì •ì˜í•˜ê³  ì„¤ì •í–ˆëŠ”ì§€ ì•„ëž˜ ì˜ˆì œë¥¼ ì°¸ê³ í•´ë¼.(ì´ ê²½ìš°ì—ëŠ” DefaultMessageListenerContainer)\në‹¤ì–‘í•œ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆì˜ ê° êµ¬í˜„ì²´ê°€ ì§€ì›í•˜ëŠ” ê¸°ëŠ¥ê³¼ ìžì„¸í•œ ë‚´ìš©ì€ ìŠ¤í”„ë§ ìžë°”ë…ì„ ì°¸ê³ í•´ë¼.\nSessionAwareMessageListener ì¸í„°íŽ˜ì´ìŠ¤ëŠ” ìŠ¤í”„ë§ì— íŠ¹í™”ëœ ì¸í„°íŽ˜ì´ìŠ¤ë¡œ JMS MessageListenerì™€ ë¹„ìŠ·í•œ ê³„ì•½(contract)ì„ ì œê³µí•˜ì§€ë§Œ Messageë¥¼ ë°›ì€ JMS Sessionì— ì ‘ê·¼í•´ì„œ ë©”ì‹œì§€ë¥¼ ì²˜ë¦¬í•  ìˆ˜ ìžˆëŠ” ë©”ì„œë“œë„ ì œê³µí•œë‹¤.\nêµ¬í˜„í•œ MDPê°€ ì–´ë–¤ ë©”ì‹œì§€ì—ë„ ì‘ë‹µí•  ìˆ˜ ìžˆê¸°ë¥¼ (onMessage(Message, Session) ë©”ì„œë“œì—ì„œ ì œê³µëœ Sessionì„ ì‚¬ìš©í•´ì„œ) ì›í•œë‹¤ë©´ MDPê°€ ì´ ì¸í„°íŽ˜ì´ìŠ¤ (í‘œì¤€ JMS MessageListener ì¸í„°íŽ˜ì´ìŠ¤ë¥¼ ì„ í˜¸í•˜ëŠ” ê²½ìš°)ë¥¼ êµ¬í˜„í•˜ë„ë¡ í•  ìˆ˜ ìžˆë‹¤. ìŠ¤í”„ë§ì´ ì œê³µí•˜ëŠ” ëª¨ë“  ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆ êµ¬í˜„ì²´ëŠ” MessageListenerë‚˜ SessionAwareMessageListener ì¸í„°íŽ˜ì´ìŠ¤ë¥¼ êµ¬í˜„í•œ MDPë¥¼ ì§€ì›í•œë‹¤. SessionAwareMessageListenerë¥¼ êµ¬í˜„í•œ í´ëž˜ìŠ¤ëŠ” ì´ ì¸í„°íŽ˜ì´ìŠ¤ë¡œ ìŠ¤í”„ë§ì— ì˜ì¡´ì„±ì„ ê°€ì§„ë‹¤ëŠ” ê²ƒì„ ìœ ì˜í•´ì•¼ í•œë‹¤. ì´ë¥¼ ì‚¬ìš©í•  ê²ƒì¸ì§€ ì•„ë‹Œì§€ëŠ” ì–´í”Œë¦¬ì¼€ì´ì…˜ ê°œë°œìžë‚˜ ì•„í‚¤í…ì³ì˜ ì„ íƒì´ë‹¤.SessionAwareMessageListener ì¸í„°íŽ˜ì´ìŠ¤ì˜ â€˜onMessage(..)â€™ ë©”ì„œë“œê°€ JMSExceptionë¥¼ ë˜ì§„ë‹¤ëŠ” ê²ƒì„ ê¸°ì–µí•´ë¼. í‘œì¤€ JMS MessageListener ì¸í„°íŽ˜ì´ìŠ¤ì™€ëŠ” ë‹¬ë¦¬ SessionAwareMessageListener ì¸í„°íŽ˜ì´ìŠ¤ë¥¼ ì‚¬ìš©í–ˆì„ ë•Œ ë˜ì €ì§„ ì˜ˆì™¸ë¥¼ ì²˜ë¦¬í•˜ëŠ” ê²ƒì€ í´ë¼ì´ì–¸íŠ¸ ì½”ë“œì˜ ëª«ì´ë‹¤.\nMessageListenerAdapter í´ëž˜ìŠ¤ëŠ” ìŠ¤í”„ë§ì—ì„œ ë¹„ë™ê¸° ë©”ì‹œì§€ë¥¼ ì§€ì›í•˜ëŠ” ë§ˆì§€ë§‰ ì»´í¬ë„ŒíŠ¸ë‹¤. ê°„ë‹¨ížˆ ë§í•˜ë©´ ì´ í´ëž˜ìŠ¤ëŠ” ê±°ì˜ ëª¨ë“  í´ëž˜ìŠ¤ë¥¼ MDPë¡œ ë…¸ì¶œí•˜ë„ë¡ í•´ì¤€ë‹¤. (ë¬¼ë¡  ëª‡ê°€ì§€ ì œì•½ì‚¬í•­ì´ ìžˆë‹¤.)ë‹¤ìŒì˜ ì¸í„°íŽ˜ì´ìŠ¤ ì •ì˜ë¥¼ ë³´ìž. ì´ ì¸í„°íŽ˜ì´ìŠ¤ê°€ MessageListenerë‚˜ SessionAwareMessageListenerë¥¼ ìƒì†í•˜ì§€ ì•Šì•˜ìŒì—ë„ MessageListenerAdapterë¥¼ ì‚¬ìš©í•´ì„œ MDPë¡œ ì‚¬ìš©í•  ìˆ˜ ìžˆë‹¤. ë‹¤ì–‘í•œ ë©”ì‹œì§€ ì²˜ë¦¬ ë©”ì„œë“œê°€ ì–´ë–»ê²Œ ë°›ì•„ì„œ ì²˜ë¦¬í•  ìˆ˜ ìžˆëŠ” ë‹¤ì–‘í•œ Messageì˜ ë‚´ìš©ì— ë”°ë¼ íƒ€ìž…ì„ ì§€ì •í•˜ëŠ”ì§€ë„ ì°¸ê³ í•´ë¼.\níŠ¹ížˆ MessageDelegate ì¸í„°íŽ˜ì´ìŠ¤ì˜ êµ¬í˜„ì²´ (ìœ„ì˜ DefaultMessageDelegate í´ëž˜ìŠ¤)ê°€ ì–´ë–»ê²Œ JSMì— ëŒ€í•œ ì˜ì¡´ì„±ì€ ì „í˜€ ê°–ì§€ ì•ŠëŠ”ì§€ ë´ë¼. ì´ëŠ” ë‹¤ìŒì˜ ì„¤ì •ìœ¼ë¡œ MDPë¡œ ë§Œë“¤ POJOë‹¤.\në‹¤ìŒì€ ë˜ë‹¤ë¥¸ MDPì˜ ì˜ˆì‹œë¡œ JMS TextMessage ë©”ì‹œì§€ë§Œ ë°›ì•„ì„œ ì²˜ë¦¬í•  ìˆ˜ ìžˆë‹¤. ì–´ë–»ê²Œ ë©”ì‹œì§€ ì²˜ë¦¬ ë©”ì„œë“œê°€ ì‹¤ì œë¡œëŠ” â€˜receiveâ€™ë¡œ (MessageListenerAdapterì˜ ë©”ì‹œì§€ ì²˜ë¦¬ ë©”ì„œë“œì˜ ì´ë¦„ì€ ê¸°ë³¸ì ìœ¼ë¡œ â€˜handleMessageâ€™ì´ë‹¤.) í˜¸ì¶œë˜ê²Œ ì„¤ì •í•˜ëŠ”ì§€ ì°¸ê³ í•´ë¼. â€˜receive(..)â€™ ë©”ì„œë“œê°€ JMS TextMessage ë©”ì‹œì§€ì—ë§Œ ë°›ê³  ì‘ë‹µí•˜ë„ë¡ íƒ€ìž…ì„ ì§€ì •í•˜ëŠ” ë°©ë²•ë„ ì°¸ê³ í•´ë¼.\nMessageListenerAdapterì˜ ì„¤ì •ì€ ë‹¤ìŒê³¼ ê°™ì„ ê²ƒì´ë‹¤.\nìœ„ì˜ â€˜messageListenerâ€™ê°€ TextMessageê°€ ì•„ë‹Œ ë‹¤ë¥¸ íƒ€ìž…ì˜ JMS Messageë¥¼ ë°›ëŠ”ë‹¤ë©´ IllegalStateExceptionê°€ ë˜ì ¸ì§ˆ ê²ƒì´ë‹¤.(ê·¸ë¦¬ê³  ì´ì–´ì§„ ë©”ì‹œì§€ëŠ” ë¬´ì‹œí•  ê²ƒì´ë‹¤.) í•¸ë“¤ëŸ¬ ë©”ì„œë“œê°€ voidê°€ ì•„ë‹Œ ê°’ì„ ë°˜í™˜í•˜ëŠ” ê²½ìš° ìžë™ì ìœ¼ë¡œ ì‘ë‹µ Messageë¥¼ ë‹¤ì‹œ ë³´ë‚´ëŠ” ê²ƒì€ MessageListenerAdapterí´ëž˜ìŠ¤ì˜ ë˜ë‹¤ë¥¸ ê¸°ëŠ¥ì´ë‹¤. ë‹¤ìŒ ì¸í„°íŽ˜ì´ìŠ¤ì™€ í´ëž˜ìŠ¤ë¥¼ ë³´ìž.\nìœ„ì˜ DefaultResponsiveTextMessageDelegateë¥¼ MessageListenerAdapterì™€ í•¨ê»˜ ì‚¬ìš©í•œ ê²½ìš° â€˜receive(..)â€™ ë©”ì„œë“œì˜ ì‹¤í–‰í›„ ë°˜í™˜ëœ nullì´ ì•„ë‹Œ ëª¨ë“  ê°’ì€ TextMessageë¡œ ë³€í™˜ë  ê²ƒì´ë‹¤.(ê¸°ë³¸ ì„¤ì •ì— ë”°ë¼) ê·¸ ë‹¤ìŒ ë³€í™˜ëœ TextMessageëŠ” ì›ëž˜ì˜ Messageì˜ JMS Reply-To í”„ë¡œí¼í‹°ì— ì •ì˜ëœ(ì¡´ìž¬í•˜ëŠ” ê²½ìš°) Destinationì´ë‚˜ MessageListenerAdapterì— ì„¤ì •ëœ ê¸°ë³¸ Destination(ì„¤ì •ë˜ì—ˆë‹¤ë©´)ìœ¼ë¡œ ë³´ë‚´ì§„ë‹¤. Destinationê°€ ì—†ë‹¤ë©´ InvalidDestinationExceptionê°€ ë˜ì ¸ì§ˆ ê²ƒì´ë‹¤.(ì´ ì˜ˆì™¸ëŠ” ë¬´ì‹œë˜ì§€ ì•Šê³  í˜¸ì¶œ ìŠ¤íƒì— ì¶”ê°€ë  ê²ƒì´ë‹¤.)\níŠ¸ëžœìž­ì…˜ì—ì„œ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆë¥¼ í˜¸ì¶œí•˜ë ¤ë©´ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆë§Œ ìž¬ì„¤ì •í•˜ë©´ ëœë‹¤.ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆ ì •ì˜ì˜ sessionTransacted í”Œëž˜ê·¸ë¡œ ë¡œì»¬ ë¦¬ì†ŒìŠ¤ íŠ¸ëžœìž­ì…˜ì€ í™œì„±í™”í•  ìˆ˜ ìžˆë‹¤. ë¡œì»¬ ë¦¬ì†ŒìŠ¤ íŠ¸ëžœìž­ì…˜ì„ í™œì„±í™”í•˜ë©´ í™œì„±í™”ëœ JMS íŠ¸ëžœìž­ì…˜ë‚´ì—ì„œ ê° ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ í˜¸ì¶œì„ í•  ìˆ˜ ìžˆê³  ë¦¬ìŠ¤ë„ˆ ì‹¤í–‰ì´ ì‹¤íŒ¨í•œ ê²½ìš° ë©”ì‹œì§€ ìˆ˜ì‹ ì´ ë¡¤ë°±ëœë‹¤. ì‘ë‹µ ë©”ì‹œì§€ ì „ì†¡ (SessionAwareMessageListenerë¡œ)ë„ ê°™ì€ ë¡œì»¬ íŠ¸ëžœìž­ì…˜ì— í¬í•¨ë˜ì–´ ìžˆì§€ë§Œ ë‹¤ë¥¸ ë¦¬ì†ŒìŠ¤ì— ëŒ€í•œ ìž‘ì—…(ë°ì´í„°ë² ì´ìŠ¤ ì ‘ê·¼ ê°™ì€)ì€ ë…ë¦½ì ìœ¼ë¡œ ìˆ˜í–‰ë  ê²ƒì´ë‹¤. ì´ëŠ” ë°ì´í„°ë² ì´ìŠ¤ ì²˜ë¦¬ëŠ” ì»¤ë°‹ë˜ì—ˆì§€ë§Œ ë©”ì‹œì§€ ì²˜ë¦¬ëŠ” ì»¤ë°‹ì´ ì‹¤íŒ¨í•œ ê²½ìš°ë¥¼ í¬í•¨í•´ì„œ ë¦¬ìŠ¤ë„ˆ êµ¬í˜„ì²´ì—ì„œ ì¤‘ë³µ ë©”ì‹œì§€ íƒì§€ë¥¼ í•´ì•¼ í•œë‹¤.\nì™¸ë¶€ì—ì„œ ê´€ë¦¬í•˜ëŠ” íŠ¸ëžœìž­ì…˜ì— ì°¸ì—¬í•˜ë ¤ë©´ íŠ¸ëžœìž­ì…˜ ê´€ë¦¬ìžë¥¼ ì„¤ì •í•˜ê³  ì™¸ë¶€ ê´€ë¦¬ íŠ¸ëžœìž­ì…˜ì„ ì§€ì›í•˜ëŠ” ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆ(ë³´í†µ DefaultMessageListenerContainer)ë¥¼ ì‚¬ìš©í•´ì•¼ í•œë‹¤.XA íŠ¸ëžœìž­ì…˜ì— ì°¸ê°€í•˜ë„ë¡ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆë¥¼ ì„¤ì •í•˜ë ¤ë©´ JtaTransactionManager(ì´ íŠ¸ëžœìž­ì…˜ ê´€ë¦¬ìžëŠ” ê¸°ë³¸ì ìœ¼ë¡œ Java EE ì„œë²„ì˜ íŠ¸ëžœìž­ì…˜ í•˜ìœ„ì‹œìŠ¤í…œì— ìœ„ìž„í•œë‹¤.)ë¥¼ ì„¤ì •í•´ì•¼ í•œë‹¤. ì—¬ê¸°ì„œ ì˜ì¡´ JMS ConnectionFactoryëŠ” XA ê¸°ëŠ¥ì´ ìžˆì–´ì•¼ í•˜ê³  JTA íŠ¸ëžœìž­ì…˜ ì½”ë””ë„¤ì´í„°(JTA transaction coordinator)ê°€ ì ì ˆížˆ ë“±ë¡ë˜ì–´ ìžˆì–´ì•¼ í•œë‹¤! (Java EE ì„œë²„ì˜ JNDI ë¦¬ì†ŒìŠ¤ ì„¤ì •ì„ í™•ì¸í•´ë¼.) ì´ëŠ” ë©”ì‹œì§€ ìˆ˜ì‹ ì´ ë°ì´í„°ë² ì´ìŠ¤ ì ‘ê·¼ê³¼ í•¨ê»˜ ê°™ì€ íŠ¸ëžœìž­ì…˜ì— ìžˆë„ë¡ í•œë‹¤.(í†µì¼ëœ ì»¤ë°‹ ê°œë…ì„ ê°€ì§€ì§€ë§Œ XA íŠ¸ëžœìž­ì…˜ ë¡œê·¸ ë¹„ìš©ì´ í¬ë‹¤.)\nì•žì—ì„œ ë³¸ ì»¨í…Œì´ë„ˆ ì„¤ì •ì— ìœ„ ë¶€ë¶„ì„ ì¶”ê°€í•˜ë©´ ëœë‹¤. ì»¨í…Œì´ë„ˆê°€ ë‚˜ë¨¸ì§€ë¥¼ ê´€ë¦¬í•  ê²ƒì´ë‹¤.\nìŠ¤í”„ë§ 2.5ë¶€í„° JCAì— ê¸°ë°˜í•œ MessageListener ì»¨í…Œì´ë„ˆë„ ì§€ì›í•˜ê¸° ì‹œìž‘í–ˆë‹¤. JmsMessageEndpointManagerëŠ” í”„ë¡œë°”ì´ë”ì˜ ResourceAdapter í´ëž˜ìŠ¤ ì´ë¦„ìœ¼ë¡œ ActivationSpec í´ëž˜ìŠ¤ ì´ë¦„ì„ ìžë™ì ìœ¼ë¡œ ê²°ì •í•˜ë ¤ê³  í•  ê²ƒì´ë‹¤. ê·¸ëž˜ì„œ ë‹¤ìŒ ì˜ˆì œì—ì„œ ë³´ë“¯ì´ ìŠ¤í”„ë§ì˜ ì§€ë„¤ë¦­ JmsActivationSpecConfigì„ ì œê³µí•˜ëŠ” ê²ƒì´ ë³´í†µ ê°€ëŠ¥í•˜ë‹¤.\në˜ëŠ” ì£¼ì–´ì§„ ActivationSpec ê°ì²´ì— JmsMessageEndpointManagerë¥¼ ì„¤ì •í•  ìˆ˜ ìžˆë‹¤. ActivationSpec ê°ì²´ë„ JNDI ê²€ìƒ‰ (ë¥¼ ì‚¬ìš©í•´ì„œ)ì—ì„œ ì˜¬ ê²ƒì´ë‹¤.\nì˜ˆì œì—ì„œ ì„¤ëª…í•œëŒ€ë¡œ ìŠ¤í”„ë§ì˜ ResourceAdapterFactoryBeanë¥¼ ì‚¬ìš©í•˜ë©´ ë¡œì»¬ë¡œ ëŒ€ìƒ ResourceAdapterë¥¼ ì„¤ì •í•œë‹¤.\nì§€ì •í•œ WorkManagerë„ í™˜ê²½ì— íŠ¹í™”ëœ ìŠ¤ë ˆë“œ í’€ì„ ê°€ë¦¬í‚¬ ê²ƒì´ë‹¤.(ë³´í†µ SimpleTaskWorkManagerâ€™s â€œasyncTaskExecutorâ€ í”„ë¡œí¼í‹°ë¥¼ í†µí•´ì„œ) ë‹¤ì¤‘ ì•„ë‹µí„°ë¥¼ ì‚¬ìš©í•œë‹¤ë©´ ëª¨ë“  ResourceAdapter ì¸ìŠ¤í„´ìŠ¤ì— ê³µìœ  ìŠ¤ë ˆë“œ í’€ì„ ì •ì˜í•˜ëŠ” ê²ƒì„ ê³ ë ¤í•´ ë´ë¼.ì¼ë¶€ í™˜ê²½(WebLogic 9 ì´ìƒ ë“±)ì—ì„œëŠ” JNDI (ë¥¼ ì‚¬ìš©í•´ì„œ)ì—ì„œ ì „ì²´ ResourceAdapter ê°ì²´ë¥¼ ê°€ì ¸ì˜¬ ê²ƒì´ë‹¤. ìŠ¤í”„ë§ ê¸°ë°˜ì˜ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆëŠ” ì„œë²„ê°€ ì œê³µí•˜ëŠ” ResourceAdapterì™€ ìƒí˜¸ìž‘ìš©í•  ìˆ˜ ìžˆê³  ì„œë²„ì— ë‚´ìž¥ëœ WorkManagerë„ ì‚¬ìš©í•  ìˆ˜ ìžˆë‹¤.ìžì„¸í•œ ë‚´ìš©ì€ JmsMessageEndpointManager, JmsActivationSpecConfig, ResourceAdapterFactoryBeanì˜ JavaDocë¥¼ ì°¸ê³ í•´ë¼.ìŠ¤í”„ë§ì€ JMSì— ì˜ì¡´í•˜ì§€ ì•ŠëŠ” ì¼ë°˜ì ì¸ JCA ë©”ì‹œì§€ ì—”íŠ¸í¬ì¸íŠ¸ ê´€ë¦¬ìž org.springframework.jca.endpoint.GenericMessageEndpointManagerë„ ì œê³µí•œë‹¤. ì´ ì»´í¬ë„ŒíŠ¸ë¡œ ëª¨ë“  ì¢…ë¥˜ì˜ ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ(CCI MessageListenerë“±)ì™€ í”„ë¡œë°”ì´ë”ì— íŠ¹í™”ëœ ActivationSpec ê°ì²´ë¥¼ ì‚¬ìš©í•  ìˆ˜ ìžˆë‹¤. ì‚¬ìš©í•˜ëŠ” ì»¤ë„¥í„°ì˜ ì‹¤ì œ ê¸°ëŠ¥ì€ JCA í”„ë¡œë°”ì´ë”ì˜ ë¬¸ì„œë¥¼ ì°¸ê³ í•˜ê³  ìŠ¤í”„ë§ì— íŠ¹í™”ëœ ìžì„¸í•œ ì„¤ì •ì€ GenericMessageEndpointManager JavaDocì„ ì°¸ê³ í•´ë¼.\nNoteJCA ê¸°ë°˜ì˜ ë©”ì‹œì§€ ì—”ë“œí¬ì¸íŠ¸ ê´€ë¦¬ëŠ” EJB 2.1 ë©”ì‹œì§€ ì£¼ë„ ë¹ˆê³¼ ì•„ì£¼ ë¹„ìŠ·í•˜ë‹¤. JCA ê¸°ë°˜ì˜ ë©”ì‹œì§€ ì—”ë“œí¬ì¸íŠ¸ ê´€ë¦¬ë„ ê°™ì€ ì˜ì¡´ ë¦¬ì†ŒìŠ¤ í”„ë¡œë°”ì´ë” ê·œì•½ì„ ì‚¬ìš©í•œë‹¤. EJB 2.1 MDBì—ì„œì²˜ëŸ¼ JCA í”„ë¡œë°”ì´ë”ê°€ ì§€ì›í•˜ëŠ” ëª¨ë“  ë©”ì‹œì§€ ë¦¬ìŠ¤ë„ˆ ì¸í„°íŽ˜ì´ìŠ¤ëŠ” ìŠ¤í”„ë§ ì»¨í…ìŠ¤íŠ¸ì—ì„œë„ ì‚¬ìš©í•  ìˆ˜ ìžˆë‹¤. í•˜ì§€ë§Œ JMSê°€ JCA ì—”ë“œí¬ì¸íŠ¸ ê´€ë¦¬ ê·œì•½ì—ì„œ ì‚¬ìš©í•˜ëŠ” ê°€ìž¥ ì¼ë°˜ì ì¸ ì—”ë“œí¬ì¸íŠ¸ APIì´ë¯€ë¡œ ìŠ¤í”„ë§ì˜ JMS ì§€ì›ì´ í™•ì‹¤ížˆ â€˜íŽ¸ë¦¬í•˜ë‹¤â€™.\nìŠ¤í”„ë§ 2.5ì—ëŠ” JMS ì„¤ì •ì„ ê°„ëžµížˆ í•  ìˆ˜ ìžˆëŠ” XML ë„¤ìž„ìŠ¤íŽ˜ì´ìŠ¤ê°€ ë„ìž…ë˜ì—ˆë‹¤. JMS ë„¤ìž„ìŠ¤íŽ˜ì´ìŠ¤ ìš”ì†Œë¥¼ ì‚¬ìš©í•˜ë ¤ë©´ JMS ìŠ¤í‚¤ë§ˆë¥¼ ì°¸ì¡°í•´ì•¼ í•œë‹¤.\në„¤ìž„ìŠ¤íŽ˜ì´ìŠ¤ëŠ” ë‘ê°œì˜ ìµœìƒìœ„ ìš”ì†Œì™€ë¡œ êµ¬ì„±ë˜ì–´ ìžˆê³  ë‘˜ ë‹¤ í•˜ë‚˜ ì´ìƒì˜ìžì‹ ìš”ì†Œë¥¼ ê°€ì§ˆ ê²ƒì´ë‹¤. ë‹¤ìŒì€ ë‘ ë¦¬ìŠ¤í„°ì˜ ê¸°ë³¸ ì„¤ì •ì— ëŒ€í•œ ì˜ˆì œì´ë‹¤.\nìœ„ì˜ ì˜ˆì œëŠ” Section 22.4.4, â€œMessageListenerAdapterâ€ì—ì„œ ë³´ì—¬ì¤€ ë‘ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆ ë¹ˆ ì •ì˜ì™€ ë‘ MessageListenerAdapter ë¹ˆ ì •ì˜ë¥¼ ìƒì„±í•˜ëŠ” ì˜ˆì œì™€ ê°™ë‹¤. ìœ„ì—ì„œ ë³´ì—¬ì¤€ ì†ì„±ì„ ì¡°ê¸ˆ ë” ì„¤ëª…í•˜ìžë©´ listener ìš”ì†ŒëŠ” ì—¬ëŸ¬ê°€ì§€ ì„ íƒì ì¸ ê°’ì„ í¬í•¨í•  ìˆ˜ ìžˆë‹¤. ë‹¤ìŒ í‘œì— ì‚¬ìš©ê°€ëŠ¥í•œ ëª¨ë“  ì†ì„±ì´ ë‚˜ì™€ ìžˆë‹¤.\n<listener-container/>ìš”ì†Œë„ ì—¬ëŸ¬ê°€ì§€ ì„ íƒì ì¸ ì†ì„±ì„ ë°›ëŠ”ë‹¤. ê·¸ëž˜ì„œ ê¸°ë³¸ JMS ì„¤ì •ê³¼ ë¦¬ì†ŒìŠ¤ ì°¸ì¡°, ë‹¤ì–‘í•œ ì „ëžµ(ì˜ˆë¥¼ ë“¤ë©´ taskExecutorì™€ destinationResolver)ì„ ì»¤ìŠ¤í„°ë§ˆì´ì§•í•  ìˆ˜ ìžˆë‹¤. ì´ëŸ¬í•œ ì†ì„±ì„ ì‚¬ìš©í•´ì„œ íŽ¸ë¦¬í•œ ë„¤ìž„ìŠ¤íŽ˜ì´ìŠ¤ì˜ ìž¥ì ì„ ì´ìš©í•˜ë©´ì„œ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆë¥¼ ì»¤ìŠ¤í„°ë§ˆì´ì§•í•´ì„œ ì •ì˜í•  ìˆ˜ ìžˆë‹¤.\në‹¤ìŒ í‘œì— ì‚¬ìš©í•  ìˆ˜ ìžˆëŠ” ëª¨ë“  ì†ì„±ì´ ë‚˜ì™€ ìžˆë‹¤. ê° í”„ë¡œí¼í‹°ì˜ ìžì„¸í•œ ë‚´ìš©ì€ AbstractMessageListenerContainerì™€ ê·¸ í•˜ìœ„ í´ëž˜ìŠ¤ì˜ í´ëž˜ìŠ¤ ìˆ˜ì¤€ JavaDocì„ ì°¸ê³ í•´ë¼. Javadocì—ëŠ” íŠ¸ëžœìž­ì…˜ ì„ íƒê³¼ ë©”ì‹œì§€ ë°˜í™˜ ì‹œë‚˜ë¦¬ì˜¤ì— ëŒ€í•œ ë…¼ì˜ë„ ë‚˜ì™€ ìžˆë‹¤.\nâ€œjmsâ€ ìŠ¤í‚¤ë§ˆë¥¼ ì§€ì›í•˜ëŠ” JCA ê¸°ë°˜ ë¦¬ìŠ¤ë„ˆ ì»¨í…Œì´ë„ˆë¥¼ ì„¤ì •í•˜ëŠ” ê²ƒì€ ì•„ì£¼ ë¹„ìŠ·í•˜ë‹¤.\në‹¤ì–‘í•œ JCAì—ì„œ ì‚¬ìš©í•  ìˆ˜ ìžˆëŠ” ì„¤ì • ì˜µì…˜ì€ ë‹¤ìŒ í‘œì— ë‚˜ì™€ ìžˆë‹¤.\nTags:Java\nUpdated:August 8, 2022\nJanuary 13, 2025\nSlack API ë¥¼ ì—°ë™í•œ ìŠ¤ë ˆë“œ ì´ëª¨ì§€ ë…¸í‹° ì–´í”Œë¦¬ì¼€ì´ì…˜\nJanuary 13, 2025\nSlack API ë¥¼ ì—°ë™í•œ ìŠ¤ë ˆë“œ ì´ëª¨ì§€ ë…¸í‹° ì–´í”Œë¦¬ì¼€ì´ì…˜\nJanuary 5, 2024\nAWS ë¥¼ ì´ìš©í•˜ì—¬ Github Repository ìžë™ë°°í¬í•˜ê¸°\nJanuary 5, 2024\nEC2 ìƒì„±í•˜ê¸°", expected f64ooleanþ
+ÿÀÁ,kÔTBkÀÁi˜j€BjH«A°w þØøÏ¼Æ@K…?i!2l?m!¸þœéx †‚wÀ ‡ÝÄº! êñ@ 7ó€Á,lÌF@n„á† ž0˜eˆÙRG¢W$TÄ7LðŸ%˜ûµ$‚è‚ŠôÄŸ üg	fc £rbC0xÚó@ 7#€Á,mÜF@~„á† ¤0˜e¨ÛRM¢W6ÃDpÀ,Án›¸m D¯r4†ˆ@€Y‚Ý10ƒ6óÀžƒ8ÉzvÄ y@H¡Ìƒ •VV9 SÂpCÐÒÌ2änss"'¡Ì1ê€r0Ç¤k ÊÁ,nÌ1ìqP'.Ì1º”r0Ç¸k@ÊÁCÐ®)³º1Pá
+n¹‘fôìˆÁ üœ`‚AÌy ÒAŸÌìîIl00Üüu ³¼ÁˆÑ€ ´A2ôh0b`4 mPçL`Œ‚AÔy€ÊAê#F‚`Ðu t ºÁˆÑ€ ´A(¬n0b`4 mPçJ¬Œ‚AÔyÊAë#F‚`Ðu¤ràºÁˆÑ€ ´A(¼n0b`4 mPçJ°Œ‚AÔy€ÒAì   B  [
+&ˆâ^¶OP/[†(¨—-CØË–á
+ìeKÑñBÜË–Á
+}Ù2 A±/[5(øeËÀE¿lÜ ð—-ÿ²eƒd¶tP„Ì–Á
+‘Ù2àA12[=(HfËÀEÉlü 0™-('³e…e¶¤P¤Ì–Á
+•Ù2 B±2[U(XfËÀ
+EËl\¡p™-,/³e…f¶´PÄÌ–Á
+™Ù2àB13[](NfËÀÊl|¡H™-8*³e‡be¶äP°Ì–b‚x!îeKAA¼÷²eP‰ _¶-!½Í–"&‚x!îeKAA¼÷²e ‹@g¶lèÌ–a.Ù2äE/[†½òeËð½l)@#ˆâ^¶¦ØË–5{Ù2¨F`/[ÖìeËà½l`#°—-ƒlö²e À^¶¶ØË–7{Ù2ìF/[ßòeË A¾lÄ#°—-CyHp³¥€‘ ^ˆ{ÙRàH/Ä½l)Ì$ˆâ^¶¢¼Ë–ÂU‚x!îeËp+Á»lp%x—-C®ï²eÐ•à]¶ã¼Ë–\‚wÙ2”Kð.[s	ÞeË@/A½lÖFŠ›-ø<³e(Ÿ€g¶êðÌ–á}žÙ2ð$7[
+ìeËÀB½l\(°—-ö²e ¡À^¶6ØË–‡{Ù2èP`/[
+ìeËàC½lÀ(°—-ƒö²e€£À^¶rØË–Ž{Ù2ØQ`/[=’æfËPJA¾lT)È—-Ã+ù²e ¥ _¶¸ØË–A—‚|Ù2ôR/[p
+òeË0NA¾lÌ)°—-C:ö²eh§À^¶ñØË–¡ž{Ù2ÜS`/[†|
+ìeË°O½lú)°—-ƒIù²eH© _¶+äË–¡¥‚|Ù2ÀT`/[™
+ìeËS½lx*°—-Xö²e«À^¶oØË–!®{Ù2ÌU`/[†º
+ìeË°WA¾lü*È—-hù²e­ _¶¦ØË–µ{Ù2ðV/[ß
+òeË^Ýlü+°—-‹ö²ep± _¶0ØË–AÆ‚|Ù2ðY`/[†QòeËPjA¾lPMª›-«ï²epµà]¶±&ÙÍ–ÁÖ‚wÙ2àZð.[†]“îfËðkÞl)È-ˆâ^¶éÄq/[Šuâ…¸—-EÉñBÜË–õžÙ2Ä^À3[ÛxfË°{ÏlÄOÊ›-Cüö²e˜¿À^¶õØË–áþ{Ù2è_`/[þìeËà½l@0ìeËP‚A`/[†{Ù2¤`ØË–aƒÀ^¶-ö²exÁ °—-C½lf0ìeË`ƒA`/[{Ù2è`ØË–ƒÀ^¶kö²ehÃ °—-Ã½lâ0ìeËP‡A`/[†;{Ù2äaØË–aƒÀ^¶£Hz³exÅ È—--A¾lr1òeËà‹A/[q{Ù2cäË–áƒ _¶êù²ehÇ È—-<½læ1ìeËpA`/[†}{Ù2ücØË–!$ƒÀ^¶#ö²e(É °—-ÃI½l`2òeË0“A/[†š‚|Ù2ÜdäË–A'ƒÀ^¶<ö²eË °—-ÃX½lÊ2ìeËp–A`/[†´{Ù2¬eØË–Á-ƒ _¶pù²eË °—-ƒ^½lú2ìeËšA`/[†Ñ{Ù2ÀfØË–A6ƒÀ^¶´ö²e°Í °—-oA¾l~3òeËžA/[†ñ‚|Ù2œgØË–!=ƒÀ^¶îö²e€Ï °—-ƒ|½lè3ìeË`ŸA`/[ü{Ù2ìgäË–¡?ƒ _¶ÿö²e˜Ñ È—-CA¾lp4öfËp§A`/[†R{Ù2œjäË–!UƒÀ^¶«ù²e¨× °—-¿A¾lü5òeË²Ä7[†’‚wÙ2œl¼Ë–Ae©o¶/ï²eˆÙ x—-Í’ßln6þfK³A/Ä½lÊ6òeËp¶A/[
+´‚x!îeËÀ¶A/[·‚|Ù2Èm Î–!oƒ _¶~ù²eÝ È—-ÃèA¾lN7BgË »$:[Ü‚|Ù2ìnäË–¡wƒ _¶áù²eß È—-ùA¾lÐ7FgK‘¾A/Ä½l)Ø7â…¸—-ƒýA¾lø7òeËPÂA/[$ÒÙR¨qÄq/[†7‚|Ù2ÔqäË–ƒ ^ˆ{Ù2ôqäË–"”ƒ ^ˆ{ÙRrÄq/[
+T‚x!îeKñÊA/Ä½lr9xfËðËA`/[tžÙ2¸sØË–ážƒ€g¶ýö²ehé à™-ÃL½lr:òeËàÓA`/[°‚|ÙR„uÄq/[
+±‚x!îeK1ÖA/Ä½l)Ø:â…¸—-…\A¼÷²¥¸ë ˆâ^¶ñBÜË–â´ƒ ^ˆ{Ù2ØvðÌ–·ƒÀ^¶âù²e8ï °—-CzA¾l)Ô;â…¸—-ÅzA¼÷²¥`ï ˆâ^¶õñBÜË–b¿ƒ ^ˆ{ÙR€xÄq/[
+‚x!îeKãA/Ä½l~<xfËPæA`/[†5‚|Ù2ÀyØË–AÎƒ _¶sñBÜË–‚Îƒ ^ˆ{ÙRÔyÄq/[
+?‚x!îeKAêA/Ä½l)R=â…¸—-E¬A¼÷²¥Èõ ˆâ^¶åñBÜË–"Ýƒ ^ˆ{ÙR°{Äq/[†x‚|Ù2à{äË–¢ßƒ ^ˆ{ÙR€|Äq/[†’‚|Ù2¨|äË–âåƒ ^ˆ{Ù2ˆ} •        a   y  á     0P$PDPePÅA3 c Ì1ÌÉœ¼ùŒ Ì PÕÀh Í PÅ‚ 
+# c}ß²¸F# „1@# d20‚ ‚‚ 
+ ‚ (€ ‚ @R£3 49 ñ0  $   +¸Á™œY1ÄÎäÌ
+AnpfÅ078“3+ºÁ™œY1ÔÎäÌŠÁnp&gVwƒ39³bÀœÉ™CÞàLÎ¬ôgrfÅ°78“3+¾Á™œY1ôÎäÌŠÁop&gVƒ39³B œY1„ÎäÌŠAtp&gV£ƒ3+ÒÁ™œY1”ÎäÌŠÁtp&g  3w¼E(ÌDäð£0±À[ŒÂLÄ_ o!
+3¼…(ÌDÜð¡0À[ˆÂLDh o!
+3}¼E(ÌDœð£0qÀ[ŒÂLDK oA
+T#a¸!ˆ0˜e‚€BAd D*"€˜cƒaæAHUÊq ´*å‚:Ya Â0t *&`` Â0x (OÂpC `@h"†‘ ƒé†_†A†cä`º	„é$E)Di”FhP 0:Iq
+&q§A ŒNR¤J¤Fjô £“« «±¦AÀè$E+°Dk´Æ_P 0:Iñ
+.ñ¯ ŒNRÄLÄFl¬£“³ ³1ªAAÅè$D-ÐDmÄ £“·`·A ŒNBäNäFkP 0:	±:±¶AÀè$D/ðDo¼ £“¿à¿a ŒNB„X„lP 0:	1b1±AÀè$D9Ey¼ £“ç`ç ŒNB¤Z¤GlP 0:	±j±áAÀè$D;°Ez´ £“ïàë‘ ŒNBÄ\´zP 0:	1rñâAÀè$D=ÐE|Œ £“÷`ó1 ŒNBä^ÔÇ_P 0:	±zq¢AÀè$D?ðE~Œ £“ÿàû¡ ŒNB„hôG|P 0:	1¢ñøAÀè·Å8iiŒ‚AüÊ]9;b`4 m .xä84ìˆÑ€ ´A¸äEãÐ°#F‚`ÐâÂAŽCÃŽ‚AŒK[ý¶‡ÔHÔH£A0hrá‹ Ç¡aGŒÁ Ê…4‚‡†10ƒ60—Òz/1¬Á¬1b`4 mp. (¬Þ¬ž´Þ¸’Ì„á† 6À`–€dÀ…’ ‰é†\hád!€;Á“Áé†	ƒÒF 7½³Ì@€GÂAd@=—Ø‡ÞzcØ€Nb pØnRf"¸[è<Sø¼; $³ÃÁy€Á;ä­@nÔ(nÂpCÀ`0ÝÔÄ@r#†‚÷ ƒé† 'Ê0ÜÈL7;1Ì2F0Ý x@Hßî"È r)À ³Ç@&xRÌ2$È4Ý@z Hßú"È r)À ³É@& ¤rÌ2,J3ÝÀ¢ HßF# `ƒÌ,› °Jr¯ÐIÑ/' àBôA(¸7c D’€@¹#†ƒYè	* ŸÚÀÉ€ úmñ0ÀŒ@¿-à"F„9a"¨‘ è·E\ÈÈ #¦1l@6 ý¶‹!f5†ˆàF ÿpA#ÐÈ°ð… ôß".jÄ¨‘Õ6 ‚¾€þ[È…6¢ÃDàÐ‹¹¸äFXcØ€þB úo18’àŽh@ÿ-è"G”ya"è¿E]èÈ¢#®1l@¢! ý·°‹av6†ˆ`4 ßvÁ#ðÈ°€I ôÛâ.zÄé‘Ù6 ‚0	€~[à…<>"ÃD &Ðo‹¼øèGhcØ€Æ$ fœÆúîÐ`jÀ,Óƒ	½)L†ˆ 5 z!&“˜j@ï%ôbL¨16 ‚3	 ´Â†‚WƒY†‚	.b¢f	 
+@xHb™e¢íFa&f–@¨ „ˆ¶ xAN ¹@€3hB®8	¹@€K^A	¹@€cÈAn‘¹@€1„¾`1„ºhC(‡÷8!€1„sØ“ôå2"ˆ~!˜H0Ë0Q qÅ/HÑ/„!Hƒ ú… ³U*Ñ/„#8Å$‚èÂÌT˜@1Õ@n\²#ˆ. ÐH0Ë`]ÃI£!D†€ôG 7µyDŽ ƒÉn°€˜%Àr#ˆ. ,A“;K€TÆåX›qYÖ@ÅLc‘	„á† \À`ºáWŠ ]?Œ!üF¸ÜrAËHÑ+„1	’¢WmÌ2hÙz¤DÒAô
+áM‚^!Ã,Ávrð’AdD¯è$8°É€ z…0³Û@…e‚6PA`™£õ
+Á	ˆ• ÆpC€7a0Ý ÜF@°0¦‚Û2FvÄÀh@ÚÀ†ð%¸Moîùœ‘†10ƒ6È¡}	nø	¡4ÃÉ€Á,×ýÀ‘™;9üÀé‡„ŽÉàÉé‡è\?$xÄdL†Oú!Ñ#'s2'3l@©3 Ã„Ð0l@Ã F1 ³Ý,Ãç¥H?$zeP¦O.-üFú!ñ#*£2~r"2*Ú‰0a–•~HˆIË´LËÁëÀ°!¸Å Ä0 Ã„QÀ,Á7Ü #1#¦¢ÃÁÌ„ÁtCÀ'ÃB_ ÊpCà"d@à$†œƒé†z‚é"0†¼ÜƒY†X ƒ€r	Ad ÃÂ¾€™’@nÀú!1'>ã3>“¿‚±ý¨°[é‡„„MØÔJ?$îDlÄæVr\*·ÙèJ7Ê¥lv%Œí€q6¼’l@ÓAÚ0Ã¹Ñ6`Ð‰PY›µY›~Hˆ
+Û°¸ôCbTÚ¦mÂ¥¤â6n3.é
+1Ý 7ÁL7ˆ¯ ÆÈûÜ‘úÈHüÜ‘ˆúµ“@nôN6`c‡¾ƒ¬‹
+œcø•`opY—´‹
+œc—Ào‚qq—é†q	xãlc6v¸!(0˜n¦(ÒÉ‡Y‚0¨Àðž1¨˜	Ú ƒe*6Ü ƒc* À`ƒY†17¸ d– *6#N*fB	ƒ“€…
+Ì	ƒ®˜nhfÂ ‚ŠkÒ`Ô` âz…4x5¨¸V!ÆA*®SHƒ[Pƒv1Üÿÿÿÿ€©¥ÀÈ€ H FAk 02 b€‘AÌ´Á@&Á‚ˆÁ@ÅLŒ,¸Tl¿ n @}ÁˆÁ@P_° ŠÌ2˜Â,Ã *Pq!æF&Ÿ~!9CÁ…˜c‚é‚¢3\ˆ9†!à™~!4>CÁ…˜c°™%Hj…1Çà2Aû*\ˆ9!(R…1Ç eC«p!æ„ mf	Ò` C¤3ÐÀ?Æ‚úCØfaX›1¢mf	È€v`d@ýBø‚é† Ê‚A¾ 02 ˆ~!A0Ýˆƒ:Pp!H FÑ/„4¦‚sx
+.™ÀÈ€ ú…àÁtCÀô@Á…˜% ƒ& ¼*´!Ta–aäÀF(üÿÿÿ X	†=ƒY†5hƒ`  Ë€6˜epƒ88b–Þ@&úÎ`ÁQ úÎ€ÃêP úÎ ÅêP úÎÀ‡ëP úm¡7;”ìÐ ý¶ØRxHv†ˆà€~[ðM-=;ÃD`@¿-úÆ‡ša"(`–€º€
+M‚U @ taX
+BŠU @ táX
+B¿-N,4B£a"@ ß¨“FWýÎ°Ðo‹ÔQ#L|gØ€Œ è·…ê¬Q¶Fà3l@E Ì°Áma#D`! @ tA0
+Bó¡@ tÁH
+B–AôÛÂvî(¸£;6 ‚$ úmq;x$à‘û ý¶À<ò¨}†ˆà€~[äŽzô>ÃD`À,/€\ O—Aœð2rƒËÈ,ŒPøÿÿÿÿ ô07ë³{@Á@`¢spÍÌ5#'ÐŒÌ2ÔìÇ,ƒÜOÜ€À¤@ýB(•€‚qÏ@Ñ/„T	(¸—ôd@ýBh•€‚qX@Ñ/„X	(¸YDÿ-è—\Â¥a"x ÿõ“KB.½Ð°0ÐûÑ¥A—\hØ€è¿Åýì±K04l@† ôÁV(
+.D¿pE¢àBôAW 
+.D¿xÅ¡àBôßâÈ©!'r6 D úoBåä”ÓÁ! ý·!szÌI‡†ˆÀ€þ[ˆÐ9AçÄCÃDP@†AtáW
+Â‘Þ@Ñ„q	(‡{DÎ% @ ød@]@X—€Ðo‹º'0¸§{6 ' úm!CøøäFÃD°@¿-f(ŸÄ ŸÚhØ€ è·éÓèÓA ³sp06sAëÈz 7´Ž\ÀAô¡_
+.D†Aô`¢‡H* ©a" _ÿRPp!z0ñC'EœÔ°	Atá_
+Bï%Äh¥•6 ! f	æ`–!ô@<¢_)dP¹pdá¥(¸phá”(¸p(lá”(¸p8pA•(¸YÑ:Â© §pjØ€è¿Eå”S¯4l@ˆ ôßÂŽtjÐ)W6 ‚C úoqG;Eì,! ýB°(ƒÊí€C>EÁ…è€Ã0¶DÁ…è€CQ¶DÁ…è€Ãq¹DÁ…è¿E(™ÕcVf5l@ˆ ôßB”Î
+:«^6 ‚C úo1Jh¡/! ý· ¥´’ÒÊ—†ˆ €,‚èBØLnßxh+
+Bßy('
+Bß
+z('
+Bß{@'
+B¿-^©®¼ºª«a"@ ß°dWŸ]±Ó°Ðo‹Xº+0¸«u6 # úm!KxxÕNÃDPÀ,Á\?„Ï\`Aôo
+.DòAô`—þ*ø«a" _zSPp!z0¡K¢EˆÖ°pŠ?@Ñ„½	(½—ð¥ÓJNkØ€„ ˜%˜ƒY†>à÷¨ Î€d8Øƒ¢ßé¤Zj©aŽ!ŸÖê·;µÑZ#E@˜c‚’ê·Å;ÁÖ[$E@˜c“ê·…<Í–2[(E@˜c•10–ÿ°tFŽ%ÁÂ?`aÝ‚ ïõ„[ƒü‡ˆ! œp†ƒY†>àƒ`ŽÁŸV¤·æ‚¡©9†àEfjŽ!ˆ‘š10–ÿ˜znDÀì2 ˆ~!LåÎüÁ,C+¸B¹T ®ôÁi°BÑo‹“B¯ ½Ð‹0ÇpSzõÛB¥Ö‹X¯°¢@ Ì1ÁXõÛ¢¥Üëp/±¢@ Ì1YõÛ¦âK‰/³¢@ Ì1ZK‚…Ø‚É³ª 
+~Ò‹˜ª/§¾ê‹‚1Ç€SÁ}õß‚¦ð+Â/·¢àBÌ1\õßâ¦ö‹Ú¯·¢àBÌ1A\õßB§üëò¯¹¢àBÌ1A]õÛb§BL±£@ Ì1ÀU0bý¶ð)ëHL¯(sCÀWý¶«ƒÛ+
+ÂÃôU¿-ÈJÅÆ@ÅþŠ0Ç0¡Õ´j13h±£àBÌ1ÀUðbý·X+K3-
+.ÄÃ Vÿ-ÜjÆØ`ÆN‹‚1Ç0©Õ‹¸²±7°±Õ¢àBÌ1Akõ`B®rLrŒ‚Ñ{	¹Ú1:Ø1
+B&êªÇì Ç(¸³¥
+æ2Ë@
+¢`Gs¡UüØ C Z¯5Á½øÇˆ±„ XøÇ,Ô]€Áˆÿ,ƒ*Œ(Í1˜–AfƒÁiÑÖt„ð‹ŒK‚…Ì‚Þà?K 
+Xí"þ¨øÏ¨Â,ƒ*˜BºÌ2¤Â)ðÑÃm=k6ÈàÖnM7„A02#Æ‚`á¶ zîAþs²eÁÙ C0[à5!ÊøÇˆ±„ XøÇ,˜^€E þ³ª€
+±4Çp[W2¸U^Ó_Ð2þ1b`,!þ1«`P€ÿ,*ŒK‚… Âì½ÑÃo{6È€×za*áÈˆ?ÿþ³ª0Pd8ñp0
+z 
+*`§€¥À¤ ¤Â,+¬Âø/H‘c	A°ðY¨½ ƒAüg	Xa Â„U@TaÄàXB,ür‚žK—©ý‚©QP10ÀØ€‚Àq09nèfüà‚
+`iü ‚è‡ÄxµZ« Œd†ˆ! ,Z†‚–ƒYWh…`–^¡n*€åÌ<p…¢éEk´P 0.¸6 †` ° 9nhf`á‚ÓüÔ—›ƒá† tÀ`–aÊ ¨ ô<ø|l*6>3ƒŠ™ Áà3³1¨ÀØ0øÌlˆ0Ü[7êCÓ‹	³²àña †t‚Á@ 7êýè/tC7tË4ÃØ~Hü—º©˜õCÄÖmÝ~¬!ÆnìfÙf•Û‡ÀÝÈ¬›oöne–ÆvÀˆ73Kû!ˆé†`Þ˜á†±º70è‡ÄŠÕ[½Õ[?$XÌÞìÍú!Ñb÷vokÖ	Ã7|k³Ä!‚˜nÐ· ¦XÊÌdêZ+ïî\KîäZkïî\‹î„î0ÃÉÁéOípC`r`ÿTsi”Ü C fu– Usl Ü CÐfx6ÝÐfYXõÔ7/Ó-·‰Òtår£4K08ÈB×3A²p-1P±¡ƒ,ŒDKT ì óÖÈ‘\KpÁìÝpCp_d0Ý`oL7£B³µr0Pq¥.ÄC.T\¥€åW(àB.äÂ@ÅÕ¸Ð
+¹Ð.G( FAj 02 Z€‘A Œb–€fláº.Äªg×/„Ì×(¸sC nýBà~‚1Ç0áÖ/„oÜ(¸sCPn³¸@¨p!æf-;*…1Ç êF¥p!æ„@ÝÈ.Äƒ´Û,.dÈ‚dÂ-øÇB wcB¼!ð6†@ÈÛ,-- Œ¢_qL7¸\Ê€‘AôÁ‚é† Ü€‚A½ 02 ˆ~!ìA0ÝˆÃPp!( FÑ/P¦‚sÀ
+.Ä,-4!J¡í£P
+³øp¹0Báÿÿÿÿƒ07ÿ³ºÀÁ@à†-»0ËÐäÀRÄ,C8øÂ-Í2ü8„BßP!À=
+BßTa€9
+BßX¡€9
+Bß\á˜9
+B¿-þüð¿a"@ ß ~JøÝÜ°Ðo‹¿EülnØ€Œ è·…È3~87l@E ÌìB¿-FŽüò#¿a"@¿ è·É•ŸS~;7l@é ý¶(9ó{ÌOç†ˆ@ý ß&w~ÐùñÜ°¬_ ÌìÂ,ƒ8ŒC,tá¢. ª@@èÂ 
+„. ª@@èÂ¡
+„~[À\üiñÃD€@¿-bNþ6ùC»a"8 ß27ÜüÝ°Ðo‹™£¿ŽþÒnØ€Š ˜%Ø…~[Ð\ýyõWÃDÐo‹š³¿ÏþØnØ€ô/ úmas÷÷·vÃD°Ðo‹›Ã¿0À¿¶6 þ€Y‚]˜e(s‡w“¢êP º€ Ì¡ÄÜQ º€`Ø!Û€ úm1v$$`0l@I ôÛ‚ìJ0J0Ø»a"@ ßeg‚Á`‚ÞÁ ý¶0»ˆønØ€Œ ˜%Ø…”‚è·Ú¥`¤`‚Á°´` ý¶H;@oØ€\0€~[¨Ý
+Ã
+7l@/@¿-ÖŽ‚ƒÐ6 `–`2âòá×äôÁ×d– F(üÿÿÿ Z1 †á†`0˜eÀ‡t* ³Î@‡Ìm.(79Üd–AâaµfÖÁ@b–ÚA,n@àR ˆ~!ÔX@Á…¸‚Ý ‚èBŽ\ˆKÆ2 ˆ~!ôX@Á…¸Æ, ‚èB˜\ˆ¬¢ÿ¤‡†A€†ÃDð@ÿ-J/!ƒß6 F úoazjjøÞ°$Ð‹Ó[Ã€XÃ ü†ˆÀ€~!˜EÁ…èšI\ˆ~!¨DÁ…è›9\ˆþ[¼t" ý·€½:œ:ÖoØ€è¿EìÙaðØa ~ÃD`@ÿ-dïèö6 ‚B 2¢oP ŽT2 ˆ. ÌY@@84È€ º€pgáØ€4 ‚èÂž„~[„ß)`pŠÁ)ÃDà@¿-Äƒ0@ÅÀÿ†ˆ`	€~[Œ_*bŠAÿ ý¶ ?UÆ@ƒÿ6 ‚" f	ÐáìbÞæ‚ž“ô nè9¹€ ‚èB«\ˆ‚èÁDûÑbÐb0l@ƒ ôáÕ
+
+.D&Þïâƒa" ‚èÂ«„ÞKÈß.È.ÃD À,:¤*Ä,Ã;ÀCzôß"ÿz1z1èÅ`Ø€J0€þ[èŸ/‚/4	Ð‹ýûÅ`øÅ`ƒa"8Á@ úoÁààÔ`0l@(@ÿ-ø/ƒ"ƒp†ˆ è¿Eÿ‰c`ˆc€ƒÁ°¨`  ý·ð¿qŽqn06 ‚ ÿÿGŽBŽAÃDÀ‚ ôÛâÿÊ1HÊ1(Ç`Ø€Ò1€~[€``ŽbŽÃD ŽA ôÛ"ƒs–sv06 ‚u ß" cÀ cÐƒÁ°°c ³èÐƒ	Ò1hÒ16 ‚ "¨cà¨c0l@2@ï%D0XÇàYÇ`Ø€Þ1€Yt˜e‡z°Y†y üH\ ˆ~!¤[AåvÀ!‡w(¸pÈá
+.D
+s8Ã€‚Ñ‡Ô0 àBd9Dÿ-h0ÀÇ ÀÇ ƒa"H ÿ5äc äcð†Á° Ðô1ô1pÃ`Ø€è¿ÅûûÀa0l@† ôÁÞ *·A<øc@Á…è€Ã0vPp!:àPÔƒ\ˆ8÷‡¢ÿa˜dð˜d`’Á° Ð1N2€N2èÃ`Ø€è¿Å(D(ða0l@† ôß‚ƒ”¤”ü06 ‚B ²¢!d0¹}g@¢%
+Bß‘(Å€Ðw†‚$J1 @ ôá0	T(ý¶xÃ &¯&ƒš†ˆ 	€~[Àa`“Ág“+ÃDp@¿-â0¸É n2XÅ`Ø€Œ è·…8„N­A ³èp$zsI@Ñ/œ(¸ÉÑƒ	<~2~26 ‚A ú… s¢zˆe@ˆe0l@‚ œâAtaç
+Bï%ü08Ë 9Ë`Ø€„ ˜%@‡´	‚˜e°‡{¨“þ[”b–A–AZÃD‹ ôßÂµµÀ16 Y ÿ§¬e0¬eð‹Á°Ìb  ý·@Å€-‚-ƒp†ˆ€è¿*mm´e0l@µ@ÿ-R1pËÀpË€ƒa"°Å@ úo¡ŠÁ[Ç[ãÁ-Ð‹Uà2@à2(Ç`Ø€p1€~[¬b—A—A\ÃDP—A ôÛ‚¹¹Ð16 » ß­Ìe°ÌepŽÁ°Üe ý¶pÅ€.†.ƒt†ˆ /ƒ ˜%@‡L¸bP—AS—Á°ôb  =˜pÅÀ.Ç.ƒa"ðÅ@ z/áŠÁ]Ï]ÃD°—A Ì Ã,ƒ>äƒïT gò+àCÑo‹\ô2ô2ÐË€0ÇŽAÀ—A¿-x1èË€èË`
+ÂÃÔcÐo‹_@38@3 Ç€0Ç0öôÛBƒÑ”Ñð1 @ Ì1>#Æ‚`á¶€«A0bp,!þ»AßÊ1@Íà¡ b`0€ÿ°1€Š00ÜØg ³úÁƒ;qÒšÁC0'$Ì1u2’ÁCp'%ŒK‚…Ì¹ÁñI\<Ý —APo*2\Ñ/{2°ÜY~˜eP‰•¸µ
+@Ž}8”È€ úm‘nnºP æR2x3è·?½½Ìd@@˜c‚šúmñxx4P æ†À&ƒ~[ˆd0ž2žN„9†!ÐÉ`ÄÀXB,üÃð5fN¢Ì¥ÿ#œgàœgpžbŽA%ƒ =ƒþ[˜d žA¤žX\ˆ9†!Ë ÿ)´g@µg–bŽaÆ2è¿Kð\ð”e@Á…˜c‚³úmÑ’Á|Ú|óP æÄ2ê3è·Lötö°e@@˜c·úm1“A~`ŸA[„9†!xË ß6ðg0üÄe@@˜c‚¹úo¡“ÁfðŸÁ\ˆ9±‚úoÑ“ˆi ¢^\ˆ9†!ÐË ÿ`”hÀ%äe@Á…˜c‚½úo1–Šo€¢A_\ˆ9†!øË d¬h +Pp!z/A–A‹tÐ¢¡g¼h`/Pp!fDÂ\f–!$þƒ9†¹ŠºB3˜ŽƒàgücÄÀXB,ücÎ60xñŸe8	Ã`Ž/ÃFƒA† /Ó¦#œ€lücÄÀXB,ücØ60(À–à$°jFü1ðŸ%8‰Y†“‰˜™e0	’pÃ`Ž!5ƒ§GƒA†@5ƒÖ¦Â X›c	A°ð[Û À=ÂŽ4KLƒA† 4Ù¦#ä €ÿ10–ÿ˜¼,ñŸe8‰’Å`Ž!5ƒëLƒA†@5ƒÛ¦#¾ nücÄÀXB,ücú60(À–à$FŒ%ÁÂ?P¡tƒ0æb3Ú4dd3èÍ S!ÔFü18ðŸ%8‰"3À	~€ÐƒpJ#	œ	6	Á$fR%ÀxAŠŒK‚…ÌÂéƒøÏ¤Ä@…(œÄˆÁ±„ Xø,¬n`AÏ%l3ÀÓàð4  b`0€ÿ°1€ã€¯7æ€Á,Ã>ðC0P,*ÁßÂ>d@ý¨ÍàOƒ?
+ Æ¤ÃÄ ÿÀÀpCð¯Ì2¬„J³-Á½3P,,¡âÂJd@ýØÍÀTS
+ Æ©ÃÄ &ÀÀpC`²Ì2´K˜7(@ÀpC@{`0Ëà³a¸!ˆÕ È~0ÜÌj ÓpÃ,ÃKÀDpð³žò'ä` ³41PT2Áæ‚Kd@=—¨ÏàVƒàV
+*Æˆá„ Xø‡*¸oC0 ¤Æ@n|5 ƒY™ˆ‰ ïùðj`PP1F'ÁÂ?Ta~ƒ`Ø€‚˜%	Tx6€á†@e0˜eè	˜F'ÁÀî7øÙÀgƒá~6 ƒY†ž¸‰` 0uá%.›È€ z.!¢¹¹T$(¸)€¢WgÃDPÀ,ƒMÔL½B(Á@è»Šë TŒab`–À&pQÛ †œÀ`–a&h"¨ œàAa&.hÛ ‡ì0È€D9Ã½`0K#†‚`à
+*Èm·ÁpC·Ì2ôÄM »7<1Ë <Q`@2pcÀd@½BÀÓ   bdA½BØÓ   b`@€ÿ°10ËÀ;Ñô
+a¢W< T*øE0 ³<è00ÜÀm ³8‘Ýr †‚•À`–a,|" TÂpCÐ²ŒK‚…°‚$œ«èÑbÀ†ÌüÄ@àó‚O„XÌ2„XDßÚ4€Ù   bÌˆ†\`@Ñ+8
+*F&1K „XdTFX@`á<äÁ¨à?b`,!þ¡
+t}wÐÓ gƒbØ€„@hwnR7 ƒY†±ø‰`¸¡ƒðÂà\0 Ù€§B6„Yð ‹`¸aòÀàD1ß@R$õ1 ˆ~!¼k¤;Ñ/!@wT3¢_Cpó´f D¿ _-)’At!_ƒ ï1@Ó@2 ˆsÓÀFƒ¸è7€”Ë 3.ƒ
+<ì7€tÕ açÒ5É`oƒY‚²¨ ô_ ‹—úJç@ 7¡€ÁtC ®7ËfÐ?a¸! Ý fÐâ,‚4¢çáŒnŒn@AÅ˜%HLÂ@.È€ z…`²A@AÅ˜%H‹ŽŠ9-Ì[(Úé@ 7¯€Á,ÃZ¨EAôÝa]×
+*øÏ¬Å@E%¨…“ôÏ@nl7 ƒY¶˜€ü9Ãî`0Ý0Ã}ÁtÃ¬@#„á†€w0˜n0‚. ¤A0Ý«AÃtƒ²ˆLa¸!ß §0Ü”o ÓËÃ,C[ÄE0L¼ÁlÜ…[¸Å[¼\œã’Aôá	(¸Tà5s 0At!
+(#Æ‚`á¨pÒA€Á!þøà?Kð•à ÐÇåd@ýBè
+.Dx›Èd@]@ø
+Âˆ±€ Xø*Ôt`pˆ?6øÏÀÅ@E%¼/´Å©A¸’Aôa
+.Dxi`®\€At¡
+Âˆ±€ Xø*Œu`pˆ?6øÏÌÆÅ¸3Ýð«Á*u0Ýà«+v0ÝÐÊA¸wpD Ó¯„kg2LüÂlÜ…\¸E_¼jœø‚d@ýBøƒ€‚‘A^Œƒ\ÀAt!
+Â,Ã^Ì„rN D¿z4(¸Gµƒ\@Ñ
+B¿Ä4@(¸ôÞ@ úÝw †8À`ÄÀX@,üN;ˆŽ(v¸!˜ã fî‚.‚áƒŽ0˜e°‹ºª@,ñ§ûÂpC€ÇdSÓáøÏð."!þÔß@nü8 ƒéóH"À€ ÿY¾ ÂÓ7£€Á,_àE0Ë yA‚… ‚nRAøgT 
+øŠa¸!Hå Ò«Àéùƒüg	øbÄÀX@,üÆ;øÓ » ü1¨	ñ'ÂpCËL7äopøÏðÅˆ±€ Xø*¨w@³|1PS	{
+wAu¡v!å¡ìøãHà?KÐ•À(=!D¿B" àBdP÷b!ød@]@‰€0Ë`~á'g!d@ýBøÕ  àBœ-°…Ü,AtÁWƒ€Ð/r
+.Åy ÈÎ@y„á†@ž010ÿ@…¢#Šnê9 ƒYÑø‹`¸Á°ç fB4‚„*‹@ü)Ï0Üès ÙTàtÃ€Aþ³§iˆ?ýy †À`ºÓ0 À–à4èÔpÁ´ÃAI`0Ëp£Ì2”iP#Æ‚`á¨Àã†TþˆB þ¤ê@nV: ƒô*pºŽƒ@À  ÿY‚Ó10ÿ@…2B6À.nCüIÖ0ÜÌt Ó{äF€þ³§1b`, þ
+lÐÁ,ÁiÔT‚i ‚hÐh¨AhH¤A”{ þ
+øÏ Æ@E%œËÄÅ‰Fþ’Aôa4
+.Dx¡á¿\ At¡4
+Â,Cl¤hMŒp 'd@ýBÛ  àBN p Wd@]@ Û  @ ôÁl„‚AóÂ÷@ Ð¾a¸! ë FŒÁÂ?PaÕƒèˆb‡‚»À`–¡5T#n0ð: ƒYÖX ¡
+Ä"Ú÷@ 7|€A68ÝPÎA `P€ÿ,làb"âO!„á†@´0˜nPç EðŸ%Jù@ \0ípCpÚÌ2È†k³°ñÔˆ±€ Xø*øz !„†A¢ˆ?±| †‚ÖÀ ½
+œn°ç 0(À–@6FŒÁÂ?PáÜƒÑ°Âƒ¢ù@ 7µ€ÁtC?;`@€ÿ,lŒ‚… ‚»t0K 5•¨Ðt°jÀÒk°Áˆ?†B þ³³1ÐRÁP[è\ÀP\²CkA)„á†À·0Àa•ñŸnX>Ãx`0Ë@·PÏa¸! ï fjÃ6‚4‚è‚»YÄ“ üg	nãÖD‡É€ z…@¯A@AÅÀ —ñÇ' ÿY‚Ûè¨œÚlfƒÔ>Ã|`0Ë€»PÛa¸! ï frC7‚´‚èÈÁ°0Kð‡'>HÑ+„‘‚a"P`–à7FŒÁ b>(ï Or¥ƒž1@R ù àë`¯½¨î0Üðw ³½ÁÁÃŸø	\síoÌ1³Äu0Kàsk„JsétÌ1¸Ìu0ÇÜnP×Á,oTøÂBo¤M=;bp@ öA X#F‚`ÐbÄw*³¿§ê7n€Á,x”E0b`4 m@öAˆ'Œ‚A}âÊ#F‚`ÐdàuÇÁˆÑ€ ´Ùþèq0b`4 m@ö{Œ‚A}pß#F‚`Ðd¤wÐÇÁˆÑ€ ´Ùéøq0b`4 m@öÁ}Œ‚A}pß(#F‚`ÐdÜwÊÄ  w  [
+&ˆâ^¶OP/[†(¨—-CØË–á
+ìeKÑñBÜË–Á
+}Ù2 A±/[5(øeËÀE¿lÜ ð—-ÿ²eƒd¶tP„Ì–Á
+‘Ù2àA12[=(HfËÀEÉlü 0™-('³e…e¶¤P¤Ì–Á
+•Ù2 B±2[U(XfËÀ
+EËl\¡p™-,/³e…f¶´PÄÌ–Á
+™Ù2àB13[](NfËÀÊl|¡H™-8*³e‡be¶äP°Ì–b‚x!îeKAA¼÷²eP‰ _¶-!½Í–"&‚x!îeKAA¼÷²e ‹@g¶lèÌ–a.Ù2äEÀ3[†½xfËð½l)@#ˆâ^¶¦ØË–5{Ù2¨F`/[ÖìeËàÏl`#à™-ƒl<³e €g¶¶ðÌ–7žÙ2èFÀ3[ÞxfËà½lÀ#°—-ƒxö²e À^¶çäË–A=žÙ2°GÀ3[÷ìeËÜl)x$ˆâ^¶dÄq/[
+9	â…¸—-ƒ«ï²¥Ð• ^ˆ{Ù2ŒKð.[r	ÞeËP.Á»lÌ%x—-Ã»ï²e€—à]¶ñ¼Ë–A^‚wÙ2€LP/[†¼‘âfËà>Ïlæ'à™-þ<³eèŸ€g¶$$ÉÍ–A†{Ù2ÐP`/[
+ìeË€C½lx(°—-ƒö²e £À^¶bØË–Œ{Ù2˜Q`/[4
+ìeË F½lð(°—-ƒö²eà£À^¶~ØË–•¤¹Ù2ÌRÀ3[†[
+xfË°KÏl~)à™-ƒ8<³e §€g¶æðÌ–žÙ2¨SÀ3[v
+xfËàNÏlà)à™-ƒ<<³e §€g¶öðÌ–ŸžÙ2ìS`/[†
+ìeË0R½lN*°—-CJö²eX©À^¶-ØË–á¥{Ù2àTÀ3[†
+xfËÐSÏl~*à™-ƒXö²e «À^¶tðÌ–Á®žÙ2àUÀ3[½
+xfË`ZÏlP+à™-ƒj<³e`­€g¶¹ØË–a·{Ù2ôV`/[†ß
+ìeËP^ÏlÐ+à™-ƒz<³e`¯€g¶ðØË–A¾{Ù2˜X/[òeË°bÝlX-à™-ƒ«ö²e€µ€g¶þØË–¡ä‚|Ù2œ\/[•“êfËàrÁ»l`.x—-ÃÌIv³eÀ¹à]¶:¼Ë–¡ç¤»Ù2„„7[
+³â…¸—-ÅÚñBÜË–¢í‚x!îeKqzA¼÷²e€Á à™-CÏlt0xfËðƒAÀ3[3¤¼Ù2ÔaØË–áƒÀ^¶yö²eØÃ °—-ƒ½l@1ìeË ŠA`/[R{Ù2¤bØË–aƒÀ^¶­ö²exÅ °—-C,½lf1ìeËP‹A`/[†[{Ù2èbØË–ƒÀ^¶¾ö²e Ç °—-Ã;½lâ1ìeË0A`/[†z{Ù2äcØË–aƒÀ^¶ýö²eøÇ °—-ÃI’Þlf2xfËp“AÀ3[†žÙ2üdðÌ–A,ƒ€g¶d<³e0Ë à™-ZÏlÔ2xfËÀ–AÀ3[·žÙ2ÀeðÌ–A.ƒ€g¶t<³e°Ë à™-^Ïlö2ìeËð—A`/[†Ñ{Ù2œfØË–!5ƒÀ^¶«ö²ehÍ °—-Ãk½lp3xfË°›AÀ3[†ÞžÙ2üfðÌ–A<ƒÀ^¶äö²eHÏ à™-ÃzÏlÚ3xfËðžAÀ3[†øžÙ2ÌgðÌ–¡>ƒ€g¶÷<³eÈÏ °—-Ã~½lú3ìeËðŸA`/[žÙ2hðÌ–ÁDƒÀ^¶7<³eÈÑ à™-ÃŽÏlz4xfË¦AÀ3[†5žÙ2´iðÌ–áMƒ€g¶|ö²eðÓ °—-¨½lD5ìeË€ªAÀ3[†UžÙ2´jðÌ–áUƒ€g¶³ö²e¨Õ °—-ƒ®Ïlx5xfËà«AÀ3[pžÙ2ˆkðÌ–\ƒ€g¶æ<³e@× à™-ƒº½lØ5ìeËà®A`/[x{Ù2ÌkðÌ–¡^ƒ€g¶÷ö²eXÙ È—-CËA¾l`6öfË0»AÀ3[†Ú{Ù2ÜnðÌ–¡„ƒÀ^¶,ù²epá È—-Cßlj8ÞeËpÃAð.[¤¾Ù2üp¼Ë–!Œƒà]¶dH~³e8ã@ú›-A¼÷²e¨ã È—-ÃA¾l)ð8â…¸—-A¾lü8òeË Ê:[†T‚|Ù2¸räË–A–ƒ _¶³ù²e¸å@
+-8’èlÐ9òeË°ÎA/[†v‚|Ù2ÄsäË–Ažƒ _¶ôù²eÀç@-E>A¼÷²¥àç ˆâ^¶&ù²e`é È—-CMA¾lp:HgKÁ×A/Ä½lB;òeËpÚA/[
+Õ‚x!îeËðÚA/[ŠÙ‚x!îeKaÛA/Ä½l)t;â…¸—-ExA¼÷²eXï à™-C|½lô;xfË âA`/[†žÙ2¼xØË–áÇƒ€g¶eö²eXó à™-œ½lä<xfK1çA/Ä½l)è<â…¸—-EA¼÷²¥øó ˆâ^¶¦ñBÜË–bÕƒ ^ˆ{ÙRÐzÄq/[Š^‚x!îeËÀîAÀ3[y{Ù2à{ðÌ–¡ßƒÀ^¶ÿ<³¥ ù ˆâ^¶!ñBÜË–Bäƒ ^ˆ{ÙR°|Äq/[Š™‚x!îeKóA/Ä½l)Â>â…¸—-…ÚA¼÷²eÈû à™-Ãß½lJ?xfË úA`/[ÖžÙR´~Äq/[
+×‚x!îeKñúA/Ä½l)r?â…¸—-øA¼÷²¥(ÿ ˆâ^¶îñBÜË–âþƒ ^ˆ{ÙRŒ Äq/[Š‚x!îeK¡‚B/Ä½l^PòeË`ƒB/[Š‚x!îeKáƒB/Ä½lÆPòeË€†B/[Š6‚x!îeË Š‚T:     a     »     0@%@%PePd00Ö ÂÃœÌÉ[ÏÀ UÍ ŒÐÜ UŒ€ ‚ 00FÐ÷-‹kt1@# ´1@&£c ‚ (€ ‚  ‚ ‚‚ 
+3 $50@“3     ñ0  $   +¸Á™œY1ÄÎäÌ
+AnpfÅ078“3+ºÁ™œY1ÔÎäÌŠÁnp&gVwƒ39³bÀœÉ™CÞàLÎ¬ôgrfÅ°78“3+¾Á™œY1ôÎäÌŠÁop&gVƒ39³B œY1„ÎäÌŠAtp&gV£ƒ3+ÒÁ™œY1”ÎäÌŠÁtp&g  3w¼E(ÌDäð£0±À[ŒÂLÄ_ o!
+3¼…(ÌDÜð¡0À[ˆÂLDh o!
+3}¼E(ÌDœð£0qÀ[ŒÂLDK oA
+T#a¸!ˆ0˜e‚€BAd D*"€˜c ƒaæaHUÊq ´*å‚:Ya Â0t *&`` Â0x (OÂpC `@h"†‘ ƒé†_†A†ƒæ`º	„é$E)Di”FhP 0:Iq
+&q§A ŒNR¤J¤Fjô £“« «±¦AÀè$E+°Dk´Æ_P 0:Iñ
+.ñ¯ ŒNRÄLÄFl¬£“³ ³1ªAAÅè$D-ÐDmÄ £“·`·A ŒNBäNäFkP 0:	±:±¶AÀè$D/ðDo¼ £“¿à¿a ŒNB„X„lP 0:	1b1±AÀè$D9Ey¼ £“ç`ç ŒNB¤Z¤GlP 0:	±j±áAÀè$D;°Ez´ £“ïàë‘ ŒNBÄ\´zP 0:	1rñâAÀè$D=ÐE|Œ £“÷`ó1 ŒNBä^ÔÇ_P 0:	±zq¢AÀè$D?ðE~Œ £“ÿàû¡ ŒNB„hôG|P 0:	1¢ñøAÀè·Å8iiŒ‚AüÊ]9;b`4 m .xä84ìˆÑ€ ´A¸äEãÐ°#F‚`ÐâÂAŽCÃŽ‚AŒK[ý¶‡ÔHÔH£A0hrá‹ Ç¡aGŒÁ Ê…4‚‡†10ƒ60—Òz/1¬Á¬1b`4 mp.!(¬Þ°ž´Þ¸’Ì„á† 6À`–€dÀ“(‰é†\hád!€;Á“ƒÁé†	ƒÒF 7½³Ì@€GÂAd@=—Ø‡ÞzcØ€Pb pØnRf"¸[ð<Sø¼; $³ÃÁy€Á;ì­@nÔ(nÂpCÀ`0ÝØÄ@r#†‚÷ ƒé† 'Ê0ÜÈL7<1Ì2F0Ý x@Hßî"È r)À ³Ç@&zRÌ2$È4Ý@z Hßú"È r)À ³É@& ¦rÌ2,J3ÝÀ¢ HßF# `ƒÌ,› ¸Jr¯ÐIÑ/' àBôA(¸7c D’€@¹#†ƒYè	* ŸÚÀÉ€ úmñ0ÀŒ@¿-à"F„Aa"¨‘ è·E\ÈÈ #¨1l@6 ý¶‹!f5†ˆàF ÿpA#ÐÈ°ô… ôß".jÄ¨Ö6 ¿€þ[È…6ÂÃDðÐ‹¹¸äFXcØ€@C úo18’àŽAh@ÿ-è"G”a"è¿E]èÈ¢#°1l@£! ý·°‹av6†ˆ€4 ßvÁ#ðÈ°€I ôÛâ.zÄéÚ6 ‚0	€~[à…<>BÃD &Ðo‹¼øèGhcØ€Æ$ fœÆúîÐ`ÁjÀ,Óƒ	½)L†ˆ@5 z!&“˜Áj@ï%ôbL¨16 ‚3	 ´Â†‚WƒY†‚	.b¢f	 
+@xHb™e¢íFa&f–@¨ „ˆ¶ xAN ¹@€3hB®8	¹@€K^A	¹@€cÈAn‘¹@€1„¾h1„ºpC(ø8!€1„sØ“ôå2"ˆ^!˜H0Ë0Q qÅ/HÑ+„!Hƒ z… ³U*Ñ+„#8Å$‚èÂÌT–@1Õ@n\²#ˆ. ÐH0Ë`]ÃI£!D†€ôG 7µyDŽ ƒÉn°€˜%Àr#ˆ. ,A“;K€TÆåX›qYÖ@ÅLc‘	„á† \À`ºáWŠ ]?Œ!üF¸ÜrAËHÑ+„1	’¢WmÌ2hÙz¤DÒAô
+áM‚^!Ã,Ávrð’AdD¯è$8°É€ z…0³Û@…e‚6PA`™£õ
+Á	ˆ• ÆpC€7a0Ý ÜF@°0¦‚Û2FvÄÀh@ÚÀ†ð%¸Moîùœ‘†10ƒ6È¡}	nø	¡4ÃÉ€Á,×ýÀ‘™;9üÀé‡„ŽÉèÉé‡è\?$xÄdL¦Oú!Ñ#'s2'3l@©3 Ã„Ð0l@Ã F1 ³Ý,Ãç¥H?$zeP¦O0-üFú!ñ#*£2 ‚k:7Ð‰0a–•~HˆIË´LËÁëÀ°!¸Å Ä0 Ã„QÀ,Á7Ü #1#§¢ÃÁÌ„ÁtCÐ'ÃB_¤ÊpCà"d@à$†œƒé†z‚é"0†¼ÜƒYW ƒ€r	Ad ÃÂ¾€™’@nÀú!1'>ã3>ÓL†_ù™Ÿé‡D€ØÜJ?$ì$lÂæVú!q'b#6·’g@ÓÙÃ´6`Ð	>1³1›~HôÉÙœ¯ôCÂOÐm|¥’6iã+™
+1Ý°6L7ô®ŒÆù‡úÜýÇøÈùûÜýGù¡“@nê®5Vc‡‚»ƒ„‹
+œcØ•Àn^9—Œ‹
+œcð• o‚_Q—é†_	nãbÃ5v¸! 0˜nð›m¦¨¿¡‡Y‚0¨°Üž1¨˜	Õ ƒe*6× ƒc* À`ƒY†1ƒ4¸`d– *6#~¡*fB	ƒ_h…
+Ë	ƒ¤®pn^fÂÀ‚
+33˜…3hÃýÿÿÿÖ Œ‚Î `d@„ #‚ 4 Ä,TXR+ TÌD(´ˆÁ@ÅÖ­€b0P¤V+˜T ©Õ
+rˆÁ,ƒœdq²ÓÎŒ&e–€È FÑ+%˜n@(¨s$„‰ÀÈ€ z… Ó)¸cŽÁ|†N`d@½B°‚é†€h‚Š1Ç`cC¬ 02 ˆ^!pÁtC º@AÅ˜c0´™% ƒ& xvÐv0°ƒY<xU¡ðÿÿÿÿ˜#`nÂfÐ@‚
+@2 Ò`–aÜÀ-2 ˆY†6`ƒ|è;CúC@è;ÃsC@è;CtC@è;ÃuC@è·EØˆP"B"4l@H ôÛBlFH!½6 ‚# úm16$´Þ ý¶ ›bJHo†ˆ €Y‚4è4]@ô€Ð„A(]@(ô€Ð„C(ý¶p›²^è…†ˆ 	€~[¼]0t:ÃDp@¿-à&†°:a"0 ßq#C™Î°0K·¡Œd@]@øƒ€ÐÁu(]@ ^‡Ðv(YÑo‹¾ñ¡À‡|hØ€’ è·…ßüðC¶3l@H ôÛâoÀh #Û6 ‚# úm:aD„‘í ³ip«ppA8]
+q‚½Èõ"³q0Báÿÿÿÿ@NÀ0ÜÈÌ2àA mo@ÀÁý2ð‹œ°/2Ë u ³s@(qG AôM
+.Ä#D¿à$ àB\’AôN
+.Ä5,D¿ð$ àBdEý·Ø?
+þè†ˆà€þ[ð(	 t?ÃDÀ@ÿ-z'”†PºŸa"H ÿ¾#J„(ÝÏ°Ð/„>¡(¸ýBø‰‚Ñ/„P(¸ýB‡‚ÑóY¥f•ViØ€è¿Åù°’ÃJ#4l@‡ ôß}Zéi¥6 C úo‘>®¹ÒA! ÑS	(GaDT% @ œd@]@p•€pl AtAV
+B¿-ðÇ—ÀÀ—|iØ€œ è·EþüRü’Á ý¶Ðpp²¡a"@ ßûNcN64l@E ÌÀÁýÊÌt#èÜ@7r@Ñ/r	(¸
+Ñƒ	Z§`†ˆ`€~!˜KAÁ…èÁ„	¹áNÃD @&Ñs	(½—H!yBäiØ€„ ˜%€ƒY;¸×HT ˆ~!ÀKAåvÀ!{¢àBtÀa …7¢àBtÀ¡°8¢àBtÀáÀ…8¢àBd-Dÿ-vèŸ‚ú§a"H ÿ<RHÝÑ° Ð‹
+©!¤îhØ€è¿…‰!Rw4l@† ô¡_ *·A8”¢Ã8ø¢E9ü¢Ç9€¢ÿhÔROKµÔ° Ð‹4r)È¥JiØ€è¿…½TôR¥4l@† ôßb`J‚©R6 ‚B ²¢(d0¹}gà¦(}gä¡•(}g(èÁ•(}g8ìá•(ý¶°#žòxŠ§†ˆ 	€~[ÜQO}=EKÃDp@¿-ðÈ§ÀÀ§hiØ€Œ è·EýTü-A ³ppý€:s=@Ñ/„Ÿ	(¸ÉÑƒ‰?2«À¬†ˆ`€~!„MAÁ…èÁD(¥‘VÃD À)þ DÄ& @ ô^¢”Ü*q«a"`– fô jg 8ƒ< ß 2 ˆ~[ÀR\qW„9†p
+æªß³DW]­aŽaÚ©ß¶tWÇ]µaŽaÞ©ß¹¤WŠ^½aŽaâiÄÀXB,üÃ^-18–ÿ€Y‚¾;ðÒ_=Tð6 †` pú/nÚfô ‚k»¢_æd`¹³|0Ë 
+«p*€zp©AôÛ"T+P-Õ¢@ Ì1èSÀZý¶`§Ö"Z‹¤(sC`Rý¶x'Ø:`Ë¤(sC€Rý¶§ÙRf¥(sC R#Æ‚`á¶€nÁ,Ã)ôA™ôßbžnË¹­Û¢àBÌ1èS[ý·°'ÝŠt+¦(¸sC0Sý·È§Þ¢zk¦(¸sCPSý·à'ðºÀ«¦(¸sCpSý¶è§ñÒÆk¼(s3”W¿-@Ê¼:óê)
+ÂÃüT¿-F*½À ½~Š0Ç0aÕo“b¯1`¯°¢@ Ì1ÁXõßB¥ÞËÞë½(¸s2ÄWÿ-ZJ¾Ò@¾ÒŠ‚1Ç0kÕ˜ª/6¨¯µ¢àBÌ1A[õßb¦ðëð«­(¸sCðV=˜ ©ý’ƒý¢àBô^‚¦ú‹ú‹Ðƒ‰›ú/;ø/
+.Ä,ƒ(øA«Ì2„ÂàÐÃX!6È•\MG„Aà+þ1b`,!þ17`ðâ?Ëp
+  Fshe˜Ø CVw5áãâ#Æ‚`á³ÀsøÏœÖ­ˆ?±þ³§0Ëp
+£ +³¦@
+>4Ç WO‹2{åWÓa¨Ëˆ±„ Xø‡-ˆ]€{„ÿ]Y26ÈÔÕhMGÈAð.þ1b`,!þ1h`ˆÿ,Ã)”ÂÍ1äÕucƒ^¡ÖtÄÐ‹ŒK‚…ÌBÛà?Kp
+#Æ‚`á¨Pw14Ç ZA2£åZ˜
+Aøc.â¹€ÿ,Á)™Nð€‚üS
+)à„(°A(¦0Ë
+¨P:ÄRdÄÀXB,ücî.À`ÿY‚T¨0S18–ÿ€…½ë• ç¦…f¿€fTð6 †` pÐ†[ƒY†=àƒ` XT·ƒ=È€ ú!QZoöf ãºab ‹wƒá†àÝÀ`–aT!˜ehV¸™
+`aõV!‚è‡ÄjÙ™ Œò†ˆ! ,ì†{ƒY†V`…àÈEw É%ß``¸!0˜eƒ2* ÿ>öƒŠõ>úƒŠ™@½¾Æ` Â‚¿¾Æ€ÜO 7¦ÃëÁtC_Â,Ã+ D@>„á†@ÕÂ€äO 7¬ýø-US5Uk&ÃŠ­ÚªõC"¼XÕF¬âÕj­6bý/WsµËÙ!ˆé† ÖŽá¢50è‡zÉš¬ÉZ?$ÒkÖfMÅú!¡^´Fk*Ö‰õªµZS±¬‚˜n¸µÀv¦Ò‰ÄÞéÔÊæîÖêåäÔ
+çîÖ*æ„h0ÃA¸ÁÝS>ípC0n`¼Ts'ˆÛ C€b3–½Ts*”Û C°b66Ý°bÁH]?éÓ7ìÓê¶ýÐtµn`4K –-¼Bu3¡¯'1P±ùÂ+ôÂIT âð
+£v¼\`GpÜÝpC@[d0Ý0kAÌ2ÈÂ,°Á@…l²Ð
+³Ð*Å¨ FAf 02 :€‘A Œb–Àr:Ùé†ÍÒgºAµ€“2KÓÏ›±éÀÈ€ z… ÓTŒ96RŽü `d@½B ƒ`º!…‚Š1Ç`¦F£ 02 ˆ^!˜A0Ý DAÅ˜c0‚U#T D¯Ø ˜n\Á¢ bÌ1¬ÍÄBÜ@ÚŽ r0Ë á`
+#þÿÿÿ? »ÃAêÁ,-ØB0Pˆ~D-Ì2Ü‚/ØR1Ë°¸F³¹ nÐw†:ÄŽÐw†;vÐw†<(xÐw†=8zÐo‹TS»DíÔnØ€ è·…ª­²vâ6l@G ôÛbÕØna;q6 # úmÁjmÇ´¸A ³µÐo‹Vs»ÆíÜnØ€ä. úmájoç¼¹ÁÜ@¿-^î¸3·a" » è·¬Åwæ6l@u ³µ0ËÀ½à]@ …¨ÁP º€0ì¡ÅP º€pì¡ßº¶wÚÞíÝ° Ðo‹]ã»ïæmØ€Ž è·¯õ×wó6l@F ôÛ¢×ü®ó»y6 ‚" f	j¡ß¾öwÞßýÝ°Œ^ ôÛâ×@ï½{6 Ò€~[€[èAèÝÛ°”^ ôÛ"ÜD/DïÞ†ˆÀô`– f~^áÆ Ï$‚èÂ-„. þF@èño„.  G@È6 ˆ~[´›ë®çzÃD@¿-Üíõ„×3¹a"@ ßï{ì™Ü°Ðox‹="öLnØ€Œ ˜%¨…”‚è·…¼Í^0{³7l@· ý¶˜7Úhoå†ˆ ÷ ßôV{Cí­Ü°ä^ ôÛ¢Þl°½•6 Ý€Y‚ZHs ˆ3‡4“;4“Y‚q¡ðÿÿÿÿ¸Á †‚À`–AÆ!¨ ôPB.€³¹àÍä7“YrX‡šše(th‡Ys8‡—¸#H ú…ð[â
+;ƒ¢_ãPp!.	È€ ú…p^âš™€¢_ëPp!²"ˆþ[¸œüò'ÃDð@ÿ-^nþ„ùS»a"` ÿ0Gý©Ý°$Ð‹˜«?¢þÔnØ€è|Q\ˆ~!È—DÁ…è}A\ˆ~!Ø—CÁ…è¿EÎù_ãþ7l@ˆ ôßBçþÏù?»6 ‚C úo±s < ØÝ°ÐžÁ 
+ÁÀî†ˆ €‚èB~„#Zƒ¢ýP Ü2 ˆ. „X@@86ˆÈ€ º€Pb¡ßkƒÄ`ƒÁ°8Ðo¶“Á d0H½a"X ßm7ƒÌ`zÃD€@¿-ÜŽƒ1 Á õ†ˆ €Yq¸±è³¹àÜä=€ÎM.àÈ ú…pc"C z0qw>>Á  ýBÈ±‚‚Ñƒ‰¼Ã€Ã`Ø€È„ º€c¡÷|W†R†Á°0K ©
+1Ëê`ý·½3‚3Î06 Ø€þ[¿7l@±' ý·(½4†4~oØ€dO úoazjjüÞ°Ìž ôßÂôÖ0(Ö0XÃ`Ø€hO úoqzllŒß°Ôž ôßõÚ08Ú0¿a"°=è¿Eê¹a€¸a0~ÃDp{Ðo‹Ô{Ã yÃàƒa"˜Ã  úm¡zp(pœß°Ða ý¶X½8–8ÎoØ€ê0€~[°žŒç7l@vÀ,8ô`‚õæ0hæ06 Þ€L°ÃDÐ{Ð{	Ö«Ãà©Ã`Ø€ò0€Yq˜e`‡wY†vp‡òH\ ˆ~!ÌYAåvÀ!‡<(¸pÈAþ(¸p(Ìaþ(¸p8Ðþ(¸YÑßÅ Å@ƒa"H ÿ¿7Š0Šþ" ý· ?RRôoØ€è¿Eø•b@”b ÃD`@¿@Ê r;àÄ*\ˆ8ó‚¢E=ˆ`@Á…è€Ãq#Pp!úo±~°<°Àb0l@ˆ ôß‚ýb1€b1@Á`Ø€è¿EûÉbÉb€‚Á°Ð÷›Å@šÅ ƒa"( ë º€°jA“Ûw† $n1 @ ôa	(}g(H"
+Bß“Á€Ðo‹üûÅÀûÅàƒa"@ ßúŽÁŽÁÃDp@¿-ö/0Çàƒa"0 ßü'ŽAˆcpƒÁ°0K +7˜d@ýB·€‚‘,A=˜Á ƒ ƒa" _äVPp!z0A‚;;ÃD À).DÊ- @ ô^ƒx’x†ˆ@€YqH› ˆYxˆ1é¿ÅóóÌc0l@<@ÿ-`0 Ç@ Ç`ƒa"èÁ@ úoƒA=C=kÐì1 ì1XÃ`Ø€~0€þ[È`pAqÁ=ÃD † ôßb||Þ06 ‚0 ÿ4äcpäcð†Á°ˆa  ý·¨Á@Dƒ7†ˆ`è·Eû$ûìc0l@ÿ@¿-l0àÇ@áÇ`ƒa" É  úmqƒA?K?sAHÐoü1`ü1˜Ã`Ø€D2€YqèÁÿ4ÿÐƒ	@2p@26 ‚4 ÷8„dð„d0l@%À,8Ì2ÐÃ< Ý@pó`²‚<d@ý¶Ã€$ƒ€$’(st&ôÛÂƒ“ˆ“ü0 @ Ì1(ý¶HÃ@%ƒC%P(sC ŠA¿-Ø0hÉ@iÉ@
+ÂÃb0b`,!þab#Ç‚`á°P¦AôÝá™
+*øC0 8Éf Ãh`0Ë@ó™ØcÀÓ÷zvir›Áe@ýBØ³ Ë%°‡Y’(	¨ øV ‡Ó‰¢ß~üdüdð“aŽáƒ ,ƒ~[„b –!–A.„9†!ØÅ ß¤”ep”e°‹aŽaz1è·Å)h(hôb@@˜c‚_FŒ%ÁÂ?l¡Oƒ`–!$îÁUúoŠ[[lPp!æ^1Ü2è¿Å*oDo˜c@Á…˜ctúoáŠ\”\èPp!æ†@ƒþ[ÄbP—ÁU—:\ˆ9†!`Ç ß²àe áe€—aŽƒ@/ƒ~[Ôb°—A·—<„9†! Ç ß¸øe ~Ðc@@˜c{úm±‹Ahcš=„9†!ÀÇ ÿ¿f`¤f@Á…˜c8Ç 0Í ÿâœf§øc@Á…˜cúoQŽjl šH\ˆ9†!É ÿè´fð­ˆd@Á…˜c’z0‘Žlr ›¢÷éÈf@²P z0ÁŽmv@›b–ðÁ^fö!ÚoŽƒÂ6ƒA† ƒ“¦#Â 8ÿ10–ÿ˜vÞ@ügBBîoŽ¡c7ƒA†À–¦#œ€eücÄÀXB,ücâ50(À– $°úEü1ÐðŸ%‰Y†è‡|™e 	˜¿9†—ñ˜f2˜nƒ`fFŒ%ÁÂ?lá^ƒ ÷ ÿ9†”¬ó•p2˜Žƒ gücÄÀXB,ücú5°Ä–!$þƒ9—.ö‚—z2˜Žø‚žñc	A°ðYÙ À  ÿY‚10–ÿ@•ÌoŽá&ƒ@>ƒA† 'ƒ±0‚ðÇ@fÄƒ—ÿY‚(2œ°8Ð=Èç0À	~`ƒ}@b–a$Dˆ¤Èˆ±„ XøÇ,°l`0ˆÿ,ÁHT˜ HHŒK‚…ÀÌ'ô\b'ƒþ~¡?
+*øC0 8}ÀÀpC°¦Ì2Ôƒ=ÀB&-ÔCÑ	H4 Ñ   `\r0l@Á `Aª7¤€Á,CID0Ëp&:Àb4-”DÑ	°V4XÑ   `\àr0l@Á `±ª7«€Á,ÃI˜D€aÓª79³(Ån †À€ö6ÃŽ`0ÝPŸA0Ì2¤„JWw¶èýÞÝÉ¾³.1PT,a×Jd@=—ÐË€Gƒ€G
+*Æˆá„ Xø‡*ÌmC0 ô¾@nÆ4 ƒY–X‰ ï~„i`PP1F'ÁÂ?Toƒ`Ø€‚˜%`	TÂ5€á†àU0˜e¸	•F'ÁÀø6 ×`\ƒá†Ò#×€fn"&‚
+ ¶…”¸`"‚è¹ÄiiiPP1 dà¦ 2 ˆ^!°gA1 ³0ñµô
+Aõ„¾;´f §BAÅ6 †` f	`—w``¸!èÕ fZÂ%‚
+`	³Zâyp¸aÿ2 ÂpC°§ÌÌÄˆá„ ¸Âë÷Øk0ÜPÔk@³7Á@`ßBL„MÌ2Ð„MÜpD¯ú3(¨YD¯@4(¨à?l@Á Ì2ØDM4½B ?¢Wá‡PP1h¨à?l@Á ÌØB'ÀÀpCP¯Ì2ÈÄLÄÃ@n`5 ƒY†žÀ‰€Z8Ã¬`0b`,!þÁ
+ç¤fpï³^ñ'³91P ¹€aÀ³;¡EÑwùj5(¨³<„!Aô
+¡þ
+*F&1KÀ„°’NdTÆN@:á<äAŠà?b`,!þ¡
+ù}wøÏ@\ƒbØ€„@ln\6 ƒY†žÈ‰`¸A³Âàf¯Tžn0Õ ftÃ'‚áøKÛ î´ôâ0HÁ@ò‚èAÎa@½BœÃà%È€ z…0‡‡L’Aô
+	z…ì`§Dü4ƒöd ‚¸ùv3ˆãÍ oÈ{*0í1¨ÀûÍ`oÈvŽáMS@6˜%ø‰
+€äŸ©Ü 7ÂpC`²L7pp³c‘r †‚”À`–A,Â"Hƒ z.a¦ÊÊTŒY‚±À$dà‚0€¢W«TŒY‚±è¨˜°ÄBž…Ÿ pÂpC@³Ì2”YDßà4˜Ù   b ˆÿ,AYTTY8cA¤„á†`g0˜e0‹Öh”0Üôl Ó¸ìeL7œÁ„Ê@nÂ6 ƒé3(Å èBÓ6øn0L7ünp£qÝr †´À€z9ÃÚ`0ÝÐj0Ì2œÅZÃ$À´Æ] …[¤Å[¨Å9n D¯ž€‚ŠqŒÈd@]@€
+Âˆ±€ Xø*¬r`pˆ?zøÏ¤Å@E% …œÅmx D¯¸€‚ŠqÈd@]@è
+Âˆ±€ Xø*àr`pˆ?2øÏ¨Å@E%¤.œÅ¡™’Aô
+!
+*Æ™šrA@Ñ5(#Æ‚`á¨PÎA€Á!þÈà?KÐç
+bÌtC˜-ÈÁt˜.ÌÁtÃcÐÁL7Äp0¦œÈ0	À­qláwñ¢q{°’Aô
+
+*ÆåÁ/Èx Dú  @ Ì2ÔE[àÁ=ä ×AôÁ7ƒ€‚qS:ÈAd@]@èÍ  @ ôa<„‚Apªë@ ^a¸!ˆß FŒÁÂ?P¥ƒèˆb‡úÀ`–!.Ü"n0ê7 ƒY¸x‹ ¡
+Ä"Âë@ 7ù€A68Ý0¶A `P€ÿ,]àââO~„á†à0˜n@Û $ðŸ%°2í@ \0ípC@ÂÌ2Ø…\³t1Ôˆ±€ Xø*ìt !„†A¢ˆ?¥v †À ½
+œn Û 0(À–À.FŒÁÂ?P¬°Âƒ˜Ší@ 72€ÁtÃÞ3`@€ÿ,]Œ‚… ÂZt0K`5•P¨tðj Ò\tÁˆ?þC þ³w1PQ	v"kqü’Aô
+¡
+*ÆéCOÈù Dü! @ Ì2€^äÃÁ‚XÈ¹B D¿~4(¸Gg!d@]@ðÑ  @ ôL„‚Añ²ï@ P~a¸!ã FŒÁÂ?P!µƒèˆb‡‚:À`–/ò"n0ì8 ƒY†½Ð‹ ¡
+Ä"Êï@ 7z€A68Ý@¾A `P€ÿ,AhàòâOÿ„á† ”0˜nHß 4ðŸ%:ñ@ \0ípCPÊÌ2„F_³áÔˆ±€ Xø*ðv !„†A¢ˆ?©x †‚UÀ ½
+œn¨ß 0(À– 4FŒÁÂ?P¡¼ƒP°ÂÙ’ñ@ 7³€Átÿ´`@€ÿ,AhŒ‚… {t0K5• ¨Àt j°’_Áˆ?‚B þ³¢1PQ	¡!2kq}‘·d@½Bð‹€‚Šq{Ñ·\ Atá/
+Â,ÃjŒ†^\Lˆn ÷d@ýB ×  àB\Mœn 'd@]@øÕ  @ ô¡\„‚Arºó@ ža¸!˜ç FŒÁÂ?PAÅƒèˆb‡{À`–á4H#n0î9 ƒYÓ( ¡
+Ä"Òó@ 7û€A68ÝPÆA `P€ÿ,kà"âO „á† ¤0˜nPã@DðŸ%`Bõ@ \0ípC`ÒÌ2°j³ª‘Ôˆ±€ Xø*ôx !„†A¢ˆ?­z †–À ½
+œn°ã 0(À–€5FŒÁÂ?PÁÌ‘°Âƒšõ@ 74€ÁtC5`@€ÿ,kŒ‚… B›t0KÀ5•°¨ptPj`RjªÁˆ?‚B þ³­1ÐR‘ÐYÐŒZÐZ¬ABeA¨„á† §0ÀA…ñŸnV=ÃAX`0Ëà±¯a¸!ë f^6‚‚èB›ƒÄ“ üg	bãÊ$wÉ€ z…0§A@AÅÀà†ñÇ' ÿY‚Øè¨œ×`ZƒÒ=ÃA\`0Ë µ»a¸!˜ë ffƒ6‚„‚èÂŸÁ°0K''½HÑ+Q‚a"P`– 7FŒÁ `= ëàNR•ƒž1@R˜õ Øç@Ÿƒ|ˆÞ0Üìu ³·aÁCžà	<sÁÌðÌ12Às0K€sëì	_sÁÈôÌ17Ðs0ÇØl@ÏÁ,nTøbÂmd-=;bp@  îA X#F‚`ÐáÀu0*³¹¡òß7í€Á,ƒnüD0b`4 m0îh¦Œ‚AŒ{ ÚAª#F‚`Ðãàs€¿ÁˆÑ€ ´Á¸}äo0b`4 m0îA_úŒ‚AŒ{`×Áþ#F‚`Ðã uÀ¿ÁˆÑ€ ´Á¸hôo0b`4 m0î]þŒ‚AŒ{`×Áÿ#F‚`ÐãØu ÂÄ   x  [
+&ˆâ^¶OP/[†(¨—-CØË–á
+ìeKÑñBÜË–Á
+}Ù2 A±/[5(øeËÀE¿lÜ ð—-ÿ²eƒd¶tP„Ì–Á
+‘Ù2àA12[=(HfËÀEÉlü 0™-('³e…e¶¤P¤Ì–Á
+•Ù2 B±2[U(XfËÀ
+EËl\¡p™-,/³e…f¶´PÄÌ–Á
+™Ù2àB13[](NfËÀÊl|¡H™-8*³e‡be¶äP°Ì–b‚x!îeKAA¼÷²eP‰ _¶-!½Í–"&‚x!îeKAA¼÷²e ‹@g¶lèÌ–a.Ù2äEÀ3[†½xfËð½l)@#ˆâ^¶¦ØË–5{Ù2¨F`/[ÖìeËàÏl`#à™-ƒl<³e €g¶¶ðÌ–7žÙ2èFÀ3[ÞxfËà½lÀ#°—-ƒxö²e À^¶çäË–A=žÙ2°GÀ3[÷ìeËÜl)x$ˆâ^¶dÄq/[
+9	â…¸—-ƒ«ï²¥Ð• ^ˆ{Ù2ŒKð.[r	ÞeËP.Á»lÌ%x—-Ã»ï²e€—à]¶ñ¼Ë–A^‚wÙ2€LP/[º‘âfË€:½l\'È—-íù²eÐ _¶àäË–}$¹Ù2ØO`/[ü	ìeË ?½lø'°—-ö²e¡À^¶$ØË–Á„{Ù2 P`/[
+ìeËÀB½l\(°—-ö²eð¡À^¶`ØË–AŒ{Ù2°‘47[†;
+xfË°GÏlþ(à™-Ã(<³e0¥€g¶¨ðÌ–A•žÙ2°RÀ3[W
+xfË KÏld)à™--<³e°¥€g¶¸ðÌ–A—žÙ2ðRÀ3[†_
+ìeË0N½lÎ)°—-Ã:ö²eh§À^¶ïØË–!ž{Ù2ÌS`/[~
+xfËðOÏlB*à™-ÃH<³e0©À^¶(ØË–§žÙ2èTÀ3[ž
+xfËàSÏlÔ*à™-[<³ep«€g¶pðÌ–¡¯{Ù2üU`/[†Ð
+ìeË0Z½lR+à™-k<³ep­€g¶°ðÌ–¶{Ù2ØV`/[õ
+òeËÀ^A¾lÞK¢›-Ãš<³eh³À^¶oðÌ–¡×{Ù2[/[sòeËnRÝlÚ-x—-Ã»ï²e7Én¶÷¼Ë–!ß‚wÙ2ð›t7[“ðfKQrA¼÷²¥P¹ ^ˆ{ÙR°\/Ä½l)Â.ˆâ^¶©ØË–ö‚|Ù2Ø^/[ÞòeË ~A¾lÔOÊ›-Cþö²eØ¿À^¶ýØË–áÿ{Ù2ˆ`ØË–ƒÀ^¶&ö²e@Á °—-C½l^0ìeËƒA`/[†{Ù2Ô`ØË–áƒÀ^¶9ö²eØÁ °—-ƒ½lÀ0ìeË †A`/[2{Ù2ÌaØË–¡ƒÀ^¶wö²eÈÃ °—-C½lþ0ìeËŠA`/[†Q{Ù2¬b éÍ–áƒ€g¶»<³eøÅ à™-Ã8ÏlÌ1xfË€ŽAÀ3[užÙ2°cðÌ–Áƒ€g¶ð<³eÇ à™-=Ïlì1xfË€AÀ3[}žÙ2ðcðÌ–áƒÀ^¶#ö²e8É °—-ÃJ½lZ2ìeËð’A`/[†˜{Ù2ÌdØË–'ƒ€g¶?<³eË à™-ÃXÏlÌ2ìeË€–A`/[†¶žÙ2¼eðÌ–!.ƒ€g¶s<³e¨Ë à™-Ã]Ïlò2xfË°—AÀ3[†¾{Ù2üeØË–!4ƒÀ^¶£ö²e0Í à™-jÏlT3ìeË°›AÀ3[†ÞžÙ2üfðÌ–!<ƒ€g¶í<³exÏ à™-C|Ïlæ3xfË ¢A`/[{Ù2hØË–ÁDƒÀ^¶,<³exÑ à™-CŒÏlf4xfËp£A`/[†{Ù2øhðÌ–Lƒ€g¶b<³e Ó à™-ƒ™ÏlÐ4xfË ¦AÀ3[6žÙ2¸iØË–NƒÀ^¶rö²e Ó °—-ÃÏlò4xfË°§A`/[†W‚|Ù2ÄjäË–Vio¶2<³e Ù °—-ƒÍÏlH7ìeË°ºA/[†Ö‚|Ù2Àn ñÍ–vƒà]¶¶ï²eÈÝ@ê›-ƒïÁ»lÀ7ÞeË0¾ä7[ó¤¿ÙRœoÄq/[ú‚|Ù2ØoäË–â~ƒ ^ˆ{Ù2ìoäË–¡ƒ _¶!H ³e@á È—-CA¾lb8òeË ÃA/[¤ÐÙ2üp ‰Î–áŒƒ _¶jù²e`ã È—-A¾lâ8òeË0ÇA/[†;¤ÑÙRàqÄq/[Š=‚x!îeËPÊA/[†U‚|Ù2ÐräË–á–‰t¶ûñBÜË–¤ƒ _¶&ù²¥Hé ˆâ^¶.ù²¥é ˆâ^¶5ñBÜË–"§ƒ ^ˆ{ÙR€uÄq/[µ‚|Ù2¼uØË–¯ƒ _¶}ö²e0í È—-Ãj½lv;òeË ÞA`/[óžÙ2¬wØË–¡½ƒ€g¶îñBÜË–â½ƒ ^ˆ{ÙRÀwÄq/[
+ý‚x!îeKâA/Ä½l)L<â…¸—-Å‹A¼÷²¥Àñ ˆâ^¶gù²e`ó °—-ƒœÏlî<ìeËçAÀ3[
+=‚x!îeK±çA/Ä½l)ø<â…¸—-…©A¼÷²¥hõ ˆâ^¶²ñBÜË–b×ƒ ^ˆ{ÙR{Äq/[†y‚|Ù2à{ØË–Áßƒ€g¶#ö²e(ù à™-…ÉA¼÷²¥8ù ˆâ^¶(ñBÜË–Bæƒ ^ˆ{ÙRä|Äq/[
+Ÿ‚x!îeKqöA/Ä½l)à>â…¸—-ßA¼÷²¥ ý ˆâ^¶£ñBÜË–õƒ _¶¯ù²¥ ý ˆâ^¶·ñBÜË–÷ƒ _¶áù²¥0ÿ ˆâ^¶ùH¥    a   ™  ·     0@%@%PePÀÅA3 c Ì1ÌÉœ¼ùŒ Ì PÕÀh Í PÅ‚ 
+# c}ß²¸F# ´1@&£# c ‚ (€ ‚  ‚ ‚‚ 
+3 49 ñ0  $   +¸Á™œY1ÄÎäÌ
+AnpfÅ078“3+ºÁ™œY1ÔÎäÌŠÁnp&gVwƒ39³bÀœÉ™CÞàLÎ¬ôgrfÅ°78“3+¾Á™œY1ôÎäÌŠÁop&gVƒ39³B œY1„ÎäÌŠAtp&gV£ƒ3+ÒÁ™œY1”ÎäÌŠÁtp&g  3w¼E(ÌDäð£0±À[ŒÂLÄh oQ
+3£¼E)ÌDÜð¡0‘À[ŒÂLD^ o1
+3}¼E(ÌDœð£0qÀ[ŒÂLDK oA
+D#a¸!€0˜e‚€@Ad 4*"€˜cƒAæA(UÊp ¤*å:Ya Â0s *&P` Â0w OÂpCð`@g"†‚ ƒé_†A†Câ`º	„é$)ŒihP 0:Ia
+%a¦1 ŒNR ÂI jð £“ªª¡¥AÀè$+¬k°†_P 0:Iá
+-á®ñ ŒNRÀÂKÀl¨£“²²!©AAÅè$-ÌmÀ £“¶P¶1 ŒNBàÂMàkP 0:	¡9¡µAÀè$/ìo¸ £“¾Ð¾Q ŒNB€ÃO€ÇkP 0:	!a!°AÀè$9Œy¸ £“æPæñ ŒNB ÃY lP 0:	¡i¡àAÀè$;¬z° £“îÐê ŒNBÀÃ[°ÇyP 0:	!qááAÀè$=Ì|ˆ £“öPò! ŒNBàÃ]Ð‡_P 0:	¡ya¡AÀè$?ì~ˆ £“þÐú‘ ŒNB€Ä_ð|P 0:	!¡á÷AÀè·Å8ŒÆhŒÆhŒ‚AøŠ]9;b`4 mð+wä84ìˆÑ€ ´¸àEãÐ°#F‚`Ðá²AŽCÃŽ‚Aˆ?ý¶Ô@Ô@£A0hƒqÙ‹ Ç¡aGŒÁ È…/‚‡†10ƒ6(—¾z/1«±«1b`4 m`.ÿ(¨Þ¬ž°Þ´RÌ„á†€6Â`–€dÀ’‰é†\hád!€;…Á“Áé†0 ƒÐF 7¼³Ì@`GÂAd@=—ØÞxcØ€Lb pÐnPf"¸[è<Sð¼;ø¤²Ãy€Á;è©@nÒnÂpC°`0ÝÐÄ@q#†÷ ƒé†à&Â0ÜÄL7:1Ì2F0Ý x@Hßì"È t)° ³Ç@…%xRÌ2$È4Ý@z Hßø"È t)° ³É@…% ¤rÌ2,J3ÝÀ¢ HßD# `ƒÌ,› °Jr¯ÐIÑ+'  bô
+A(¨7c D’€@¸#†‚ƒYè	* žÂÀÉ€ úmñ/¼È‹ÁŒ@¿-àF9a" ‘ è·E\ÄÈ#§1l@5 ý¶!dä4†ˆÀF p1#ÅŒ^@&à‚F6 ‚¼(€~[ÀE5R#ÃD#Ðo‹¸°ÄFZcØ€t$ úm!7’ÜHkÁŽ@¿-æGia"à‘ ˜epPè»Ã]äÈ2l@£1 ³NÏ%èBG6 Ò€žKÐÅŽ4;2l@¥1 ½— qxdØ€À$ ÒnPf
+&¸=X‰š%€* áÁ‡e–AŠªëƒ–˜Yi "Ó‚n°9ÁäÎp	¹"$ä.I9däŽñ¹…äÆîÂ<ÆÞâ<.dáÒã„ ÆÂN.˜—Ëˆ z…ðÁ,ÃDéÅ¹ D¯† ‚è‚ÌT©D¯Žàp¢WC0KPTXÅLä>a¸!80ÈŽ º€Ð"Á,ƒu'õ…d@]@š0Ü¸
+äE]@8‚&wº>b– Ë º€°Lî,6PA—cTlÆeY3a\ŒEg$†]ƒé\)‚v!àH0†ºrkÈ&#D¯x$H: ˆ^!˜I0Ë eå‘n@IÑ+4	z…³ÛÉANH‘y@½Bh“àhÂ$‚èÂÌl”	Ú@eŽÖ+' RÃAÜ„Átƒ¥À˜nbcÈiØ£A0hƒŠ—à¶¹¹ØC²EvÄÀh@Ú@†è%¸!'„ÄH 7ý³\ôCBFöe_àää#n¤4Ò/ý2'G{sý°‘ù;é‡Ä€È€Ì°ˆÎ Â}À°A0l@Å Ìt³Ÿ7"ý¸‘	;Á±¸	è‡DŽŒÌÈä	–EèÜ@?$v¤dJ†Oú!Á#&c2&3l@¨3 Ã„€0l@Ã F1 ³ßp‹¨LÜŠ€Š7,ÓAcw!*ÃŠå’@nb¦Üe¦ˆÀnðdfX’%‘@7ôôGa¸!È0è‡D›ÜÌÍÜL3pgp¦o’39+ý€ÑXé‡DœìÌÎÀJžAL7=s7¸FØ€A?$ìäg~ægú!q'`6·Ò	<	›°¹•~Hä‰ØˆÍ­d*ÄtÙj0ÝP6I8L7f#Óy!+qúQ>wûá;rúq>wû>Bã$†¸ƒ;ÔØá†@nÀ`Ž¡VØn[—9†[a¹dpE\¦n%ˆCÕØá† oÀ`– *,õ ƒg*fÂ4À`ƒŠM5Ààƒ
+ÀþÀ`ƒY†1ƒ3¸ d– *6#~a*fB	ƒ_X…
+Ë	ƒd®`nZfÂ€‚
+33˜…3hÃýÿÿÿV Œ‚Ê `d@d #‚ 3 Ä,ÁTXÒ* TÌD(¬ˆÁ@ÅÖ«€b0PôÓ*˜T ý´
+`ˆÁ,ƒœdq²ÓAÌ„&e–€ˆ FÑ+%˜nüÀ(¨súàÀÈ€ z… Ó)°cŽÁj†J`d@½B°‚é†@d‚Š1Ç`:Cª 02 ˆ^!pÁtC ¸@AÅ˜c0‚Ÿ™% ƒ& x¦Ðv00…Y<HS¸//à6ºâQ‘BEf	â`„Âÿÿÿÿà€a¸!è!0˜e@ƒ5* uÈ€PƒY6xƒ¸È€ fÜ ø¡ïjØ¡ïl0¼¡ïnPÀ¡ïppÄ¡ß>ã?‰ÿøÏ° Ðo‹ŸùåìfØ€Ž è·Ø€ÐBv3l@F ôÛ"lBˆ	!»6 ‚" f	Ô uÐt!ø
+B†? @ t¡ø
+BŽ? @ ôÛbmVÈZ¡6 $ úmÁ6,t±ÐèÁ ý¶h›ÂZht†ˆÀ€~[¸e.4:ÃDPÀ,ÜV2’At
+BÕ¡@ tX
+BÖ¡@ dD¿-ôF‡Ò¡a"H ß{³CÂÉÎ° Ðo¾á¡‡dgØ€Ž è·EßôÑC²3l@F Ì¨Á…ÿÿÿÿÀ.ÃpCJ`0Ë€qT ¢¤ÔË\@/rÂ¼È,ƒÔxÌ2Ì˜Ät GÐ¤@½B “€‚Š1Ç°:AÁ/Aô
+!M
+*ÆC”Ï-'D¯Ü$  bÌ1Aú´Aô
+aN
+*ÆC´OfÑ‡‰ÛÑ£@†ˆ`(€^!ØIEAÅ˜cø z…'cŽaî§W|QP1æ† z…ð'cŽaö§ãsJÎ)P 9ÑP	(g;DH% @ œ”d@]@@•€pn€AtU
+B¿-äç–¼[º¥a"p ßóƒK.½Ð°,ÐoúÉ%0È¥6 $ úmQ?ººôBÃDPÀ,\;Ì\à6rÀn#øä@½Bð•€‚Š‘£@=—ðr
+ÈiØ€†è¸TŒžK€Ð9ç4l@Â dB]@ —€Ð{‰Z'd†ˆ@€Y8˜e°ƒ;pT‚è‚ºœl7 À¤d,D&^Hžy6 ‚¡ z…à.G'ÛM„À$(0)}˜˜¡{2îiØ€„ÈZ ˆ. ÀKÁäö!`‰}¢@ ôap	:¢@ ô¡€‰:¢@ ôá	;¢@ ôÛÂ‡FJ©‘6 $ úmñC$5‘ÔÁ ý¶ £’¢Jj†ˆÀ€~[„‘IU&µGÃDPÀ,\NÀÍ\`Aô
+ád
+*F²Aô\âŒZ*h©a" W)SPP1z.‘F0EÀÔ°pŠ;@Ñ•	(½—h£šJjjØ€„ ˜%€ƒY=Èƒ¾¨ Î Ü6Àƒ¢ßx„SNáaŽá”ê·Åí±S²D@˜cZê·…ùÔáS´D@˜c[ê·E(…•V¶D@˜c\10–ÿ°;FŽ%ÁÂ?`!Ï‚ ï¤dVƒü‡ˆ! œÌ†ÚƒY=Èƒàz#½.‚è­Xî,Ì2 B*ÔÉ@ ¾ìÄ)d@ý¶ˆ¥¸
+â*®(sàÌU¿-h‰®ºZ'
+ÂÃ´S¿-né®Ž»j'
+ÂÃ¼S¿-tI¯½z'
+ÂÃÄÓˆ±„ Xø‡-¼Z0ËP
+}#}˜Ø%¿rüŠ“Òo‹]-´@‹0ÇðNhõÛÂ—Fk-}¢@ Ì1?õÛ"œLË2-~¢@ Ì1?õÛ‚œR+K-¢@ Ì1HõaX‹c-
+LJÏ%ÐÉµ<×¢ bô^``‹Ðs‰u’-1-
+*Æ,C(øA™Ì2€Â°ÏC>´5ÈèIMGW	ùšøÏ1ôS[ƒ?¡ÔtDÐ¤L7øS€?à?KP
+l"þ¨	øÏ”Â,C)ˆBšÌ2Â(ÄÏÃJ9¿5È°ÔKM7XÁ¨ŒK‚…Ø½hAøÏ1¤TE^ƒJÑÔtDp5äHâ?ÇÐRz2.…SÓA—Cþ1ÝàR
+a€ÿ,A)ŒK‚… ‚ÉÏÃLî5ÈÐ”Oáá¨ˆ?~þ³¥0PcìÀì
+nðj 
+Î(¤0Ëp
+¦Ð3d
+RdÄÀXB,ücP.À`ÿY‚S¨0ÁR18–ÿ€–»“ ç8•_©_Tð6 †` °ò†‚3ƒY†=àƒ` XPÁŸƒ=È€ ú!qS b ã–ab Pƒá† ÔÀ`–!P!˜eXUx—
+`Q–R!‚è‡DOØ‰ Œb†ˆ! ,N†‚SƒY†UP…àüDn ýDÕ``¸!Ø0˜eƒ2* °>°ƒŠß>´ƒŠ™À·­Æ` Â»­Æ€þN 77ÃÙÁtCZÂ,C+D@ï'†‚=0ÜôôC"®vlÇv¬™¼Åc<Ö‰¹ê±£­~HÐ•ùmõC¢®~ìÇh+×† ¦‚0;†d©ÌÀ z5fc6fýØ+2#³Ýê‡_•Y™íV?$úÊÌÌl·²ubºÍ·™nØ#Ú
+¥ã§s»ë'p“ã§t»ë'q*?0ÜÈÜ*¥Ò7ts·åFr6Èà–xÍ1ä–ÑÙ C [ä5Ý[Á,]+©Ò7{Óy–ÕÏtƒ¤gö3Kà
+–,´B53a­#1P±éB+ôÂHT ¾Ð
+¿5”\ÀBpÁ¿ÝpC@Vd0Ý fÁÌ2ÀB,¨Á@…l°Ð
+±Ð*…h FAd 02 *€‘A Œb–€r:ÙéF¿þfºA€±€“2Kð
+ÓO‰áÀÈ€ z… ÓTŒ9ý
+pø `d@½B ƒ`º! …‚Š1Ç`5F¡ 02 ˆ^!˜A0Ý˜DAÅ˜c0#S D¯Ø ˜nXÁ¢ bÌ1ÁÍ¼BÜ@ÚŽ r0Ë ¿@
+#þÿÿÿ? jÃÎÁ,ƒ,ÐB0P€{ð
+Ä,Ì2Ô/°Q1Ë¶p?³·€nÐw†:âÐw†;ÔŒÐw†<(ÖŒÐw†=8ØŒÐo‹Ë·$ßòmØ€ è·…Žé›¢oq6l@G ôÛbÇömÙ·86 # úmÁcüÆð[œA ³³Ðo‹ë·¦ßúmØ€B. úmácþæø[È@¿-~ìßž«³a"¹ è·˜ru6l@$ ³³0Ë »à]@ …¨ÁP º€0ì¡ÅP º€pì¡ßj¦ršÊ©Ü° Ðo‹5[¹måDmØ€Ž è·›±Çr¢6l@F ôÛ¢ÍZ®k9Q6 ‚" f	f¡ßnæržË¹Ü°È\ ôÛâÍ^î{9S6 ‚™€~[ÀÌÌ™Ú°Ð\ ôÛ"Îb.bÎÔ†ˆ æ`–`fzÁ^áÆ Å$‚èÂ-„. ­F@èáj„. ¯F@È6 ˆ~[ôYÏ=×sÃD@¿-üÌçŸ«µa"@ ßösÃÏÕÚ°ÐoP;ìjmØ€Œ ˜%˜…”‚è·…¨‰] vb7l@f ý¶µ±ÆN×†ˆàì ß¤FvÙéÚ° ] ôÛ¢ÔÊŽ(;]6 ‚´€Y‚YHs ˆ3‡ü’;ü’Y‚p¡ðÿÿÿÿ0?`nhfà!‚
+ ÷ƒ_ Àá›þKNð/™e‡tX§Y†q0‡v˜e ‡rh‰8¢WoPP1æl- »3N2 ˆ^!ÐU@AÅ˜c(x»& ‚èB^TŒ9†" ·ƒh2 ˆ^!øU@AÅ˜c(|ËŒ ú0!n¥”Þ°Ð+„Ðª(¨sê ^¯Hk¢ bÌ1Èõ
+á´"
+*ÆÃ\¯Të¡ bÌ1ÉõaÂÝdÏ‘½a"
+ Ç€ º€°ZáÌÀÌ ‚èÂk„S·€¢³P Îâ2 ˆ. ÜV@@è·E¿‰Ÿ'~â7l@N ôÛÂßÆï?6 ‚% úmñoää§sÃD€@¿-@®üÂ ütnØ€Š ˜% ‡+‹›òL.à¸!Ïä?€¢WéPP1r¢ç)÷~ÁûÁ0 ½BX¯‚‚ŠÑs‰•“?Bþ†ˆ@€L¢ëP z/árö‡Øß°0K É
+1Ëpè`}˜¨9üðoØ€z® ú0Qsù'äß°ø\ôÛ¢æôoÐ?ý6 ÿ€~[ØÜþû'wÃDðÐo‹›ã¿‚ÿänØ€@0€~[à\ÿý'wÃD‚A Ì€CÏ%pÎÿÿ6 ´€žKàÜÿ!ÿ7l@i7 ½—À9†ˆ€ƒ ˜% ‡Yuh‡¿˜eXvø¤‚èÂœl7_ À¤ä.D&Èîƒàƒa"
+ W#vdp²ÝDÈ“Ò‡	´cÁÀ`Á`Ø€„È_ ˆ. ”XÁäö!P(}gØ!õ(}g(ÜAõ(}g8àaõ(ý¶˜;$p06 $ úmAw9L9ÀÞ°Ðo‹ºÓÁ€ÒÁ ö†ˆÀ€~[ØÝÕ°7l@E Ì€ÃíF©Íð D¯x,  b¤=DÏ%øNƒ@ƒa" W>VPP1z.áwee0 §àd@]@ø±€Ð{	ÑSÃ QÃ`Ø€„ ˜% ‡	‚˜ep‡wP‘>L¤ÃD{Ð‡‰ÔkÃ@hÃ`Ø€d¯ úm‘znn¸a0l@r@¿-Tïâó6 ‚9 ß«‡A‡ùÐoÖ‹ÃÀˆÃÀü†ˆ ƒ ˜% ‡žK°ž‡ÃDÀ{Ðs	Ö›Ã ™Ã`Ø€zo z/Ázt$t0K ³ò¼6PœA<°§ D¿-nïƒàƒ;(sæäaÐoÝÓÃ€ÐÃ þ(sC0ý¶è½>Ž>æ0Ç0õ×oðÅ@Å þ(sCp#Æ‚`á¶P›A0bp,!þ¸AßÆ¯ƒ‡‚ŠÁ þÃÄ N%ÀÀpC0Ì2ÈC<‡"iðtƒ}]‹¨dpD¿ê+ÈÀrg	èa–$BÂ¶* 1äa'þ!‚è·…üÉbÈb ‹aŽ!ƒ€ƒ~[Ô_-D-,P æ†Àƒ~[à...P æ† ƒ~[ìß.Ê.0P æ†@ƒc	A°ð[€Ï ˜eè‡z€“>Lðß/Î/˜”~[ð_8P8áP æ`0Æ1è·Åÿ‘c0‘c°ƒaŽaz0è·…çXçô`@@˜c‚úmQ‚:™:?P æ† ƒ>L¤`ÐŽ×Ž&¥ç)¼cà½c@AÅè½D
+ñ€A<„žK°`0Ìc@AÅ˜eÈ{ •Y|¸‡–›cÐÁ ¨Ç`!ØÁ ƒéˆà2;ÿÀ@ÿ9Š|‚Ò0˜Žµóé†‚œÃ  ÿY‚~@0XñÇ UÀ– fúAPe–öAææØ0p@2dÚ0€Ã`ºÁ
+ÀeÄÀXB,üÃj4Ð‚ðŸcPÃ *É`!XÃ ƒéˆàìÎ?ÄŽÁƒ*%ƒA†àƒ<¦#‚Nïücºáƒ í°À– FŒ%ÁÂ?PáL’›c Ã xÉ`!¨Ãàœƒ ü1øñÇ WÀ– jÌ€èòÁîAðÁÙfþÁTLAŠŒK‚…ÌBšƒøÏüÃ@…þ€ôÃˆÁ±„ Xø,´iP+AÏ%ò0ÐÉ t2  b`0€ÿ°1€­ ›7¨€Á,Ã<ÐC0P, ºÂ<d@ýÀÃ ,ƒ°
+ ÆmÃÄ áÀÀpCžÌ2„H³#!,3P,"áºBHd@ýðÃ -´
+ ÆrÃÄ èÀÀpC€žÌ2Œ„Hø.ê@ÀpCÐg`0Ë@®»a¸!˜Ë W0ÜÔe Ó2Ã,CI˜Dp¹6ŸÞÈíš\ r0K @…ð+DÑs	\ò2ò2  bŒN‚…¨¬Á°1@,„á† 40˜e@‰“úîÀ‹_cÄÀpB,üCj5†ˆ!€Y”@Å?nØ3 ƒY†™0‰`ÄÀpB\!Wƒ@4nH·È`–a&Z"¨ TX(‰‹%2 ˆžK”c`šA`š	Jn
+ ‚èBJÁ°0ËÀ+1½Bp7¡ïë´f€PP1†ˆ!€Y–À…Enô3 ƒY†”P‰` \Â½ƒ”¸àEnø¹€ˆl0Üàf ³/1b`8!®À®372Á,ÃL´D0PÀ±Ða ³0!d 7\€@Ñ+
+*FÑ+„ž
+*øC0 ³2M¯HŽèBÉ!T*øE0 ³2™00ÜÈh ³.ñåm †‚öÀ`–!'h" µÂpCðžŒK‚…°ÉçÜÌµi ×w5'³51Pˆ³@a€³7aEÑw˜ä3(¨³8„!Aô
+!ç
+*F&1K€„p’MdTÆM@6á<äAYà?b`,!þ¡
+6}wèÉà?ƒbØ€„@¨OnÖ4 ƒY†œ¨‰`¸ÁõF5ƒ»7ñxºa<ƒ@˜e°†hÎT0¸µ+Õ@¯öÚNrü¢W±y{Ñ+!ÀÛkÃ@2 ˆ^!Áñ’Aô
+	z…ü]®Ata7ƒ Áo%È€ .&ƒ|âô1°Õ n[ ß2hØ9†ÔÐoGƒY‚¨ ôZÐ‰uªJÝ@ 7a€ÁtC š6Ëð<Ðïa¸! Ó f|¢'‚4¢ç¢ŒiŒi@AÅ˜%ø	L>¸àƒ¢WæTŒY‚Ÿè¨˜ž|Âl… ýÂpCð¦Ì2„XDßX3pÓ   b ˆÿ,AXTTX8?A¿„á†ÀN0˜e‹ÔÈw0Üài ÓóÜbL7”A4¾@nø4 ƒé28¿ gL7Èe¯Á0Ý ¯Á\Äb $¿@nF5 Âß@ 7¥€ÁtCàžÁ0Ë0g“ mwAnQoaç°d@½Bx
+*Æ1p ,At
+(#Æ‚`á¨`¾A€Á!þèà?KP•@~0·ád@½Bà
+*Æe| `At¡(#Æ‚`á¨0¿A€Á!þÈà?K`•P¸0‡ HÑ+„4(¨g¤Èe DÔ  @ Œ‚… ‡ø#€ÿ,Ajœ+øe0Ó} m Ó|¤m0Ójüe@G2ÝÀ¶Á_vpF Ã$€.¤Æ] …[ÌÅ[øÅíA.HÑ+>(¨—½ àd@]@èƒ€0Ëi÷ˆƒ\@Ñ+}
+*ÆMç At!ƒ€Ð+„
+*­r –@³„á†€e010ÿ@…1¢#Šn^6 ƒY†¶P‹`¸Á€Ù fØb-$ ñ'YÂpC0³L7ìiÀà?K ˜¼d þtË@np6 ƒéP`20 À–@.è—pA´ÃAÏ`0Ë nÌ2ÀÅ[H#Æ‚`á¨@Ç†Rþ|âOá„á†@l0˜nPÕ`0 À–@.FŒÁÂ?Paœ0Â°ÄŸÐ9ÃAÚ`0Ý«AXøÏÈÅˆ±€ Xø*ˆr ³r1PS	qkal
+m!½Üøã>à?K0• øq‡5!D¯ò!  bœ=ä„\PAtA
+Â,_ÐE=+ø„œ*Aô
+á.ƒ€‚Šq°0r­@Ñ»
+B¯ø2@(¨„Ò@ –Át †‚ÔÀ`ÄÀX@,üÀ9ˆŽ(v¸!`Ý fð¢.‚á£u0˜e¸»€ÄŸ^:Ãì`0Ý€¯`@€ÿ,A_`ÂšøMa¸!¨Ý ¦ú5hÍ À€ ÿY‚¾ žÂÑ7º€Á,C_äE0Ë°z!‚… B<JAøcð‰?ùt †‚ßÀ`ºádƒ-À€ ÿY‚¾10ÿ@|j3À,z3*ë@ 7æ€ÁtƒË¾à?KÐ#Æ‚`á¨ðÏÌôÅ@M%ðØ…Ü(à…¤Ä^`pâ|€ÿ,_TTB_ÈËY\]´j D¯ì"  bÜ\Äj Èd@]@¸‹€0Ëp!—¶ÈD D¯è3(¨×»È©D Dæ3(½BÈÏ ¡ bPiT;ÔÚ@nL8 ƒcA°ðTèé :¢Øá† …0˜eÐ†À`–A4B#@bí@ 7-€ÁtCÝL€þ³¨IŠâO±„á†@†0˜nÐÛ@Eƒ üg	Pƒr;D;ÜÜp ³¨AÁ,ƒi”†4b`, þ
+n`(áÁ'þ´Û@nx8 ƒéÒ¶ üg	PcÄÀX@,üê:Ñ ³ ü1ÐÑ@üI¼0ÜŒq Ó«ìh`@€ÿ,jŒ‚… _p0K€5•ppf  0Ri¦Áˆ?òA þ³©1ÐR±ÏXð‹Y°ÏY¨Á>aA·„á†€0ÀAgñŸnt;Ã`0Ë ­Ðza¸!ã fVƒ5‚¤‚èÂhƒ°Ä“ üg	Zãr$]É€ z…šA@AÅÀàlñÇ' ÿY‚Öè¨œÕXRƒð;Ã(`0Ëà±Ð~a¸!å f^6‚$‚èBmÁ°0KPg&íHÑ+Ü‚a"P`– 6FŒÁ ~;˜ã`MRwƒž1@Rï Pá …hÄ0Ü¨r ³³!ÁC›°ÉÿsAšÿÌ1hüo0K@sù¼É*sAŽ#Ì1mŒp0Ç°i0ÂÁ,mTø"Âldù=;bp@ ðÞA X#F‚`Ððüqp'³µuâÒ7ü€Á,ƒmìD0b`4 m ßÁ+¼Œ‚AÈwðÊÁo#F‚`Ðò˜p€²ÁˆÑ€ ´|¥¤l0b`4 m ßA)*Œ‚AÈwPÊÁÊ#F‚`ÐòœpÀ²ÁˆÑ€ ´|'´l0b`4 m ßA).Œ‚AÈwPÊÁË#F‚`Ðò”r ³Ä  @  [
+&ˆâ^¶OP/[†(¨—-CØË–á
+ìeKÑñBÜË–Á
+}Ù2 A±/[5(øeËÀE¿lÜ ð—-ÿ²eƒd¶tP„Ì–Á
+‘Ù2àA12[=(HfËÀEÉlü 0™-('³e…e¶¤P¤Ì–Á
+•Ù2 B±2[U(XfËÀ
+EËl\¡p™-,/³e…f¶´PÄÌ–Á
+™Ù2àB13[](NfËÀÊl|¡H™-8*³e‡be¶äP°Ì–b‚x!îeKAA¼÷²eP‰ _¶-!½Í–"&‚x!îeKAA¼÷²e ‹@g¶lèÌ–a.Ù2äE/[†½òeËð½l)@#ˆâ^¶¦ØË–5{Ù2¨F`/[ÖìeËà½l`#°—-ƒlö²e À^¶¶ØË–7{Ù2ìF/[ßòeË A¾lÄ#°—-CyHp³¥€‘ ^ˆ{ÙRàH/Ä½l)Ì$ˆâ^¶¢¼Ë–ÂU‚x!îeËp+Á»lp%x—-C®ï²eÐ•à]¶ã¼Ë–\‚wÙ2”Kð.[s	ÞeË@/A½lÌFŠ›-ƒÞö²e  _¶¦äË–u‚|Ù2ÈN/[ð‘äfËà>½là'°—-ƒüö²e ŸÀ^¶øØË–A{Ù2ðO`/[ÿ	ìeË B½lD(°—-	ö²e0¡À^¶4ØË–Á†{Ù2àP`/[
+ìeËàCÒÜlÒ(È—-ƒù²e˜£ _¶xäË–{Ù2øQ/[†P
+òeË@JA¾lN)È—-ƒ*ö²eh¥À^¶±ØË–¡–{Ù2äR`/[†]
+ìeËÐK½l~)°—-C8ö²eP§ _¶íäË–á‚|Ù2ÄS/[z
+ìeË`O½lú)°—-Hö²e ©À^¶&ØË–a¦{Ù2ÔT`/[†›
+ìeËS½l~*È—-ƒXù²e « _¶fäË–A­{Ù2°U`/[Ð
+òeË ZA¾lJK¢›-Coö²eX¯À^¶íäË–á½{Ù2ÄW/[†ìeË fA¾lÈ,È—-Ã™Iu³eX³à]¶m¼Ë–Î$»Ù2ÔYð.[†;ÞeË gÒÝlüLÂ›-Å¨ñBÜË–Õ‚x!îeK¡jA¼÷²¥øµ ^ˆ{Ù2”\`/[–òeË sA¾lp.È—-ƒÏù²e0;)o¶uØË–áî{Ù2ä]`/[†½ìeËàw½l@/°—-ƒèö²e ½À^¶©ØË–aõ{Ù2´^`/[†×ìeË{½lf/°—-Cíö²e¸½À^¶ºØË–÷{Ù2ø^`/[ðìeËð~½lâ/°—-Ãüö²e¨¿À^¶ùØË–aÿ{Ù2ô_`/[†ÿìeËp‚¤7[†‚|Ù2à`äË–¡ƒ _¶bù²e0Ã °—-A¾lÖ0òeËà†A/[†8‚|Ù2ÐaØË–áƒÀ^¶{ö²eøÃ °—-Ã(½lJ1ìeËpŠA`/[†T{Ù2¬bØË–ƒ _¶·ù²eÈÅ È—-Ã.A¾l|1ìeË ŽA`/[†r{Ù2œcØË–!ƒÀ^¶ëö²ehÇ °—-Ã;½lä1òeË@A/[{{Ù2øcØË–!$ƒÀ^¶%ö²e8É °—-M½ll2ìeË€“A`/[{Ù2€eäË–a,ƒ _¶eù²e8Ë È—-ÃZ½lÚ2ìeË —A`/[º{Ù2ØeØË–/ƒÀ^¶zö²eàË °—-Ã_A¾lB3òeË0šA`/[†Û‚|Ù2äfäË–7io¶öö²e Ñ °—-ƒ‰A¾lP4ìeË ¢A/[:{Ù2ìiäË–¡Oƒ _¶ H|³e Õ x—-ƒ©Á»lR5úfËàªAð.[X‚wÙ2Ìj ùÍ–ÁVéo¶·ñBÜË–\ƒ _¶æù²¥8× ˆâ^¶ëù²eh× È—-C¼èlð5òeËÐ¯A/[†‚|Ù2ˆläË–Ád)t¶/H¢³e¸Ù È—-ƒÎA¾lx6òeË ¶A/[†°‚|Ù2ŒmäË–álit¶hñBÜË–bmƒ ^ˆ{Ù2ÔmäË–aoƒ _¶¤ù²e8Ý@"-EúA¼÷²epß È—-ýA¾l)î7â…¸—-ÿA¾l)@8â…¸—-ÅA¼÷²¥8á ˆâ^¶.ñBÜË–‡ƒ _¶=ö²e0ã È—-Ã½lè8òeËÇA`/[†T‚|Ù2¸rØË––ƒ _¶¹ö²eØå È—-/A¼÷²¥èå ˆâ^¶¾ñBÜË–âœƒ ^ˆ{ÙR´sÄq/[
+y‚x!îeK¡ÏA/Ä½l)D:â…¸—-CLA¾ll:ìeËÀÓA/[†°{Ù2ŒuäË–‚¬ƒ ^ˆ{ÙR”uÄq/[
+³‚x!îeKñÖA/Ä½l)ê:â…¸—-…^A¼÷²¥í ˆâ^¶ªñBÜË–!·ƒ _¶¾ö²e ï È—-Cz½lÖ;òeKÁÞA/Ä½l)Ú;â…¸—-…{A¼÷²¥¸ï ˆâ^¶ýñBÜË–BÄƒ ^ˆ{ÙR¨xÄq/[
+‚x!îeKáãA/Ä½l)Ä<â…¸—-E™A¼÷²ePó È—-CœA¾l)ì<â…¸—-EžA¼÷²eðó È—-Ã¨A¾l)P=â…¸—-Ã®Ré     a   Â  ,     0P$PDPePd00Ö ÂÃœÌÉ[ÏÀ UÍ ŒÐÜ UŒ€ ‚ 00FÐ÷-‹kt1@# ´1@&£c ‚ (€ ‚  ‚ ‚‚ 
+$50@•3   ñ0  !   +¸Á™œY1ÄÎäÌ
+AnpfÅ078“3+ºÁ™œY1ÔÎäÌŠÁnp&gVwƒ39³bÀœÉ™CÞàLÎ¬ôgrfÅ°78“3+¾Á™œY1ôÎäÌ
+ÁopfÅð78“3+ÐÁ™œY!„Î¬DgrfÅ0:8“3+ÒÁ™œ  3¼…(ÌDäð£0±À[ŒÂLÄI o1
+3'¼Å(ÌD´ð¤@."†u ƒY!HOD A}‚ 2 ˆ9†n`‡9†@ƒr‘ŠA¹Àd–@¨0Œ@€
+ƒ	|¨0Œ@ ’0ÜäP˜„á†`À`º‚aáh6˜n@áE:Iáýà~¡ ŒNR€Â?€hô £“¢¢!vAÀè$)ŒiÆ_P 0:Ia
+%a¦ ŒNR ÂI jä £“ªª¡¤AAÅè$+¬k°ÆhPP1:	á
+-áªAÀè$,¼l´ £“²²a ŒNBÐÂLÐÆkP 0:	a5a¨AÀè$.Ün¼ £“ºº‘ ŒNBðÂNð†jP 0:	á=á¨AÀè$8üx¤ £“ââ¡ ŒNBÃX‡nP 0:	ae!âAÀè$:œyð £“êæQ ŒNB°ÃZ ‡oP 0:	ám¡¿AÀè$<¼{ô £“òî± ŒNBÐÃ\ÀoP 0:	au!ìAÀè$>Ü}€ £“úö ŒNBðÃ^àÇhP 0:	á}¡äAÀè$Hüø £“"þÑ ŒNBÄh€}P 0:	a¥!"ûAÀè$Jœ‰ì #Ó¡aGŒÁ ÈÅ-‚L‡†10ƒ6(—¾2vÄÀh@ÚÀ\ü"8SP¼=P<<`¼6h¤˜Ãm€@nlf	ˆAp8	“˜n‡€N¸W¨<<¨œn°‘4@HmÂpCà`0KàT z$DÑs‰~ðÀ7†ˆ % á†@EÀ`–a ‚ëÁs0Áûƒ0Áé†0aƒˆÒF 7éô6a¸!X0˜njb ¸Ã{€ÁtC€Ý@nâ¦‚f#˜n°7Ð‡¤ovP°Af	ŽŠM0è¤ ¼ÃA~€Á,C‚Óy!‘ô¡/
+6È,A2P±	ˆ¨ÓZD³‹L7„BœDÒ7„Ñ(Ø ³Ë@Å&(®’Ì24ÌL7ˆ‚°DÒ7Ô2ˆ\
+0È,A3P	¯,c6Á×d@]@¸
+B¤pápHÑ( @ \/,’AôÁ	(¸D>a¸!Ø0˜e¢`  «á2 ˆþ[ìÅŽ;²#ÃD@Ð¾àGdcØ€JC úoÑ=2ôHli@ÿ-üÂG™a"8˜e€Rè»C_üH1l@ª1 ³½ÃÁª€Á,Cá§ÑDÍH€ÙA3Ë@MÌq61³Ô@ L¬%Ý`rBJÈœÁr…,È\¢
+rˆ/ÈrK+ÈŒ!€zŒ!àEz\ È8¬Ç	Œ!ˆÃ\`/—AtAD‚Y†Ê+òB2 ˆ. AÑ!8E'æ‚œpBR ˆâž™˜dBf	®Œ¢NpÑiHÑ„!8Ë,&‚8Œ'f–à¨Øª
+€°¨j ‚@,­¨ Ë«r ˆ. ¤‚Áäv!ˆ&·§pd0¹ýB(…#ƒÊ¥Ã¸€AÎAôÁL‚Y,þA2 ˆ~!±@nÎ²¢_GAåN7¤H@ÌhÑ/„%È rg	´
+ÂÈl 32¨¨	#c0%0ÜÌL7ÄK´!N‚1ü˜—…@.øÉ€ z…P'AªAô
+áO‚Yn#‘$‚HU ˆ^!„JÐ+„`˜%èäB2 ˆ|‚è‚©·¬ D¯†`– ¨° Mà*ls¸^!8ùÀnT'¦øHœ ÆtC CªIÃŽ‚A ‘Ê·±Î]à’lÒ°#F‚`ÐkÔ2Á/"´Ga¸!°0˜eð¾ qB34“*Gª#ý˜›±U¹yí‡DàÎ¸J?$ì$gr&g†ˆ`w`Ø€òb †b€aÂ(`–à›e0“~HØ‰ÎèÌ«\ŽÀŽôCOx†g`åvDw®zâ3>C+ýØ“Ÿù™Ÿ6 ‚ð€aBð‘6 ˆa †£€Y‚0nX“±	ƒS\Ñá† lÂ`º!x•aÁ5te¸!82 yÃÚ€ÁtÃÉÁtÃÞú€Á,Ã9ˆA@ë„ 2 ˆá¡eÀ€pI 7rý`¸¸ÉxÙØ~H¸ŠÜÈºôCâUæfnÎ¥°B7t“.Y/“Ûw†ÀnØ¥ïÂÝ¬Kß¼i—\‚˜nôf™nhs™äŒ½ÑŸ;™¹áŸ;©¡‘ÃAé€Á½ÝÁHþH–LåvÀ!0~é&ÃÉœN¿d€±p RÇ_ú!q.ª£:ªÓ	tYÕ	™~H¤ë°ÈôCB]Z§uD&w ¦^'à)0ÜÐÜz´Ç7¶wê±;ÜäœzÀÇ7»98Ü "½Ã‡ï€ÁtïŒÁ?L78½³c0P±ùˆüBTÔ„xˆÁ.”Á@fbpe0Pb »P‰A,”Á@ÅecbÐ
+e0Pqá˜¤BT\:&¥P‰A(”Á@…@{bÐe0P!ØžäAT¸'uP‚î‰A”Á@…À{bÐe0P!øž¤ATà'eP‚ø‰A”Á@…@~bÐ•Á@…`~b•Á@…€~bP•Á@… ~b•Á@…À~bÐ”Á@…à~b”Á@… bP”Á,CA*\52Kp1+e2+e3+e4+e5+e6+e7+eŒÁJ™Ã@…@c°Ræ0P! Á¬”9Tl0+eŒÁJ™Ã@…@c°Ræ0P!àÁ¬”9T|0+e(ŒÁJ™Ã@ÅE
+c°Ræ0Pq¡Â¬”9T\¬0+e,ŒÁJ™Ã@fc°Sæ0PQº0;e›/ŒÁc×â ÃÁHÁ,ÃœC0P!¬ÃÌTç°'ÁÂ8¬Á>°Á@…ðkðlÐ†ÿÿÿÿ6]˜e0…6Ð…ŠM0w ƒŠš8)sp2¨ÀFÊÜ*€û3R ƒ
+àþÌ.2¨¸ÖÉà*®s2x ƒŠkœÌÈ` âú%s€2¨¸vÉà*„[2x ƒ
+a–ÌÈ` Bx%s€2¨VÉà*„S2x ƒ
+a”ÌÈ` Bø#s€2¨öÈà*„;2x ƒ
+aŽÌÈ` Bx#s€2¨ÖÈà*„32x ƒ
+aŒÌÈ` Bø!s€2˜e@6ø‡Y†4Pƒ’ L Ì1ôNðF]@ØÌ‡0Ç0èÓï|(sC>]@ƒõ¡@ Ì1AûÌ¬¡„@˜c@Ÿ@¨$ÂƒÈ™„@˜cù¡“sBP?³k0PQRj0†ˆÒ‚?cþŒ!ú3K`d #‚èÂÓN€r`d@]@Àƒ`º!è‰² @ PO Œ¢}L7b¡
+€‘AtA‚é†à,Þ‚0K`'
+cäÔÍ2¸(´Å,Ã„ÂÊ\€/3Ë q@9DßR$ð%
+ÂƒàÔw!nˆ0Ç09Ôw†9pˆ0Ç0:ÔwQxˆ0Ç0>4K ”aŽ!‡‚u"»sB0FtaŽAÆˆðB Ì1ÍÈÁ@E-Hp ÄÁB0Oc‚!i4†@¬Ñ,ÃÐkdG}g“ Ÿ(shèSßÈ„ˆ#
+ÂÃÌQßÎä#
+ÂÃÐQßÔD±#
+ÂÃàÑ,AÐl„9†9
+JŠ`C Ì1AQl„9!è#’0Ç  4KPµ Í@cAK!¤4†0ŒÒQJ³vpè‘w@}gÈ“@¦(s¢ÐTßø„X%
+ÂÃ´Rßþä`%
+ÂÃ¸RßDE%
+ÂÃÈÒ,P{„9†V
+~ŠÔC Ì1Á-Ñz„9!¸%b0Ç º4K€µ ÙpcÁY!¾4†0ôÒñK³yÐé1Ë { "Ñ‡X	ØŠ‚1ÇK[uÀVˆr¢àBÌ1Á9uÀáVs¢àBÌ1:uÀAWu¢àBÌ1;ÍðñÇ…˜cà¥ ¯ˆ>.ÄƒÄÑÇ…˜c‚x¢ú¸sB@O³|0!’{àcAh!ø4†0ÜÓ‘O³¦0ËàÀ#™Ñ/v	(¸sê Ö C°Nù4K 
+ä"bŽÁ‚Õ"¹sB0Rd"bŽAFŠNäBÌ1IÍ€Â@†,H~ üŒ!³5† ¨ÔÂRcÄJÍ˜ÂñƒÿÌõýL
+Ñ“	¦5‘
+BN†˜nÚ¤N(]@@™cº!€<¡@ äBýBP™`º!H>¡àBÌ˜Â±„Í $'ü‘ÜK˜Ð\pG’At!g‚é† OJ…0Ë0
+¥ðC‡ d@]@ð™`º!U¡@ \ƒ'Atal‚é†àT^…pŸ@Ñ´	¦V¡
+BÒfšn^åV(]@`›hº!]¡@ támžé† Vz…Ð¹i¦\
+BŠAtn‚é†€WÈ…pfPNAt!o‚é† \Ò…pkP+AtÁo‚é†À\Ü…pp+Atat‚é†`]æ…s@ýB(`º! —{¡àBÌ2‚)€ËÝ;AÑ/Õ	¦‚tá
+.Äñ¹@Ñ/„×	¦w	
+.Ä…º@Ñ/Ú	¦‚y1
+.Ä,)tawJaº!™”¡@ ä*Dz'˜nJ¦e(Ù
+Ñ/„ß	¦‰
+.Ä,)ô>d,Ã,
+>
+ü@
+>T
+ü0
+=‚™ÌðÌ€‚…J‚•JŒÂ@`Ff@3|@3 `F¡@¤`F¥@£0Ð#¨‘àà(¨Q(€)¨Q)€Å(ôndàÂà
+n
+ì@
+nT
+ì0
+=‚™¹ð¹€‚…=‚•=ŒÂ@`Gf€.|€. `G¡À¤`G¥À£0Ð#è‘°°(èQ()èQ)Ä(ô~dtÂt
+~
+®@
+~T
+®0
+=‚(™žðž€‚(…‚.‚(•‚.ŒÂ@`JfÀ'|À' `J¡`¤`J¥`£0Ð#¨’€
+€
+(¨R(È)¨R)ÈÃ(ô®d®Ä®
+¸
+®D
+rQ
+®4
+=‚,™,ñ,m„‚,‘”‚,Â@`Kf`K|`K  ¡`K¤`¥`K£0Ðsé’¸¨(èR(Ø)èR)ÐÂ(ô\¾d2Âî
+¾
+¢@
+¾T
+¶0
+=—8™ð|€‚8…‚+‚8•.ŒÂ@ÏeNf #|` `N¡ ¤`N¥ £0Ðs©“¨¨(ÈF(¨) A)¨Ó(É Œ‚N`d@„2 #‚ ”Ä,A*´!Tø¥
+£Â/³¯à
+ÿ4BáÿÿÿÿpsÀ0Ü”Ì2œB*€ž¦@ Â,ƒ*´e@³¬°
+«ÓT	|‚ÑUlŒ‚ÑV)lŒ‚ÑW9rŒ‚Ñ3·ÄÜÌmØ€è¿Å‰›rn=6l@‡ ôßÅÐmA76 C úo‘béÆ¤›A! ³¨Ð/„Yiú…h\ˆ~!¢_…FÁ…èÂ¡Qp!úo1cófÍÛ¼" ý· 1z»èMÍ†ˆà€þ[ÔX½aõ–fÃD`@ÿ-lÌÞ2{[³a"(`– n³)É€ ú… .¢_BœQp!ú…@Ä¢_Qp!²¢ÿb&rÈ‰Ü°$Ð‹19aäòlØ€è¿™‘Ü@rx6l@‡ ôß¢ÌJŽ(9=6 C f	Pa 8Wpùà2 ˆþ[ Ê(‡r\ˆ9†6T®ÿk¶rÄÊ…bŽaF­ÿnær‡Ë‰bŽaH­ÿqsJÌ™bŽaPmÄÀXB,ücÎ0FŽ%ÁÂ?`!ƒ è»ÙÜCAÅÀ` ÿab 'Ûƒá†€ôÀ`–á\!˜cH5”Ù¹9†@edmŽ!`™X›c\fÖFŒ%ÁÂ?l!ƒ`ŽÁÕÂìæ‚q¸µ9† lmŽ!8\›cµ^ »9†àvmŽ!]›cÆ×æl­ÐnŽ!8‡_›cÒÁ×æ‚u ·9†Wó¶›cÀaÜæq·9†€È-Ã¡ç|íân!ø5q›n`ñ:ž‘¿Ë€ ú…@JA–;K³ã@e4PÈð
+7!Dÿ-tMï½Ó;
+.ÄÃ¯|×‹^ë;¢ïæ‚1Ç0õÖp½ôè‚1Ç0öÖ‹q=eôð‚1Ç0ú6b`,!þ1¹³à ö3b`,!þa¹Áˆ±„ Xø*„c #Æ‚`á¨ ŽA_Í2àÂ,ÐÏ,Ã-Ð‚üÌ2ØB-ä
+šøÏàÂˆ±„ XøÇ,øbÀaPˆÿ,. A?â?K€%•RŠ-· ÈÂ@I¥Ô‚cÎ-8²0PbR- ¶ Ý‚$#Æ‚`á¨ ŽÁhK‚… Â:)1b`,!þaå Á,/äBÍ2ì‚.°×C¾´7Èè[ÉMGÿøx þsýfàÞ Cào)7 äÓÿ”øÏ€ÃƒÈ=½7ÈŒœËa 
+â?ÇPrø2&sÓ&°øÏ€Ã,8ôB
+Í2ü‚/Ø×ˆ±„ Xø‡-Øch
+AøÏ1¬Üe~ƒËÝÜtD€¹ ˆÿÃËaê7ÈÀÜÎMG™ùÇtCÌ÷…E þ³à0b`,!þ
+(ôÖCÍð7ÈØ\Øá,á?Ç€se0ƒAÎ‘øÏ1ì\Øß CÀsg7ÝÀsˆ!€ÿ,8Ô˜]Ä‚]ðè‚ìæÂ/Ì2ˆC8¬‘‚10–ÿ˜…—î@üg	Äa Â„p€p18–ÿ€…™Š ç?‚Á)€`@AÅÀ` ÿab WnÜ0 ƒYXˆ…` XÆ%XÈ€ ú!Av'œ`P 0.Ð'6 †` °8Å †‚SÀ`–Æ!˜e0‡rè¥
+`)È!‚è‡„Ú¹`à‚A@À¸àŸ`Ø€‚ÀÂn\1 ƒYs(‡àö¬ ÷'nÒ	fÊà‚
+A…0ðÃ *:ÂÀƒ2¨ìP?Ê` BÀC!ü0(ƒ
+A…0ðÃ *>ÂÀƒ2¨üP?Ê` B E!ü0(ƒ
+A…0ðÃ *RÂÀƒ2¨LQ?Ê` B@E!ü0(ƒ
+A…0ðÃ *VÂÀƒ2¨\Q?Ê` âÒù ü0(ƒŠ‹çƒ0ðÃ *.ŸÂÀƒ2¨¸À>?Ê` âû ü0(ƒ
+À6…0ÀÃ *0~Â ƒ2¨¨	~Â ƒ2¨Øø6PÊ€t3Ãa0Ü`˜L7½'Ì2 C[¤¢@nì0òÍ@ 7x€A?$dÏ;ì0ÈûÛØ~HÐx¸_?$j/ƒ<Ú¯¶§‡ï—û7¹}gø0¿¾3}Ä_ß?æ/ãŠ ¦P–é†Yk¿\K0öv$ƒ;žËÇ@nçD2¸ã¹}„R4ÃÁ*`p5g’ÁÍýc ¹‚AåvÀ!`Å@ƒn2´`ÐŠÁ`lˆWH0è‡DûÁb ‹,ýp¿Xb18Á ï'‹,&ôCþf1˜Å ƒ/‚˜n¨Å -JÑ@ 7º€ÁÅÛ¼ípCÀ‹\»ÁÛ^0ìpCð‹¼ÙÛ7á€A¦Z7ÀÜ8a0Üpc ÓâŒA‰M78ã˜Ø,A:Tlî€¥À5!èðOl1PÙ:ì[T ú€-°Å@ÅåèPNl1Pq‰:„[T\&½Ä—J C.±Å@ÅåèPKl1P!È:Ä[T6­Ä‚N C*±Å@…àèPJl1P!ˆ:„[Tf}Ä‚Z C±Å@…àèPGl1P!È:Ä[TvmÄ‚^ C±Å@…àèPFl1P!ˆ:„[T¦=Ä‚j C±ÅU)&˜\À—Á7çGÓ¿­0Ý´a€[³ëð­0P!ä;„Ã;TuàµðB¸C*¼Ã@…ÐîÐïÐ10…Y“€S˜e`‡v0hÂƒJ]@(ƒ?(sCŠAÐ 
+ÂÃˆbÐ„5 Å€0Ç0¦Ì¸í‚@˜cÅ ˜É€pA Ì1Á*”aŽAV1 ]sBàŠÁ,;TÔ‚ÄB;Œ!;Œ!²Œ!±Œ!³Ì¨¥ÀÈ€ º€ÐÁtC°a@@ v DD!˜nàÁ( #‚èÂ)ÓA=¬è`d@]@`…`º!Ð8 @ Ì¨Ã,C<ˆ„?\¼ÞÌ2ÈCHŒßtC€c°b³ó@AâAô!Ü»(sæxôÜˆw(sCAßÎí€Ç€0Ç0òôAÝz(sC`Á,A=ÐJ„9†x‚Ñ%Âƒìc@)!æ„`R	0Ç þÌÔÃ@E-Hó ÐÃB°šÁ‚ ’ÁÂ’Á1’Á,ƒ=ÜÃ–²@}gÈ· 6
+ÂHl}gà7"%
+ÂÃ¬dÐw†;T2 @ Ì1K}g9Å%
+ÂÃÀd0K€TaŽa%ƒ 70Ç 5ÐX„9!¨É€ÈB Ì1N³ø0PQ’=÷0†”g0† ðd0†0ìd0†@ôd0ËúPÉÑw†˜Ô3 @ Ì1èd°gÐwš#Æ2 @ Ì1AY}g¸¹ƒ,
+ÂÃ˜eÐwSÐ2 @ Ì1Z³û@!æÊ2î3 ¾sBð–õ…@˜c‚·È/ÂƒÈe0K°µ åƒ cÁc‚]cC]cÄ]³ü {1ËÐþð
+iÑ‡´H4 àBÌ1¤e˜hÐ¶#ú2 àBÌ1Á_px»Ã/
+.ÄÃ€fÐ¹SD3 àBÌ1i³ÿ@®q!æè2b4 Ó¸sBš™Æ…˜c‚Ôè4.Äƒ°f0Kð² õƒàþ1†äh0† Àf0†0¼f0†@Äf0K`©Ñ/Ò¦‚ÞX
+.Ä,IÜX b0ÓcášA¾¥@]@€½`º!pÐ„Ø#¦‚ø0(]@½cº! „ú@ýB ½`º!h†‚1K`7¸Ì*È	)ÈÙ,sAH2Ýpâ´\Ñò¦(³#Qê\2“d@]@H¿`º!8„pN@Ñ÷¦i(7…d@]@˜¿`º!ˆ‰Ðú›¦©(]@¸¿hº!¸ŒÐý{¦Ù(]@è¿fº!èc@]@ø¿`º!1 @ ÜÀe DH0¦39
+Â±Ž@Ñ„‚é†`MØ€pqà#AtÁƒ`º!€“8 @ $D¿`0¦‚4©
+.Ä,I˜D™äe D¿j0¦7Ñ
+.ÄõAš@Ñ/‚é†`Nþ€‚q¢Ð&Aôáƒ`º!ÀR àBÌ˜DÌ0(…é†ÀTN¬@]@@Ã ˜nTe(é
+Ñ/5‚é†`T^‚1K`=©ƒ¼üƒ¼€…?•?ŒÄ@ÀCê`/ÿ`/ ÁC!$ÁC%#1Ð#€‘:èË?èH€QHÐI€QIÐÄHôd¤þòþd`AdT`1=©ƒ©üƒ©€…;•;ŒÄ@ÀFê *ÿ * ÁF!A$ÁF%A#1Ð#À‘:¸Ê?¸
+HÀQHðIÀQIðÃHôt¤²ò²t$AtT$1=©ƒŽüƒŽ€…„+•„+ŒÄ@ÀGêà#ÿà# ÁG!¡$ÁG%¡#1Ð#€’:ˆÉ?ˆ	H€RH˜I€RI˜ÃHô¤¤fòf¤ò@¤Tò0=*©*ý*„n„*‘„\”*Ä@ÀJêÀJÿÀJ a!ÁJ$Á%ÁJ#1Ð#À’:ÀÒ?ÀHÈFHÀI˜AIÀÒHô\´¤ôñì´v@´T´0=.©~üƒ{€.…„(.•„-ŒÄ@ÏÅKêÀÿ  ÁK!á
+$ÁK%#1Ðs“:€È?ÈH€SHèI€SIèÂHô\ä¤äôä´äDhPä4´* #‚ Vµ
+ÀÈ€ ÈU F1KíBè“Pi€ÂŸ„Ê,CMÐ„j#þÿÿÿ? â ÃpC »Ì2œDJ ì&A Ä,ƒJÄÄ*Ä,ƒK¬„³,ÑiÒR	Ò6 àBtÀÁT†p(¸p@•"\
+.DTå ×€‚Ñ‹Xâ6Hâ6ˆÛ`Ø€è¿…¬r(r k0l@‡ ôßbVƒ¹–¹Î56 C úoA«ÝÝéA! ³(Ñ‹Zê6hê6¨Û`Ø€|5€þ[Øj`·c·»ÃDð« ôßâVƒ»ž»Ö56 p ÿ¸àm ámÐ®Á°„k  ³(1Ëð0‘'ýB˜•¨_GÁ…èÂàQp!ú…Px\ˆ~!¢ÿâˆn ‰n ºÁ° Ð‹qF7ØF7È×`Ø€è¿¹¤p¤àk0l@† ôß¢\ƒÒºÒô56 ‚B f	P¢ÿæ˜nà™n`ºÁ°¼k  ý·8×àtƒïtƒ~†ˆ ^è¿º¨€êüA¼Ð‹tR7ƒÔü56 y`– %fdb&TåÆ =É€ ú…`.¢_É\ˆ~!$Pp!ú…`œl@Á…È6 ˆþ[ÔkP»AP»AíÃD@ÿ-ì5°Ý@°Ý€eƒa"@ ÿ÷Ün0Ün°²Á°Ð|p7 p7hÙ`Ø€˜%@‰”‚è¿…¾ººèn0l@#@ÿ-ö5ØÝ@ØÝ fƒa" Ù@ úoÁ¯ïï0AÉÐ‹~z7 z7Ù`Ø€L6€Y”¨ Î€&üp8‰¢ÿ €o€o ¾bŽ¡dƒ@|ƒþ[Œl0¾1¾AÎ\ˆ9†!ØÙ ÿ&˜op˜o ³bŽax6è¿EÊé(éøl@Á…˜c°FŒ%ÁÂ?fáŸƒ`ÄàXB,üB:‚¾;°là¾ÁCAÅÀ` ÿab '7``¸!àá fj‚&‚9†°Üe~ƒ9† ^Ô6˜cä%mƒ9†€^Ö610–ÿ°…”‚Ë—Ûxºwƒ %ƒ9´àAƒ9†@â6˜cènƒ9†Àä6˜c`Û€ü7˜cÜ¡nƒ9† è6˜cäÁnƒ9¸èA„ƒ9†Àò6˜cðoƒ9†@ô6˜cHÛ L8˜cÞ¡oƒ9† ø6˜cæÁoƒ„‡
+œcÀÛÀV8dò6àÛ`º	ø48™aåà2 ˆ~!ødd`¹³71ËjñÁ@`–CMÜZd@ý· Û€†ƒ€†(¸sy6ôßânƒˆZ7 àBÌ1Áëý·ÐÛ@‡ƒC‡×(¸sC »Aÿ-ú6èá@éá@v
+.ÄÃÐn0b`,!þ1s³fª3b`,!þasÁˆ±„ Xø*ìuð#Æ‚`á¨À×Á³>‘¨3ËÐ:a:³<±³  ‰ÿ,OŒK‚…Ì^…øÏø¨#þ³>1PR);¡ð„Ð
+N”TÊN8<áô„ƒ%f íÂROH81b`,!þ
+¤ôh0b`,!þ
+¥àÄˆ±„ Xø‡-üu€³bñµ3Ë`aªÁÃì…ƒí¿LGìøz þs·r2¸Œo0´ãÓ¹`P€ÿ,YÌ1ðnðÜq0Èôn€¾¢ þs¿<z2à¬o0Ý ¾A`ªøÏ˜Å,ƒYŒEïÌ2”YÀj0b`,!þa°Ä¢Bþså\ 2æÄo0`âãHâ?Ç¾FÊÁ C ¾AýÓAf>þ1Ý°¾A«øÏ˜Åˆ±„ Xø*ˆwp§ÁÃû*ƒüû`-á?Ç ¿A´r0ÈÌoà¿øÏ1ÔoP°2ö„p0Ý`¿AÀ«øÏ˜Å@èÅMè…XðX¸AX`d!”Å,Zœ/)H‘c	A°ðYHï ÀàÄ– -*Ì@8x0‹ƒc	A°ðXhï z.‘¿.§ Ëƒü‡ˆ! \``¸!@é flâ&‚
+`IPl"‚è‡„ÿá„sP 0. Í †ˆ! ,Â:€á† ¬0˜eP‹´fØb-âh XÖÂUµÈ€ ú!AÂ:è Œr3€ab ´``¸!@ë fØb-4!µ `¸! Ï fÚ"ró@ 7ó€áx †‚zÀ`ºA–ƒ`˜ep‹·Dƒ¹ô@5Ñ@.øÓ f	æb ¨â^‡¶È€ z.ÃA>A>TŒÃ	A°ðU€ñ 6 †` ˆÕ0Ü€t ³qAßx8ðçÀ  bŒN‚…¨BÁ°10K¨øu Ã[`0ËÀoŒN‚+äxÚhÃ0„v@³|aÁ@ ²ƒ[\u‘Aô\¢Œ““(¨HP2pS D¯R9†ˆ €Y†º ‹¸z…P£Ðw‡5Z:@(¨ÃÄÀ,A]àÂÚ7z€Á,ƒ\ÌE0PwÁÇ‚\\ðÚ7ðj‘{ †œÀ`– /F'ÁÀØ< í`¶ƒá†B¶2˜eà»* ¸ì"öb–!/ö¢À€dàÆ €È€ z… ËA@AÅÈ‚ z…ÐËA@AÅÀ€ ÿab`–a/ô¢éÂšD¯Ø4@(¨4Tð6 Š` f	ö!ò``¸!í fî/Ê÷@ 7m€Á,ƒhôE@ê„á†à­010–ÿ`RÚ88=Ú;ÐÓ×€O™%ð‹
+@|‡¾ƒÐ˜e ¿(2 ˆ¾;Àr ×A@AÅ˜%$¸À€¢W TŒLb– 4*4¤¿È¨Ð€þÂ?0xÈsÀÄÀXB,üCl=úîÐËÁ_Å°€P00Ü¬w ³¢áÁpÃÊ#„Áùh ÖO7Œu³+2ÁpÃž&€ÁÉjPâžÌ´H‚m@]@ˆé Hš¢B€4¨r D†àr6hå@2 ˆ.  Asm‚èÂNöl@¿d@wËÁq Øx 9ºAž(7@ÚsÐ°s+˜mÀÛÁ,iT |<ŒFj©©| †ñÀ`º!`é`›e@Òì0Ü”w ³§aAÑs‰‘È;È;  bÌ &` €d@½B8ë   bÌ Æ@GÅ˜†pj:ñ} †øÀ`–A5R#Èˆ úîÐÒÁ{@üg	Tc ¢RÃAû@ 7÷€Á,ÃjøG@?„á† ¿0˜n(ƒ4hì0Üðw ÓwäpL7èp€ç0Ý`0ýBHƒ`ºaÏ~+Ä@hî0Üx ”÷@nL< ƒé† ®ƒa–5`#&ÜÀ?î¢5ÜÂ5Þâ5îhÉ€ º€ „cA°ðTû ¸Gä2 ˆ~!@"ƒ
+Ä#>ðŸ%pŠJhP`«ò@2 ˆ. xaÄÀX@,üà>®ó¹@ƒ¢_^@Á…È ñÄƒüg	^c ¢\ƒXãÆ ¥É€ º€ÀaÄÀX@,üü>n\:Ð 2 ˆ~!°A@Á…È ñÄƒüg	ücºaÝ“ð`ºÝƒ}ò`º¡Ý“ô`˜Ðÿ¸‹Øpðx‹÷¸9ÈÉ€ º€Àa–Á7dƒîèÉ€ º€0¾A@@¸$$‚èÂø¡ç„ƒÎA2 ˆ~!œoPp!è@,(„á† Õ0 Å  †‚UÀ`ÄÀX@,üÄ?ˆFŒÁÂ?Paü?î@v¸!xõ Î8ö‚a‡YÀ`–Á6f#¸„Ùá†€Ö0˜e¨Úª@TñŸ%°TöAüg	lc £²hC¨K6:*ƒ6´ÚÐdcÄÀX@,üà?Hå`ÄÀX@,üâ?ÐFŒÁÂ?PAþƒ2˜eÐÛpfr7*ñ'ÂpCðëL7 xPà?Kðh(âOc(„á†€Ü0˜nhñ`	0 À–à7†®sÀ`–á7v#˜eèÞèFŒÁÂ?PÁÿƒ4À&"ñ§5ÂpCÀîL7Ôx à?Kð#Æ‚`á¨P‚‚.HáA&þ$‡‚@næ= ƒé´ üg	~cÄÀX@,üXPøƒY‚ß¨©ß`ÜƒÜ°ÝxƒèÓ‡žî2 ˆ~!ìC@Á…È ñÄ• ÿYð¨¨l6„ß8 É€ º€a–¡=Â#$ŽÐB2 ˆ. ÀqP ÎØB2 ˆ. ÀqP º€@ÇÁA@¸^É€ ú…@ÇA@Á… Zå¢ †‚šÀ€rQä‹‚@np> ƒcA°ðTxC!10ÿ@8V:¸Ùá†€ç08ãØ†n~> ƒY†òàf‡‚°À`–<Æ#H¨Q	Ä– <PAñŸ%(ŽÊ<¬ðè¨ŒñÐÈCcA°ðTèCÁ¦ƒcA°ðTðCA10ÿ@…?Ê`–!=ÌÃ™e@ó¨0 ÄŸÖQÃÛ`0ÝPëA`@€ÿ,{ ¡ˆ?Á£ †‚¸À`ºA×ƒ%À€ ÿY÷n¸è> ƒY÷P`–=Ö£10ÿ@…UÒ › ü1ˆÄŸðQÃAÞ`0Ý î`@€ÿ,{Œ‚… ‚,
+g „?™øÓ?
+a¸! ý ¦Ò=ÐðŸ%pcA°ðTÈEáf	Üc ¦ÚƒÎCÐÃÒCZ‚=î4ÐC. È€ ú…€"ƒ
+Ä#Xüg	Þc ¢‚ØÜãZcÎÉ€ º€`a–?àÃ5.,î<¢ý„‹=$‚èB?¡!„S‹P$‚èBH‚ÂRd–‚@nÄ? 2KA ÐZ
+a¸!(ÿ FŒÁÂ?P…hÄÀX@,üúQÀíàd‡‚ôÀàŒc/v¸!`ÿ fè#>‚K˜nÜ? ƒY†ù ¡
+D%ÿYú@¥FÄ–€>:*K>„ù°àc £2äC›>FŒÁÂ?PA%…ñFŒÁÂ?Pa%mÄÀX@,üXR(ƒYü¨g–á>ì£Â€ÂKA 7ù€ÁtƒØE€þ³ý†"þÔ—‚@nü? ƒé†³– üg	úc¸á
+Afú#?‚Y†ýÐnÄÀX@,üpRHl‚ðÇ *MA 7&(€ÁtÃÛR€þ³ý1b`, þ
+?)Ðw€TþdâO¬)„á† 0˜n°û@0 À– ?FŒÁÂ?PÁ,…?˜%èšJà6°1¸;ÀI?ˆý8¹÷@.ˆÈ€ ú…P#"ƒ
+Ä#Xüg	üc ¥R%Ö ×P%ØúC•TƒNSÃ
+`€Ìâ?Ý©¦ †0À`–á?D$ ÝÂpC †Ì2€Hˆ9*Ñ+
+*7ˆ?&øÏˆÈ¡J®’Aô
+¬ƒ€‚ŠAÏâO þ³"2ÐQ9 "„ø¡§ †8À`–aDL$ õÂpC ‡Ì2H‰9+Ñ+¶‚a"8`–@E®Vv=¢WoÃD À,ŠŒ‚A¼¦0†‚®$ì=;b€< ¤ ›B ÿAþøÐ|
+a¸!ÐCfPäD‚9^Ù÷æÚ?˜cj<xÿ`– EæÔ?ð•=æä?˜ct<ˆÿ`Ž!Èñ`þƒY‚¨ðåDÉÝzvÄà€@þà7…@°FŒÁ ÀSxCÁ\f	TÉÅnØQ ƒY†!`ÄÀh@Ú@<…?æ:10ƒ6Oá»FŒÁ ÄS¨Cßƒ£A0hñêPÈ÷`ÄÀh@Ú@<…3ô=Ð€  ó  [
+#ˆâ^¶IP/[†%¨—-ÃØË–!
+ìeKqñBÜË–
+}Ù2ˆA±/[2(øeË`E¿lÐ ð—-ƒÿ²e`ƒd¶nP„Ì–
+‘Ù2ÈA12[:(HfË`EÉlð 0™-ƒ'³eàƒe¶~P¤Ì–
+•Ù2ˆB±2[R(XfË`
+EËlP¡0›-ƒ*g³e`…m¶®P¤Í–
+µÙ2ÈB±6[Z(DfË`ÅÈlp¡ ™-ƒ.l³eà…âd¶¾P Ì–Š”Ù2ˆCa3[r(TfË`ÅÊlÐ¡`™-ƒ:-³¥¨‡ ^ˆ{ÙRÜC/Ä½l)@"ˆâ^¶&äË–!%¤·ÙR¸D/Ä½lz"Ð™-XñBÜË–Á,Ù2¸E 3[»tfËÐ½lþ"°—-Ãhö²e8€g¶¨Äq/[×xfË Ïld#à™-m<³e¸ _¶»!ÁÍ–‚G‚x!îeKA&A¼÷²¥“ ^ˆ{Ù2¸Jð.[
+]	â…¸—-Ã¸ï²e —à]¶å¼Ë–Á\‚wÙ2¼Kð.[x	ÞeË/Á»lä%x—-Èõ²e@)n¶iØË–Á{Ù2ÌQ`/[<
+ìeË€WÏl`+°—-Ãlö²e°­À^¶ºðÌ–¼{Ù2¨W`/[†÷
+ìeË@_½lî+°—-ƒ~ö²eè¯À^¶ ØË–Ä{Ù2¤X`/[ìeË0c½ln,à™-C<³e³€g¶gðÌ–aÍ{Ù2¼Y`/[†9xfËpk’ÜlÊ-à™-Ã¹<³eH·€g¶ëðÌ–áÝžÙ2Ä[À3[†yxfËPoÏlî-à™-C¾<³eØ·€g¶ýðÌ–aåžÙ2´\À3[†—xfËsÏlÈ.È—-ƒÙù²eH;in¶<ö²eÃ È—-CA¾lÐ0èfËÀ†Að.[7‚wÙ2Äa ÕÍ–Áƒà]¶xï²eØÃ@²›-ÃÒÝl)p1â…¸—-E/A¼÷²¥øÅ ˆâ^¶!ñBÜË–¡6ƒÀ^¶ºö²eøÍ °—-y½lÆ5xfË ®A`/[†v{Ù2ÀkØË–^ƒ€g¶ÿö²e(Ù °—-ƒÊ½l^6ìeË ³A`/[†š{Ù2àlØË–agƒÀ^¶?ö²e Û °—-CÚ½lÜ6ìeË ·AÀ3[¼žÙ2ômðÌ–Atƒ€g¶¦ö²ePÝ °—-ƒëÏlä7ðfËÂAÀ3[†žÙ2”pðÌ–á„ƒ€g¶*<³e`á à™-ƒÏl`8xfËPÃAÀ3[†žÙ2äpðÌ–a‡ƒ€g¶=<³eøá à™-CÏlÆ8xfË`ÆAÀ3[4žÙ2¨qðÌ–ƒ€g¶{<³eèã à™-ÃÏlB9xfËPÊAÀ3[†SžÙ2¤rðÌ–a•ƒ€g¶¾ù²e ç È—-Ã8RÞlp;ìeËðÛA/[†ð‚|Ù2w éÍ–½ƒà]¶êï²ehï@Ú›-ƒ|Á»lè;ÞeËpßÄ7[ý¤¾ÙRìwÄq/[‚|Ù2¨xäË–bÅƒ ^ˆ{Ù2¼xäË–!Æƒ _¶5H~³eàñ È—-C˜A¾lÊ<òeË`æA/[5¤¿Ù2Ìy Î–aÏƒ _¶~ù²e õ È—-©A¾lJ=òeËpêA/[†U¤ÐÙR°zÄq/[ŠW‚x!îeËëA/[†_‚|Ù2 {äË–aÝIt¶.ñBÜË–aæƒ _¶9ù²¥àù ˆâ^¶aù²¥(û ˆâ^¶hñBÜË–bíƒ ^ˆ{ÙRÌ}Äq/[†¾{Ù2Œ~ðÌ–õƒÀ^¶²<³eØý °—-CøÏlÚ?ìeË ÿA`/[û{Ù2àØË–ÿƒ€g¶ýñBÜË–Âÿƒ ^ˆ{ÙR€ Äq/[Š‚x!îeK±ƒB/Ä½l)ÂPâ…¸—-
+A¼÷²¥ C!ˆâ^¶ (<³eHE!°—-ƒ+
+½ldQìeË@‹B`/[\žÙRä¢Äq/[
+]‚x!îeKÁ‹B/Ä½l)zQâ…¸—-Å=
+A¼÷²¥èG!ˆâ^¶()ñBÜË–&… ^ˆ{Ù2ð¤ðÌ–¡,…À^¶j)ö²epK!°—-\
+½lèRxfKQ—B/Ä½l)ìRâ…¸—-^
+A¼÷²¥ÈK!ˆâ^¶³)ñBÜË–"7… ^ˆ{ÙR§Äq/[
+ö‚x!îeË€ŸBÀ3[
+ÿ‚x!îeK!¢B/Ä½l)JTâ…¸—-ƒŠ
+A¾lbTòeKa£B/Ä½l)rTâ…¸—-ƒ
+A¾lÆTòeK¦B/Ä½löTF     a     '     0@%@%PePÀd00Ö ÂÃœÌÉ[ÏÀ UÍ ŒÐÜ UŒ€ ‚ 00FÐ÷-‹kd1@# d20‚ ‚‚ 
+ ‚ (€ ‚ 00@'3   ñ0  !   +¸Á™œY1ÄÎäÌ
+AnpfÅ078“3+ºÁ™œY1ÔÎäÌŠÁnp&gVwƒ39³bÀœÉ™CÞàLÎ¬ôgrfÅ°78“3+¾Á™œY1ôÎäÌ
+ÁopfÅð78“3+ÐÁ™œY!„Î¬DgrfÅ0:8“3+ÒÁ™œ  3£¼E)ÌDäð£0±À[ŒÂLÄI o1
+3'¼Å(ÌD´ð¤@-"†‚t ƒY!(OD A|‚ 2 ˆ9nX‡9†@ƒrAŠA¹ d–@¨0Œ €
+ƒ	x¨0Œ  Š0Üà˜„á†@À`ºá‚aá`ƒ5˜n@áE:IÑüÐ}‘ ŒNRü?üÅ_ð £“¡ ¡uAÀè$Å(ˆÄhŒ†_P 0:IQ
+$Q¥q ŒNRœ‚IœÆià £“©€©‘£AAÅè$Å*¨Äj¬†hPP1:	Ñ
+,Ñ©AÀè$Ä+¸Äk° £“± ±Q ŒNBÌ‚LÌ†kP 0:	Q4Q§AÀè$Ä-ØÄm¸ £“¹€¹ ŒNBì‚NìFjP 0:	Ñ<Ñ§AÀè$Ä/øÄo  £“á á‘ ŒNBŒƒXŒGnP 0:	QdáAÀè$Ä9˜Åxì £“é€åA ŒNB¬ƒZœGoP 0:	Ñl‘¾AÀè$Ä;¸Åzð £“ñ í¡ ŒNBÌƒ\¼ÇnP 0:	QtëAÀè$Ä=ØÅ|ü £“ù€õñ ŒNBìƒ^Ü‡hP 0:	Ñ|‘ãAÀè$Ä?øÅ~ô £“!ýÁ ŒNBŒ„hüÇ|P 0:	Q¤"úAÀè$ÄI˜Æˆè #Ó¡aGŒÁ Æ¥‚L‡†10ƒ6 ¾2vÄÀh@Ú \ú"8SH¼=P<<X¼6`$˜ÃÁl€ýŒ@njf	ˆAp0‰’˜n‡€N¸W <<¨œn¨‘4@(mÂpCÐ`0KàT x$DÑs‰~è 7†ˆ % ‡á† EÀ`–a ‚ëÁs…Áû0Áé0aƒˆÐF 7èä6a¸!P0˜nhb ·ÃA{€ÁtCpÙ@nà¦f#˜n°7Ð‡¤ouP°Af	ŽŠM0è¤ »Ã~€Á,C‚Óy!‘ô/
+6È,A2P±	ˆ¨ÓÎYD³‹L7„BœDÒ7Ñ(Ø ³Ë@Å&(®’Ì24ÌL7ˆ‚°DÒ7„Ó2 ]
+,È,A3Pa	¯,c6Ñ×d@]@¸
+B¤pápHÑ( @ \/,’Aô
+Á	(¨4>a¸!Ð0˜e¢` «!2 ˆ>Lì…Ž:2l@Q ³Ð
+}wÐ‹†ˆÀ4`– B"W``¸!80˜e(œà®˜¨Yi "8hf¨)¹l&f–€¨ „‰´¤fBN0	¹@€3rA®x¹@€KNAÙ¹@€c|AnQ¹@€1„¾(1„º0Cèô8!€1„_˜“äå2"ˆ. øG0ËPY q…]HÑ„!Hƒ º€ §ÜÄ\`rBMH
+‘AÜsÁKÈ,Á•AtÁ	."É€ º€0gÅd@‡åÄÌ\bA5PUTˆ¥U„byUÑS2˜Ü. ˜‘ÁävŽ&·W¢pdp²4Ba¸!à0È9 ˆ^!ˆI0Ë€eÃ¡?HÑ+„! ÃÁ¸€A¶Aô
+á28Ùé	ˆY-ã€ z…°œì,6PA™ƒTXFfag`dF|$†‚wƒé†v)‚v!´I0†Pïr¡È;#D¯â$HU ˆ^!ìI0ËÀm!’¤@©
+Ñ+„>	z…³Ý¡Â[H‘¯@½B•àÐ‚$‚èÂÌt´	Ü@m×+' ]Ãé„ÁtƒÐùÀ˜nÚcÈ3iØ£A0h22™à6Ô¹ÖB2MvÄÀh@ÚàŒR&¸E„îH 72³ÞôCÂM`fJãÂt$ p"32ƒ*8°sýš¡™Ué‡ÄœÔLÍÔÌ°ÜÎ ‚]À°A0l@Å Ì|³a ?Ò‰9±›Y•³Ö‘~HÔ	ÎàŒ«ŽØÎõCâNtFgb¥x²3;³3ÃDÐ;0l@;2 Ã1À°a0KÃhò3apgR+:Ü„ML7«2Œ!¬Æ­7dBäNa¸!00˜n™!˜n c¸Á;0˜e 1èœD 1Ü ¤-	„á†ÀmÀ ©Â6lÃ6Ù.Û‰Uq·)—~H°ÊÛ¼M¹ôC¢UànÊ%ãerûÎÈMºôA˜›té;Ã@7é’k@ÓÝ,Óª1.°ÑL|Á¼9±Ÿ»y9ÁŸ»‰¡ÃAè€Á±ÿÜµHýH?$~%tB'tú!.¢#:ùÒ‰pÑÉ—~HˆéN¾¤-Ätƒéw0Ýp:’;L7¨óÄOa¸!h0¸ò8n^.<Èc/v¸!08òPnh†F¤vÂ`¸Á°0˜%ƒŠMFÄ`Ê` âlC^¡*,ÝƒU(ƒ
+ 1x…2¨¨HLJ¡*Ì@¿Ä Ê` BÐ;1èƒ2¨øNò *¿ƒ:(ƒ
+ôÄ Ê` B=1hƒ2¨HOÒ *Óƒ2(ƒ
+õÄ Ê` BP=1èÊ` B`=1ÈÊ` Bp=1¨Ê` B€=1ˆÊ` B=1hÊ` B =1HÊ` B°=1(Ê`–¡È NÒ™%8ƒ
+ƒS‡
+ƒS‡
+ƒS‡
+ƒS‡
+ƒS‡
+ƒS‡
+ƒS‡
+Æà”Æa B ƒ18¥q¨Ð`Ni*6ƒS‡
+Æà”Æa B ƒ18¥q¨ð`Ni*>ƒS‡
+3 …18¥q¨¨HaNi*,Uƒ[‡Š3p…1¸¥q¨Ødažq¸3°nîfÆ€‚
+¡Ö %Ø` B‡5	6¨zaê*„\Xƒt`ƒ&0üÿÿÿÿ°¹Â,Ã(´+TlÂ8ˆTœÁ(ƒ8Á@…õGã d0PìÚ8øT »64Á@EuFã@d0Pac4ä@Â9Á@…°Cã@d0P!ÜÐ8T34ä@Â9Á@…°Bã@d0P!œÐ8T#4ä@ÂÿŒ9Á@…°?ã@d0P!ÜÏ8Tó3ä@ÂûŒ9Á@…°>ã@d0P!œÏ8Ì2 ÀÃ,C¨=%æT'à¡. `´C@˜cÛéÂf;„9†!À. x¸C@˜cÝ™%XÊ0ÇP;Á‘=„9! º0Ç áCø æ„@|f	Ö` ¢¤4Ô`!x£1á|Æ†óC Îg–Àè$ FÑ8¦‚”ˆ	
+©ÀÈ€ º€PÁtCà6A@ — Dô ˜nfb'($ #‚èÂÓN€a–Àîh.0©›ep?ð‰Y†7èƒ|¹À\f–â ,r ˆ¾3èG°J„9†ý	Z©ïýA”aŽaN¨ï rœaŽaR¨ï#¢¤aŽaVh–@H-Âƒ	¸Dg!æ„ †-ÂƒÈ¥…@˜c‚š%ƒŠZà@ˆƒ1„ œÆCphÀ¡Y†9 ƒ¿ÈŽ úÎ #A9Q æj(8§¾3ÔñC„9†!£¾3àÈF„9†!£¾3ìˆ2F„9†!(£Y‚: Òs`È…†@˜c‚5"ÑsBÀF4aŽAÚh– *jAšÆ}Cäha£1BŽfìàr#ï€ úÎ &Á?Q æÞ(©¾3´	‘G„9†!Ø£¾3ÀÉ±G„9†!è£¾3Ì‰ÒG„9†!ø£Y< ßsz°í†@˜c‚R"ÞsB`JÔaŽANi– *jA²áÆšCXia`¥1‚•fò@t#c º‰ *ÁtC KõAI™%…Y†=àƒûÈY ˆ^!œJ@AÅ˜c(¥à§S‚¥Y‚Q p2)³£pº :s» :“At¡V‚é† ?B„Ð[!¦þ 
+Bnå˜nþãD(¹D¯r%˜nðcE(¨³£pê ;sÉ	+$×²3Œ$A]@@—`º!`¡@ Ì2ü(¬Ï!4DÚ%˜nb$G(×œd@]@—`º!°¡@ œ´"Atá^‚é†`GÆ„Ð|™¦1
+Bö%šnÂ$M(]@ð—gº! 6¡@ t!dšé†àLÞ„b@]@™`º!X“9¡@ œÄd@]@@™`º!€<¡@ Ü	d@]@h™`º!¨“>¡@  	d@]@™`º!ÐQ¡@ äD¯h&˜næÄT(¨³ 
+o2Ç SA{ìd@½BÐ™`º!ÈV¡ bÌ1ZÔ	d@½B ›`º!øY¡ bÌ1Á[)è	d@½B0›`º!(\¡ bÌ1]ÍŒÂƒYQ 6ÈœU\ÍŒBàf¦[ñ
+BÆAtAn‚é†@WÄ…³@½B ›`º!˜s¡ bÌŒÂ@‘`>f@+y`>}€ €¡`>¢@+|@+{0P$¨àJ¨OÐ(ÐD(¨(à
+àÊ	îc¼’îÓ`
+`
+î#
+¼Â¼²E‚ü˜¸äüô[€[„‚üˆ¸ð¸ìÁ@‘`?f€&y`?}€ €¡`?¢€&|€&{0P$è°IèO€(€D(è(°	°É	þcp’þÓ(
+(
+þ#
+pÂp²E‚™äõL€L„‚‰ðìÁ@‘`BfÀy`B}   ¡`B¢À|À{0P$¨€H¨P˜(˜C(¨(€€È	.d$’.Ôò 
+ò
+.$
+$Â$²E‚™Šäõ?€‚?„‚‰ŠðŠìÁ@‘`Cf`Cy@}`C `C¡à¢`C|`C{0P$èèP€Gè(èP(°(èèÐ	>d>”¼Ñ>
+>
+f 
+>Ä>´Ef Ff "y F}  `¡ F¢`|€{0PT™‘˜QàF˜(˜Q(ˆ(˜˜ÑP¯ Œ‚|`d@ô+ #‚ pÄ,)´
+áG~¥™aò+³¬°
+®4BáÿÿÿÿPnÀ0ÜÌÌ2‚)€m£@”Â,Ã)¨‚ìd@³©€
+=ÓM3	(0)}˜x-7ÜlØ€„˜%(…^! 	Ñ+„ ¢ bÌ1ÔV g½B $
+*ÆÃ°W¯Ž‰‚Š1Ç0îÕ+…¢ bÌ1|õa¢·ø,â³a"
+`– nê%É€ z…€'A'KIIŒ ú0A^£ŒÚ°0KP
+@´
+*BÑ‡‰ó2µÀÔ(0)#Ç‚`á°À{AÐwôJ5‚‚ŠÁ þÃÄ ")ÃÁ½Á,+¬B0ÇÀ_«âjsA«˜ØCð*&6ÇÄŠ‰K‚…Øùs!6
+³6Ç”ÂŠÍ1§°bsA*¬ØC‰ýÁ­Í1¡ðbsÁ(¼ØCP
+/6Çb§°ksA*ÌØC°
+36Ç´ÂŒÍ1°)üÚ CÐb06Ýp1uºv—AôÁ~‚,w–ÀfÀ!ng põ€þá2 ˆ>L¤ºèFI™eè…W ›c	A°ð[à?jÄÀXB,üH0…c	A°ðT(Á œfj|f–bgffAz
+XÿY‚Z@BÄ– pÐ%ñŸ%¨…’
+‘dZ@^a ¤Bd™†˜W(1HY€hz…c	A°ðT`ÁÀœFŒ%ÁÂ?P¡]10–ÿ°…®Y†\°µ™eÀ…[x©9+ìm!è±3›Ž³ñÎ@üçÀÌÐ·A† ÌÖl:"8ÔÆ?¦Ä,@)
+ðŸ%è…9†2{þm!038ÃàÄŽÍ‘dÒlÎ¦Ò,x)ðŸ%è…Y†^Ð…¹™eà…]È©c	A°ð[ÀÁ °‚ðŸcp³å‚7Ë³éˆ Ãÿ@"ÿ99ÃXn!˜³>›Ž2¾ñé:t
+‹ üg	zaÄÀXB,üÔ0 ©9<dn!È³QCQÂŽaÏÊ æ>35ñŸcð³2À¹A†àÏRmºáÏ‚²B" ÿY‚^¨1špšÈ>¸7Àl^˜eø_ˆ#Â)2b`,!þ1qØøÏüÂ@…¾à½0bp,!þuAÏ%DMìö@ì(¨à?l@Á àˆ7°³­à
+Á@°€ì­AôCâÔÒ.í
+ Æ`ÃÄ éÃAúÁ,C8€C0Ë0â0BÀ"¾„CÑ‰Vƒ;¸( ”C0 XÀ7ð³ã Áµ)¶ÍüÁÀpCðB`0ËPgTö„Ï•Á@…€ïAð\Tú„Ï•Á@…ÀïAð\Tþ„Ï•Á@… òAð\T"„Ï•Á@…@òAð\T&„Ï•Á@…€òAð\T*„Ï•Á@…ÀòAð\T.„Ï•Á@… óAð\T2„Ï•Á@…Øv<WyaÀse0PÐ 6W–haàse0Pq¢„Ï•Á@Å&¢Aø\P>a¸!ˆ½0n0R‰¦~fÊ-JË@ 7µÔ@nnú!!oµW{µ—6·±ý ·Û»=—ë‡D½áî¹\?$ì-÷rÏåRç&·ïÁîÉ\ßÞ“¹¾3½'sIK1ÝüÞ2Ý0_,—_Íd»ð¿Û³îø¹=ÃàŽÏt0BË@ 7êWgeÜÙ™Ò	”S?õS¿~H¤Üú­ŸØõCBåØýÄ®+×~í'vùO1Ýð~8ÑXa¸! ?08s±nìÅVl/v¸!È?0¸‹±nö†ÔŒÿÂ`¸Áè?0˜nØ¿N¬¦þ«Ys¨ØÄ¡þà,*ÎÀÊá–Îb ÂR‡r˜¥³¨ Ü¡öí,**y(‡>:‹
+3°‡rÈ£³¨ô¡êè,*(‡8:‹
+A$Ê¡Îb B0‰rH£³¨T¢Êè,*—(‡0:‹
+A&Ê¡‡Îb B°‰rÈ¡³¨t¢jè,*Ÿ(‡:‹
+A,Ê¡…Îb B0‹rH¡³¨Ô¢Jè,*·(‡:‹
+A.Ê¡Îâ¤±’À.Åà†#ƒé†úHaº!=yše@v …
+!Ö!Øa B¨ƒu¨v¨â`R*„6X‡>`‡& |}0ËíÐ³é @˜c`½Àƒ. ˆíQ æ† ÷º€P¸G@˜cÝëèaŽaxo–`HÂÃíiÐ+„9!?‚0Ç ãG± æ„€üf	Öa ¢¤tÔa!ˆÃ`AH¿1„!ýÆˆô›%8€‘AtA‚é†@Â€@ã 02 ˆ. üA0ÝœƒP è FÑR¦vX
+­ÀÈ€ º€
+ÁtCp@@˜%8‡Ywà‡z¸:0·™ex‡}Ð·é†:°¿²še€‡x¢ïû°b@@˜cà¿Àƒ¾3øa‚aŽaP0è;Cˆ(P æ†@ƒ¾3˜¢‚aŽaX0˜%	0Çp‚A‹ýƒ@˜c$ÂƒÌ`@!!æ„€ƒYy¨¨	„xCÂ1Cr0Cr0C r0˜e˜zØR¢ï3˜c@@˜c°Á @Ç ï6F€a@@˜c1úÎc‡„9†! Ã ï<¦a@@˜c3f	êxB Ì1„aÌc@9!æ„€Ò	0Ç mÐN„9!pÃ`– *jAšÆ‚}Æ„9Æ†9Æˆ9fìáê Ù úÎ°fH„98‘úÎàf„„9†!àÃ ïqvða@@˜c?úÎ@gŠ„9†! Å`– È.ÂÃAK4aŽAL1 ºsBpŠÕ…@˜cTf	ða ¢${îa!¨É`AhÅ`ahÅ`hÅ`–!ôA.Ò$¢›£L7»Ä&e– $’¢W¨L7~QTŒ9†S‚°Td1˜%‰{‰Õ›é†—€Åà¿R ˆ. ØZ0ÝÄÆ@@èÂ­Óm„. àÚ1ÝÜFB@Hs ˆ^!èZ0ÝÀFCAÅ˜%‰û‰Ý›Z0X0‹Ù›H0é†± Ç`Æ² ˆ. ¨[0Ý”Ç@@˜eèh¿Kl0€¢ïL7êP ÎÈ€ º€@oÁtCðá&ò€¢ùL7ô!Q º€ oÓtCp¡ýM7úQ º€ rÏtCÐ¡#×L7 âQ r¢%L7$"„;ƒ9 ‚è‚ÊÓAŠœáØ ? ‚èÂËÓ‹°áâ D ‚èÍÓÁŒÄ!é€ z…`sÁtCÀ"u@AÅ˜eð‡@‘9™‚÷.ú0€¢W<L72²TŒ9#`ËàþÀE ‚è‚ØÓŽ„cŽÁâ2¸R˜È€ z…€vÁtCà#§@AÅ˜c0»f	BbŽ-JDƒA† -ƒ¹f	B¢r·
+ÓÁ›´!e º€@wÁtC0'±@@HZ ˆ^!Ø]0Ý°I-PP1f	Bb GàŸs°•|°}àŸ}@	@‰àè@èt%tE@hhÂhâ@$z:_É_ÑÚ°ð°ø‰…ÎA\òA\ô…ö-ü-þ…@b G`¡sP“|P}`¡}ÀÀ‡`!è`èÜ$ÜD`h@Â@â`$z:9É9ÑÚ”ð”ø‰‡ÎÁNòÁNô‡ö&ü&þ‡@b Gà¡sð|ð}à¡}ÐÐ…à!èÀèD$DDÀhÌÁÌáÀ$z2:ÉÑ2Úyðyø2‰ÎAEòAEôöÁüÁþ@b G`£s`£|`#}0}`#`£ðèàèà(àHÄcàÈàèØ $z:::Ê:ÒßØ:ò:ú3 ‰3À£s ‘|À}À£}Ð°ƒÀ#è©øèø(øHtcøÈøèÄ $ÈN FAw02 Â€‘APž Œb–€$Z…&mÒL„5i“Y˜x	XF(üÿÿÿ Î5 †á† V0˜e	’* ÝB‚‰Y†’`	ÚË€ fRÂ$~n–á$PGº‰ '&¥±Ài0Ài0l@BÌŒD&d3ˆÓ€ˆÓ`Ø€l3(€Y‚‘˜eP‰•à‘^!ÌIÑ+„@¢ bÌ1àfÔiÐ+b¢ bÌ1Á{½B8(
+*ÆÃÄgÐ+¥¢ bÌ1Á|}˜ ÏàOéOƒa"
+`–`$ú0ž¨¨ÃDPžAÌŒÄ,CK¸Äš\Žd@½B • ƒ“¥À¤¤F}˜@ÏàTƒàTƒa"
+`–`$’#ˆ>L¨gªAªÁ°¸gP ³#1PD/aã‚Hd@}˜hÏ€Uƒ€U
+LÊˆÁ±„ Xø,ˆo}wpÏàU‚‚ŠÁ þÃÄ "/ÀÀpCÐ¯Ì2ÀÄKs"ä	­sÁž°h0Çô	‹sÁŸ°h0b`,!þaêG*xðtCžûÍ1¤h
+»Ì1«0£ÁCÐ
+3Ì1¯0£ÁC‹¥ð«ÁCp
+7Ì1©p£ÁC°
+7Ì1ÄhÐ
+ãÌ1¯°£ÁC;Ì1³°£Áªp®Á CP£ŽÓG“Áá
+Ú—AôÁÿ‚,w–@&fÈ¢,~o ðu&þa,2 ˆ>LÄh ¯A ¯&e–!,f"dFŒ%ÁÂ?l„jÄÀXB,üX8À…c	A°ðThá ƒY†œ ‰™eÀ‰šè—Y†›°‰²P°ñŸ%È	$pAüg	rqÄ– 'J*Ä&›p™‰’
+±	æ&œ`fb Ä ›@nÂ	h&FŒ%ÁÂ?P†wFŒ%ÁÂ?P¡†p10–ÿ°…®Y†žÐ‰•™eà‰¸É`ŽLƒÂ_ƒA† Lƒ7¦#ãdüƒ4ÿ94‘‚4æ4˜ŽŽ•ñé5˜0(À– ,æÚ4xN6dÜ4ÀÓ ƒ8ÿ98•‚8ö4˜nˆÓ ¸É üg	Âb–!,|‚ffÀâ'Â210–ÿ°0Ê ï ÿ9;.˜‚;B5˜Ž°œñ$ñŸcÐÓ £Ù`!ØÓ Tƒéˆ ëÿ˜nàÓ Ë ‹ üg	ÂbÄÀXB,üä8@É`ŽTƒ@gƒA† TƒU‚ðŸcÕ z6dH5pÕ ‡@üçL5(°‚Sb5˜n8Õ hË ‰ üg	Âb ÆpB&p¢'ø`'Ü€'°ŸÀb–a,Äb¤Èˆ±„ XøÇ,äq``â?K0f ˆ…;„ÅˆÁ±„ Xø,ôqP=—PÕ@mƒ=PÛ€‚ŠÁ þÃÄ þú00Üàn ³1!Á@°ø1‘AôCâUƒ¸â6(  a ÃÄ ñÀÀpC¿Ì2”Y³gaâ3P,fáþBYd@ý¨Õ o¼
+ ÆmÀ°1€þ00Üào ³gaöþ0Üàa ³haùs †‚ÑÀ€Ð9ÃAé`0Ý ¶A0Ì2¤…ZG‹Áz4Øb Ìd ³n1PTlƒZd@=—H× uƒ u
+*Æˆá„ Xø‡*€sC0 ÄÓ@n`7 ƒY¶X‹ ïí¸n`PP1F'ÁÂ?T¡œƒ`Ø€‚˜%`T\8€á†€0˜e¸µF'ÁÀÒ9ˆá †ƒárb8 ƒY†»ˆ‹` PÃ!-.¸È€ z.a¯ííT$(¸)€¢W9ÃDPÀ,\¼…ˆ½BHÇ@è»¿½ TŒab`– .páá †À`–¡-Ü"¨ ¹ O¡-.øá ‡à2È€è:Ãú`0K0#†‚`à
+üq0ÆÁpC!ÆÌ2ÜE\ ,qv1Ë@vQ`@2pcÀd@½BPÛ   bdA½BhÛ   b`@€ÿ°10Ë`uÑô
+á¢W  T*øE0 ³v00Üˆq ³r1¥v †‚þÀ`–¡/ð" ½ÂpCð¿ŒK‚…°MþœK}è¹f “ÌäÅ@ ’^„_Ì2ì…^DßÂ6á   bÌð†\`@Ñ+š
+*F&1KÀ„°’^dTÆ^@zá<äÝà?b`,!þ¡
+f}wpÛà…ƒbØ€„@¨•nö8 ƒY†¾È‹`¸á7ƒYÂàä1ß€§æ7„Yñ‹`¸á%[ÀàÌ2¨å@Ï<´$é3 ˆ. „o$zÑ!@ôv6¢Cpíøl D ^ÉŸAô
+a}ƒ ã3(Õ@2 ˆCÛ fƒ¸˜Ì9€“ÙÀœHÓvŽAwƒüÖ8˜%ø‹
+@7¿¸«¡ÜÂpCÇL7»h³£½w †:À`–A4B#Hƒ z.1»ÁÁTŒY‚ÑÀä“>È€ z…`¿A@AÅ˜%ŽŠ	A4P_øZñ@ 7€Á,CiFAôÝ¡w?
+*øÏ”Æ@E%†3ôÞ@nL9 ƒYÓÈ€Ü;Ã*`0Ý@h|a¸!Xå ¦L:H× ˜nP×à¤aº¡Æ3z…€ÁtƒJ¬ Wˆˆa¸!˜å Å0ÜÔr ÓÁÿÃ,Ãi¬F0L´A~Üj¸Ej¼…jÜÁ’At
+(#Æ‚`á¨ßApOÈd@½B€
+*†ø£€ÿ,AjTTjøÁi…’At¡(#Æ‚`á¨àßAp\Èd@½Bè
+*†ø#€ÿ,jTTBjàÂi\Ün DÔ  @ Œ‚… ÂŠÁ¥ïr@Ñ+5(¨âL þ³ù1Ýp×Áìu0Ý€×êv0Ý×Áìw0LØB~Ük¸Ån¼…zÔ‚d@]@Èƒ€0Ë­wä‚d@]@˜Ó  @ \Ò’AtaNƒ€Ð„;
+ÂAã D¯î4(¨4ë@ \ÂpC@Ó®z=ÃÁM`0b`, þ
+nD#Æ‚`á¨ðæÁÊw ;Üìt g{Á°ÃO`0Ë®\ÂìpC ÖÌ2ÀÆk˜@â?K˜¨l þ³±1ÐQQ¯!ÀÕ•ñl`­1b`, þ
+{Ôl0b`, þ
+|d#Æ‚`á¨ÐçÌ2Ô†l4³´1„øSºa¸!Pë ¦f9(ðŸ%Ð4ñ'wÂpCðÖL7àr°à?K Ã–\`0Ë ¶Ì2àÆmp#Æ‚`á¨ê`„?‘ø“½a¸!¸ë ¦À9ðŸ%ÐcA°ðT€õÀl¤‚ðÇ ê÷@ 7~€ÁtÃ9Z€þ³º1b`, þ
+·øÁ,nÔTBn°ÁlˆmØAmH·AàÆÙNÈó D¯î!  b``ˆ?–D þ³»1PQ±Èjºqûð’At$
+Â,zð?œ,Œ…d@]@ð×  @ -œ…d@]@ð×  @ tAdƒƒp»Ð’Aô
+Adƒ€‚ŠA>û@ 7¿€} í0Üˆw #Æ‚`á¨ïA4b`, þ
+úØnp²Ãy`pÆ±;Ü¤w ³àÑÁ%Ì7ë€Á,ÃoøF€	$þ³àIíâ?K åÂoP¼1ÐQ¾ýÆ#Æ‚`á¨`òø#Æ‚`á¨pòA6b`, þ
+(Á,y„G3Ë0âAa@ˆ?Ñ} †‚úÀ`ºÁ§ƒ"À€ ÿY‚ô@CÊû@ 7ú€ÁtÃXK€þ³é1Ü`õw ³éQÁ,Ãy˜7b`, þ
+4 6Aøc‰?…~ †À`ºa­)À€ ÿY‚ô10ÿ@…â7@*2ñ'ÔÂpCâL7Èu à?K#Æ‚`á¨ öÌ¤Ç@M% ˆ‡Œ‡‡dÄy\hˆ‡\àAô
+A4
+*†ø£*à?K •Ø¬†güHÑ„×(³÷±§q=Òd@]@HÝ  @ ÜOt DR7(]@hÝà @ œY¨t D¯Z7(¨”þ@ ÷ÂpC æûæ?ÃA›`0b`, þ
+¤D#Æ‚`á¨PúAw ;ÜÄy g{Á°Ã`0Ëðì\ÂìpC`çÌ2¸G{˜@â?Kð˜€q þ³ï1ÐQQí!¸µ•Ñ˜{`ë1b`, þ
+±¬q0b`, þ
+²d#Æ‚`á¨0ûÌ2Ì|4³ò„øÓÿa¸! õ ¦Ò;(ðŸ%À4ñ'ÂpCPêL7¸w°à?K€Ãª`0Ë€ôÌ2ØG}p#Æ‚`á¨ðû`„?‘ø
+a¸!hõ ¦ì;ðŸ%ÀcA°ðT0ÿ€¤‚ðÇ šAA 7´€ÁtCZ€þ³ø1b`, þ
+íøÁ,~ÔTÂ}°A|ˆ|ØÁ|HõAØÇ±È_rAŠ@Ñ+„	(¨âª€ÿ,A~´Txt¨£x´~àQiP
+a¸!÷ p¸í@ü§B ÂpC`îÌ2èG†‚@nÐ= ƒY†ýà õ„ z…@¾A@AÅÀÀ·ñÇ$ ÿY‚þ¸?ë@2 ˆ^!¨oPP10 ï@üñ	À– ?:*g?þ ƒü 7ÂpC`ïÌ2øGˆ‡‚@nð= ƒY†ÿ ‘ U… z…`¿A0l@Ç Ì”È±ŠX’Aô
+!ƒ`Ø€”˜%(‘£A0hƒÒ=ˆ•¼ñ gGÁ€pP@=øóÀÏÊCA 7 €Á,ÃˆˆH0Ç0+²RçÁC ÎAsÁ/uÌÈœµòÁC ËAžs9yÌ1ãäy0K@"~ ˆˆ0")æAÏŽ‚Á”¡ÖˆÑ€ ´
+õôÊ,A‰à®~ ÃÜ`0Ë`"Œ‚A ¡PòAÿ#F‚`Ðh(”| ÂÁˆÑ€ ´
+ûüu0b`4 m€†Â¾ Œ‚A ¡ÐçAh Ó  [
+#ˆâ^¶IP/[†%¨—-ÃØË–!
+ìeKqñBÜË–
+}Ù2ˆA±/[2(øeË`E¿lÐ ð—-ƒÿ²e`ƒd¶nP„Ì–
+‘Ù2ÈA12[:(HfË`EÉlð 0™-ƒ'³eàƒe¶~P¤Ì–
+•Ù2ˆB±2[R(XfË`
+EËlP¡0›-ƒ*g³e`…m¶®P¤Í–
+µÙ2ÈB±6[Z(DfË`ÅÈlp¡ ™-ƒ.l³eà…âd¶¾P Ì–Š”Ù2ˆCa3[r(TfË`ÅÊlÐ¡`™-ƒ:-³¥¨‡ ^ˆ{ÙRÜC/Ä½l)@"ˆâ^¶&äË–!%¤·ÙR¸D/Ä½lz"Ð™-XñBÜË–Á,Ù2¸E 3[»tfËÐ½lþ"°—-Ãhö²e8 _¶¨Äq/[×ìeËA¾ljC‚›-…ñBÜË–ÂG‚x!îeKÁ&A¼÷²e@•à]¶´Äq/[†^	ÞeËà+Á»l~%x—-¸ï²eH—à]¶ê¼Ë–a]‚wÙ2°Kð.[}	êeË`;RÜlh(°—-Cö²eð¡À^¶cØË–¡¤{Ù2¨T/[—
+ìeËPS½lp*°—-ÃNö²eø© _¶iØË–á­{Ù2ÐU`/[†¼
+ìeËÀW½lþ*°—-ƒhö²e(­À^¶©ØË–Áµ{Ù2ÌV`/[Ü
+ìeËÀ[A¾lÆ+È—-Czù²ex¯ _¶÷ØË–a¿{Ù2üW/[0“äfË`f½lÐ,°—-›ù²ex³ _¶räË–¡Î‚|Ù2àY`/[?ìeËj½lL-°—-Cªù²eXµ _¶®&ÍÍ–Ý{Ù2À]`/[†»òeËwA¾løN¢›-èï²e½à]¶¥'ÕÍ–Aõ‚wÙ2°^ð.[†×“ìfË0{ÒÝl)Ò/ˆâ^¶îÄq/[
+øâ…¸—-EA¼÷²eèÅ °—-ƒ8½lÎ1ìeËÀŽA`/[†Ö{Ù2ÈfäË–a7ƒÀ^¶¾ö²eÏ °—-CyA¾là3ìeË`ŸA`/[†ý{Ù2€hØË–aDƒÀ^¶&ö²eHÑ °—-‹½l`4ìeËP£A`/[{Ù2ühØË–aLƒ _¶jù²e€Ó È—-ƒA¾lü4ìeË ªA`/[S‚|Ù2œk áÍ–Á]ƒÀ^¶ðö²e˜× °—-¾A¾lö5òeËà¯A/[†‚|Ù2lØË–ádƒÀ^¶.ö²eˆÙ °—-CÍ½lt6ìeËÐ³A/[†Ÿ‚|Ù2ˆm åÍ–AtƒÀ^¶&ö²ehá È—-ÃA¾ld8ôfË`ÃAð.[‚wÙ2ìp íÍ–Œƒà]¶bï²e(ã@â›-Rßl)Ò8â…¸—-ƒA¾lð8òeK‘ÇA/Ä½lú8òeËðÇA/[†Q$¿Ù2¨räË–á•ƒ _¶³ù²e å È—-.ÒßlÂ9@gËÎA/[v‚|Ù2¸säË–Ažƒ _¶óù²e¨ç È—-C>Rèl)ô9â…¸—-E?A¼÷²e8é È—-CKA¾ll:òeËÓ$:[Š½‚x!îeË ÚA/[Ó‚|ÙR¤vÄq/[×‚|ÙRÈvÄq/[ŠÚ‚x!îeKÛA/Ä½l)À;â…¸—-ƒz½là;òeË€ßA`/[ÿ‚|Ù2˜xØË–Åƒ _¶7ö²eàñ °—-˜½lÄ<ìeË`æA/[Š3‚x!îeKæA/Ä½l)Ô<â…¸—-ÅšA¼÷²¥ õ ˆâ^¶ªñBÜË–¢Öƒ ^ˆ{ÙRôzÄq/[†t‚|Ù2Ä{ØË–ÁÞƒÀ^¶úö²eà÷ °—-ÈA¾l)B>â…¸—-…ÈA¼÷²¥ ù ˆâ^¶%ñBÜË–Âçƒ ^ˆ{ÙR}Äq/[Š·‚x!îeKq÷A/Ä½lF?òeË°úA`/[Ø{Ù2Ð~ØË–ÁöƒÀ^¶ºù²¥Øý ˆâ^¶¼ñBÜË–Â÷ƒ ^ˆ{ÙRü~Äq/[
+ü‚x!îeKáÿA/Ä½l)RPâ…¸—-E
+A¼÷²eèA!È—-…
+A¼÷²¥0C!ˆâ^¶i(ñBÜË–Á… _¶u(ù²¥ÐC!ˆâ^¶}(ñBÜË–A… _¶§(ù²¥`E!ˆâ^¶¿(H£    a   ô  ­     0P$PDPEPd00Ö ÂÃœÌÉ[ÏÀ UÍ ŒÐÜ UŒ€ ‚ 00FÐ÷-‹kd1@# ´1@&£c ‚ (€ ‚  ‚ ‚‚ 
+# 3 $5@•3     ñ0  !   +¸Á™œY1ÄÎäÌ
+AnpfÅ078“3+ºÁ™œY1ÔÎäÌŠÁnp&gVwƒ39³bÀœÉ™CÞàLÎ¬ôgrfÅ°78“3+¾Á™œY1ôÎäÌ
+ÁopfÅð78“3+ÐÁ™œY!„Î¬DgrfÅ0:8“3+ÒÁ™œ  3¼…(ÌDäð£0±À[ŒÂLÄI o1
+3'¼Å(ÌD´ð¤@/"†‚u ƒY!hOD A~‚ 2 ˆ9oh‡9†@ "ƒrÁ•ŠA¹àd–@¨0Œ€€
+ƒ	À¨0Œ€ š0Üè˜„á†€À`º!‚aápƒ6˜n@áE:Iñþð± ŒNR„H„Fhø £“£ £1wAÀè$E)Di”hP 0:Iq
+&q§‘ ŒNR¤J¤Fjè £“« «±¥AAÅè$E+°Dk´iPP1:	ñ
+.ñ«AÀè$D,ÀDl¸ £“³ ³q ŒNBÔMÔlP 0:	q6q©AÀè$D.àDnÀ £“» »¡ ŒNBôOôÆjP 0:	ñ>ñ©AÀè$D8€Ex¨ £“ã ã± ŒNB”Y”ÇnP 0:	qf1ãAÀè$D: Eyô £“ë ça ŒNB´[¤ÇoP 0:	ñn±àAÀè$D<ÀE{ø £“ó ï‘ ŒNBÔ]Ä_P 0:	qv1½AÀè$D>àE} £“û ÷± ŒNBô_ä‡|P 0²vÄÀh@Ú WÆ"È^hØ£A0h]‘‹ {¡aGŒÁ ve.‚ÓƒÿÀ{ƒÿÀcƒÁA20Ü¤FÌƒ² ù0Ý0++p¡€"xj€"8Ý°¥ˆA=#†‚Ø ƒYf  #á 2 ˆžK¼Cl±1l@ü0 8¼7ý³Ü+Ä(Ì^ÐÒÎ„á†`7À€ÂF 7½ÓÁI$6a¸! 0˜nTb ´ÃÁx€ÁtCÐÃ,ÃaÓoëô-‚@—2KpTX‚á#­@nØf$˜n˜ƒ6˜‡¤opd ºXY‚d Â79¦ ž˜f%˜nà;Ð‡¤owP°Af	–ŠMPì$C‰µ8U$‚è‚PP1z…ÀTŒs…C2 ˆ. (\G 7%³ÐT (5<NÑ²(‘ DJdØ€ÚB úoQ&"˜_[@ÿ-ÌâD†á‹a"xè¿ÅY "|1l@p! ³N³}w0‹)†ˆ€.`–ÀÁãT``¸!¨0˜e(˜à¬~¨Yh 7Xf¤ˆ9ìf–@¨ „¬ þAN¹@€3bA®H¹@€KBA™¹@€clAn!¹@€1„´1„°˜C¸…Ú8!€1„\“Àå2"ˆ. °G0Ë0Qlq…XHÑ„!Hƒ º€ §ŒÄ\ rBHH
+‘AÌTùD˜à·¢CpTKL1KPTl¥MAIÓ@aPÖÔ+P28Ù^!€ÂÁÉvÁŒ&—ÔG 7£ÉÑ/„	f¬k¸0xÉ€ ú…0ô>a¸!P0H3 ˆ~!A•;Ý°1K€¥D¿– ƒÊ%À*ãr¬
+Ì¸,k ¢&Œ‹±hŒÂpC`+`0Ý@+EÐ.	ÆtÃVN¹@d$‚èŽ9
+Ñ+1	f´Ì<²"G z…@&A¯‚a–`»P É€ ¢WiÜN”‚d@½B‚Y‚m Â‚2A¨ °ÌÑz…àJ c¸!h›0˜nd# RÓlÉ";b`4 m°BíÜö6wOHºHÃŽ‚A¸¼7Ä‡	„á† _À`–ë‚~HÌÈ½ÜËšY´ôC¢Fò%_ÜäêCN´7²/û'ýÀ~á~6 ¿€aBH‹6 ˆa †£€Y‚n–áóH¤8Ò/ý'·s#ýÐ‘ù:¹þè›ë‡„LÈÜI?$zDdDFd†ˆ€t`Ø€@d †b€aÂ(`–ành“	ƒc‘=Ñá† eÂ`º!“aÁ/úd¸!H2 ZÃAË€ÁtƒºÁtÃžë€Á,Ã*€A@®„ 2 ˆá^À€öH 75ýp“™™™™IZÙØ~HÀIÍÔÌªôC"NlÆfV¥rr37³*‰+“Ûw† g^¥ï‚Î¼Jß†y•\‚˜nzf™nðU!áÝ0h&¸€Ø~øÎ]~ÜŽ~€Ï]~äŽôC"TÊ¦lÊ¦¢b6fÃ+ý•³9^é‡© ÚðJÎAL7¨M@Ókó¬ÃtƒÀ6ì@à$†‚¸ƒ³ÜØá†`nÂ`ŽÁVî"n‚[—9\¹‹¹dr…\¦r%`»ÝØá†@oÀ`– *6ƒ9ƒŠš€0xƒ1¨ÀhÖ`* üƒ7ƒ
+ÁßÀ Æ` ¢r-0ƒ1¨¨`º1¨H²1¨Lª1¨P¢1¨Tš1¨0Öƒd*ÌÀµÀ ƒY†1ƒ:8åd– *Ì€ƒQ…
+3@Âà_Ta B`Âà_Ta B€Âà_Ta B Âà_Ta BÀÂà_Ta ¢âÂà_Ta ¢ƒ0øU¨È þE*05ƒ—Q…Ššpƒ0xU¨Øä U¸k`¸! 2˜eƒU*„ZHƒ~Pƒ
+!Ò Ô` Bh…4(5¨R!rAšÀðÿÿÿÿÃ¶³u°{0P±	ª 
+b0PQû¢
+¢ Ø½¨‚(ˆÁ@ðSªàb0Pü”*ða Â¯¨)ˆÁ@Eµ+ª@
+b0PQÝŠ*‚T³¢
+¤ Â«¨)ˆÁ@…°*ª@
+b0P!œŠ*‚T˜Á¨¨)ˆÁ@…ü‰*‚Ì2˜ÔÂ,Ã Á.#æl&@Ÿ. @?C@˜c‚°éÂ6„9†!›. XcC@˜c‚²™%Hò0Ç6ÁüÐ.„9!Xâ0Ç lC½ æ„ mf	Ò` ¢¤3Ð`!ØŸ1AnÆ¹C äf–€ˆ FÑ4¦w°
+½ÀÈ€ º€ÐÁtC0û@@ y Dä ˜nð$(t #‚èÂÓA?”a–€îäfØ@Db–¡â 2 ˆn"ìF0ÝØŽJP`Rº‰ÀÄtC;-AI™epƒ7x‰¾3ôÆ±C„9†Õ	z¨ïà¡ÐaŽal§ïãÑØaŽap§ïæáaŽatg– h&ÂƒíhD0!æ„ |(&Âƒ„É„@˜cñ™%€ƒŠZÜ@xƒ1„ ŽÆ„óCÎg8ŸY‚:¸0§» ]&‚è‚ÓN°£WÿAL7;ñTŒ. €È1Ý¨…\P f	êàÚÀŸî‚z™rFNÀI z…À"ÁtC`zAAÅ˜e˜:H‹9õ	Pé°¢W2L7lTŒ9# ¡kÜ2 ˆ^!àH0ÝÈ…iPP1æŒ …nšÈ€ z…à#ÁtC€¬AAÅ˜c0ê˜\Ó_ÀcŽ„_ê™TÓhÐcŽp¨Wh2M7¤TŒ9"Ø¡^!°I4Ý oPP1æˆÀ‡¢oL7¹„cÒ¢tL7¾a„‹ƒØ€¢yL7ã±„³ƒÚ€¢~L7è„Y‚:èÂ¨èÁtCðóAAÅH? ˆ. ”J0Ý¼Ç}P f	ê` Åü„ü$ü„xlaZÌ@TÈ@Tâ@Tè 7à æ` E020•80:@8 æ` EP2P•8P:`8 ƒ9h\…\%\…àØ`ZY!Y‰Y¡º€<˜ƒ–ÊVÈ€,â %èÀVàÀVæ` ¥Ò2 ‹8Àè@Wà@Wæ` Eð2à‰8èÀWàÀWæ€Ò`d@¤ #‚ õ ±ÀÈ€ f	ð ]{±Pè‹õ˜eðƒ>P
+ÿÿÿÿ€Ú†á†`´À`–Áð ¨ ì6¨âfò€v%‚˜eØ=0“8ˆFÀS\ˆ8Æ@K\ˆ8˜FQK\ˆ8 ÆaK\ˆþ[ŒY%dEVÃD€@ÿ-H©¬”²Ú¥a"8 ÿ¥dV‹YíÒ°ÐS:+æ¬viØ€
+˜%¸ƒ~!´FÓ/„@£àBôaÐ(¸ýB(4
+.D¿‚ÑXŠ++®âjØ€è¿E,ÉÕ%Wè4l@‡ ôßB–æ
+›+t6 C úo1Kt•Ñ:A! ³wp[øHÑ/Þ(¸ýBÞ‰‚Ñ/ž(¸ýB0â‰‚‘e@ý·ø%Ð
+@´†ˆ €þ[€Sh	¡uOÃD€@ÿ-ÂI´Ñº§a"8 ÿâ4ZÄhÝÓ°0KpÀô
+vAôß¢œL+0-Ó¢àBÌ1¤S€Zý·@§Ô"RëŸ(¸sCRý·X'Ö:X+¤(¸sC0Rý·p§×R^k¤(¸sCPR#Æ‚`á³PnÁˆÁ±„ Xø,œ[ôÝ!žhë¡ b`0€ÿ°1€ÁÀpC b`0Ëà}Ì1œ”ˆäÖC@"05Ç˜LÍ1(S#Æ‚`á¶ðnÁKÑ‚oÍ1¶PSs.ÔÔC 55ÇpR· ^ƒJÍÔtDð>äˆâ?Ç°Rº`^ƒKÝÔtD bäÓ-€ø£“'âÁ€ÿƒNC{2;åSÓN +G#nvD¿z&ÈÀr§E‡¦¬Tf	@a–áPd* wü`L!‚è¿ÅMáW€_øEÁ…˜cØ©@¿úo¡SûEìW\Qp!æ†`®úoÑSþuø×\Qp!æ† ®úoV!¦„X]Qp!æ†à®FŒ%ÁÂ?fáæ‚éòª•[™n(¯W	¦Ô@Ê•YRa–aDFŒ%ÁÂ?lAç2dƒ ü10ñÇ@À–€FŒ%ÁÂ?P¡ìXhŽA®‚dæÊ¯P‚ðÇÀWÄ^ÿYRè0QFa–ÁJt¤Èˆ±„ XøÇ,œ]€A$þ³¦0PaB))ŒK‚…ÀÂÚAÏ%ì
+ÇÂ Ç(¨à?l@Á `à7¦³ 
+Á@°œ_AôCb¯~ìÇ
+ ÆoÃÄ ¿ÃÁ¯Á,*œB0Ë 
+© 3À’
+ª BÑ‰Ð233( ÐC0 X˜7æ³ª
+Á½Jí ¾JºÁÀpCà3`0Ë0eT˜ØlÁ@…mðÁÖTæ|°5:lÁ@… ÎÁ[c0P!°sðÁÖTT||°5•ßlÁ@… ÏÁ[c0PÀwð©ÖT`°÷ÉÖTÔì}²5
+ŸlŸ@nþ,†Ø!ƒé†@½„YVÐ‡€n0ÃÁ¨…­Ÿ@nJú!á[£6j£–$¶±ý ¯R+µýê‡Dx™š©íW?$ÄëÔNm¿Å&·ïAªýWßUû¯¾3«ö_¹;1Ý´Ú2ÝàNúEOÃ*%k`ÐLƒ5X;´r¹»´:99´‚¹»´J9é‡D|ÕZ­ÕZ?$äËÖlÅú!1_·vk,Ö	úÂ5\c±!‚˜nÐµ€|È0ÜüœI‘Ô7ás$VN¿6È”ŒÍ1˜X9…Û Cpb26Ýpb>J•Ô7èÓæ¦™ÑtCsng4KÐ
+/°ÂäÃ@EM€+¼L>T`äÀ
++“ :°BlåÃ@…À¬P/ù0PQÁ+ÄK>TTôÀ
+í’>°BºäÃ@…À¬P.ù0P!€+„K>T$Á
+½’f€¬+ù0Pa,Á
+µ’§ü\PKpAÝÝpCð[d0Ý€kAL7fæ>³¯0y0P!ä,„Ã,Tu µ0BÈB*ÌÂ@…Ð²Ð³Ð„Kf|ä`–bÁ L Ì1¼Yr]@ÐðŒ0Ç0zÖ„NÏ(sCÀg]@ >£@ Ì1ŸÍÈ‚@˜cÐ³€åˆÂƒ•‚@˜c‚R#SsB`j³²0PQ,±0†ÐÜ‚°jcÃª!«6Kà
+T #‚è‚ÓÁ-„p`d@]@¸ƒ`º!à3 @ / Œ¢|L7á°€‘At!‚é†Àà€0Kà
+³µ°ê0Ë`ºÐÓt€k`”w@ÝD §`º!x·“ÒM„z"¦y3(0)³·€Hßìé ;
+Â¹v×w†|RÚ0Ç0ïÖw~jÞ0Ç0ñÖw†‚â0Ç0ó6KÄaŽáÝ‚Ð£|sBo¤aŽAôöA Ì1Á¾ÍäÂ@E-H· àÂBzcÈ! 7†@€Ü,/œ-„ØL7Ø‚¾‰R
+Ñ+„›
+¦‚(¨½BÀ)bº! 	ƒ‚ŠÑ„œ:¦‚™H(³¾pâÐbsAœÉ	p&Óä€r°”Aô
+¡¬‚é†à%
+*Æ,/ô‚LÌ1Œ\~‡äd@½BX«`º!¨‰„‚Š1Ç`=wÎM@Ñ+„¸
+¦‚x(¨sF vGñd@½B¸«`º!‹Š‚Š1Ç`g×+„¼º¦‚²È(¨s9Ü_¯úªšnÒ¢£ bÌ1AÜõ
+!´¦é† -Â€‚Š1Ç@t×+„ÒŠ¦‚¸(
+*ÆÜ]¦Atµ‚é†@4Ô€pmÐkAt¡µ‚é†à4Þ€pr AtA¶‚é†€5è€pwàAtá¶‚é† 6ò€0Kà½Bà-=˜nPƒ(¨ùÑß
+¦Ü 
+Â,/´˜­¸­è­ôoä‚-ðÂ@‹àŠ+àŠ.àJ/àF.à/´¼â
+¼¢¼Òh‘/´àâ
+à¢àÒl‘`À-¹¸¹è¹ô\äðÂ@‹€.®€.º€.½@¹€¼0ÐR±‹+…. D/°K.°/´Tðâ
+`¡X/ÀK.À/´ôâ
+<¡R/ÐK.Ð/l Œ‚f`d@D #‚ Ú Ä,A8´¡4R£
+§‘³íÀã6BáÿÿÿÿàŽ07¼€Á,Ã/„C0P §à8Ì2ˆC:ÐW1Ë`ãðW³äP|ÑÖê0 àBtÀÁ5†ö£àBtÀ6
+÷£àBtÀA6Ž÷£àBôß‚÷ú0Hú0èÃ`Ø€è¿Eïùa øa@ÃDp@ÿ-|ïƒåú6 C úoñ{ 0 Ðß°0K ý· ¿PšPB16 ‚ô€þ[„Ÿ(Ž(ø7l@ê' ý·¿QžQðoØ€ÖO úo1~¤@¤àß°°Ÿ Ì€Ã,Ã9 kôa7¢~!¢_ƒGÁ…èBáQp!ú…px\ˆþ[´Ÿ+š+®" ý·p¿W¶WJ06 ‚C úoñ~°p°”`0l@† ôßþb1èb1(Á`Ø€
+˜% ‡þ[ÄŸ,ž,²þ	@ÿ-äoƒoƒ†ˆ`ÿ ÿóG‹Ðb‚Á°ðŸ ôß‚þj1ƒZR06 ‚þ€Yp˜eP‡uè‘“¢_îPp!ú… À`@Á…èƒ¢_†\ˆl‚è¿áá„c0l@‰ ôß"qqp06 D úo!‚Á8Ã88Á! ý·Á€‚†ˆÀ€YpH9 ˆþ[”``ŽA`Ž9ÃDà‚ ôßÂƒs„sz06 ‚ ÿ' c0 cÐƒÁ°À`  ý·@Á "ƒ†ˆ ˜% ‡
+àØÁV…_È€ úo±‚;;ìPp!æ^0Ü1è¿…ïï”a@Á…˜c‚3úoƒ<‡<gPp!æ† ƒþ[Ð`PRA\ˆ9†!XÃ`ÄÀXB,ücV4FŽ%ÁÂ?`¡Eƒ è»Ãú<Tð6 †` pÒË †´À`–¡Ø!˜chÃ Dþ1˜cFÄƒ9† Dì0˜cNÄƒc	A°ð[¨Ñ 8Ç€§È1älŽƒq0É`Ž!(‡>æ‚sèÃ`Ž!H‡>æÞ00•8ö0˜ŽÜÁôü•@üçæ0H—:þ0˜ŽâAõücº¡ƒ í°À¡9âüçD1x‡š‚QL1˜npT¹1±Íà2 ˆ~!”ZåN7 ŠèM7ÚŸÌ¼Ã,ƒ=ÜšT ~+´Ã*ÔCÑ‹?À2À2 Ë€‚1Ç0ŠA –Aÿ-D1Ë€Ë 
+.ÄÃìbÐ‹RÌ28Ì2ØÅ€‚1Ç0½ôßƒ´”´z1 àBÌ1Á/#Æ‚`á³ð§A0ÝÀ’Á«ÄÊtCK©L7°4+³ó Â,ƒ<ÄìK‚…Ø‚¨ºAþ˜øc à?K0#Æ‚`á¨ÐªÝÍ1èbÔe0Èìb`ŽÒAþàŠøc`+à?K0f`½ƒ‚<Ì2Ô=Ø10–ÿ˜…W"ñŸ%¨‡
+3èæaÄàXB,üf5(‚žKøb šA€f@AÅÀ` ÿab Ë DnÜ3 ƒYwx‡` Xì…wÈ€ ú!1ŽÁi§ Œn†ˆ! ,N4€á†àD0˜e¸{fòTf XðA‡…{È€ ú!‘Žk® Œx†ˆ! ,\4€á†ÀE0˜eÈ|]`4€€á†àÜÀ`–AZ! šÂpC›¿a¸!ØÍ ¦ð2†Y†}à‡àF.G=¾+9¹`ï`– $*€ÊøXÐ‡¢çýüfüf@AÅ10œÿP{‚ab€ä6Ãy`0ËàýôÝ!$ò
+*Æˆá„ Xø‡*ìkC0 ³þ€
+™00ÜÈh ³)ÁÁˆá„ ¸Â¿g˜i0Ü0sgÁ,CJŒD0PØ²°—Hd@=—PÉ€=ƒ€=
+*”Ü@Ñ+„·‚a"(`–A$B‚ƒ^!àœÐw˜æ3@(¨ÃÄÀ,Hà"§7`€Á,Ã?€D0P$!êÁ?\P§7à^@¤º@nü3 ƒY‚’10œWÙ@Oƒ<†
+<È`–!%F"¨ øY‰0@‰Y“@‰2ƒ .@ ‚èh#‚èÂhü‡ˆ!€Y”8‰¦WnGô
+áí
+*ü‡ˆ"€Y”@HUnð4 ƒY’(‰€~7ÃÁŒ`0Ëð*ìa¸!¨Ñ FŒ%ÁÂ?XAm™®ïf5Ð³¿¿“Y‚•¨ ÜZP‰0p‰Y†–`‰"‚è»C]8TŒY—@ÂÈ€ z…0z#‚˜%p‰
+Bh	‰%2*£% –ðòÇ€5ð10–ÿP¾‚¾;ˆfP¦A1l@Â  4®7±€Á,ÃK¬D0Üp‚Aºapa‡¢O7¤h³¬Ápƒß±k W{ëè¹`p{’<Dî3‚è‚ oÈ@Ñ„!¸ä2¢HÐ„ ý’‚èBˆæ`pŽd@Ç—Yqeðk g–¿º4ì|a„j0K€‰0N«Aï„á†àT0˜nâ3ÐfjB&*á@ 7ª€Á,MÌDAô\â<ƒT‚T(¨³5É'|Aô
+Eƒ€‚Š1KP3MÐ¯Æ@nj5 ƒY†›°‰ #‚è»C|´T4ñŸ%¸‰ŠJ°	§&¨„0Üðj ³8ñ‘p †_À`ºÐ  ÂpC®L7ðl°’A0ÝÀ’AÏÂtCÈ`0ô‚é°À3@®!ÂpC®a¸!X× ¦‚†Y†œè‰`˜hƒ¿¸p‹xž¸ƒ$‚èP FŒÁÂ?Pá„ƒàž8È€ ú… \ˆ*@ü1øÀ–`'**A'@!'®ÊÉ€ º€à„cA°ðT¨á ¸Îä2 ˆ~!x"ƒ
+Ä#ðŸ%à‰ŠJØ	^È‰ƒö$‚è„cA°ðTã ¸5Ï@.@È€ ú…À"ƒ
+Ä#ðŸ%ø‹éØÔ3Àƒé†ØÒ3Èƒa þâ.|Â-Òâ-èâäà$‚èÂ„Y†³ø‰98c$‚è‚8ã’_¢â„^!˜cpPP1èœ@ìzç@ 7i€Áˆ±€ Xø*€rðQìpCÀ¶Ì2ŒXÃFÛ`0Ë a ñˆ?½s †¸À`º!W&À€ ÿY´ÀÄ.ñ'zÂpCP·L7øjp—A€þ³hAû„¢nô6 ƒY´ ‹`–Á,ÊB10ÿ@…X0”‚ðÇÀòç@ 7€Átº[€þ³h1b`, þ
+¸üe€Yþœf þTÒ@nL7 ƒé†wP30 À– -FŒÁÂ?Pá—7˜%@‹šJ883P©,³8tP	¹  ‚èB:\ˆ*@ü1ÀðŸ%H‹ŠJ>zB@‹s™¢÷P fäB-ÞáDÁ&$‚è‚OãJA'$‚è‚O¡WbTë@ ZÖ:ÃAù`0b`, þ
+ü<G;Ü o ³n±Ápƒ‘¾Ì2´[H<âOk„á†€}0˜n¨Ù€	0 À–`.0‘Ï@ü	®0ÜÄo Ó:Ìg`@€ÿ,Á\Ð]á‚h‡ûÀ`–a.Þ"˜eˆ¸FŒÁÂ?P¡¥¥ ü1ðÄŸô:ÃÁþ`0Ý@¶Á`@€ÿ,Á\Œ‚… Mû`„?#ˆ?…v †À`ºamðŸ%˜‹cA°ðTØéÀf	æb ¦äØÂÚÜB‚".Ž,JC.È€ ú…P"ƒ
+Ä#ö üg	èb ¢R—žæâÔ‚^É€ º€0a–¡/êb-Îð5¢WºTŒ	~$‚è‚n¡W¾Túí@ yÎ;ÃA`0b`, þ
+x<G;Üq ³yaÁpƒQÆÌ2àÅ]H<âOç„á† 0˜nˆÝ€	0 À–À/0qÓ@ü‰½0Ü´q Ó¶¼i`@€ÿ,_Ð|á‚h‡9À`–Á/ô"˜eà‹½FŒÁÂ?P!µ¥ ü1ðÄŸì;ÃÁ`0Ý ¾Á`@€ÿ,_Œ‚… lw`„?ˆ?õw †?À`ºá|PðŸ%ð‹cA°ðT¸íÀf	üb ¦úîÂðòBÚ‚/<Î6z2 ˆ~!„G@Á…È ñÄƒ= ÿY‚¿h©Ä''Ø…'Ä§'¿Ÿ› üÂpCÐÊà ºøO7„@û„á† –0˜e ÑˆÅ0ÜÌr ³¡!A¾Aô
+=ƒ€‚ŠÁéâI þ³£q4R³d@½BpÏ   b`Ðºøã€ÿ,ÁhtTNh¢A9„á† œ0˜e ÓˆÇ0ÜŒs ³¥aAþAô
+A?ƒ`Ø€Ž˜%X“œ$‚èBÁ°(0K°#F‚`Ð Ðr`&	ÂAÏŽ ‚)Œx¬q ÆADæ@nÖ9 ƒY†Ô@`ŽMÎä‡ƒ9† Wƒæ^~8˜%P9†Ô„ƒ9† Uƒ1æ‚pÆ8˜cÀ5ã`–@5*ü@A!5r…ƒž18 ƒ?€ñ ¬£A0hƒÀ9“Y‚Õ@8yë †‚žÀ`–5b"10ƒ6˜ñ žƒFŒÁ f<€ç€Dƒ£A0hƒÌ9 Û`ÄÀh@Ú`Æsê610ƒ6˜ñ —»4   Î  [
+#ˆâ^¶IP/[†%¨—-ÃØË–!
+ìeKqñBÜË–
+}Ù2ˆA±/[2(øeË`E¿lÐ ð—-ƒÿ²e`ƒd¶nP„Ì–
+‘Ù2ÈA12[:(HfË`EÉlð 0™-ƒ'³eàƒe¶~P¤Ì–
+•Ù2ˆB±2[R(XfË`
+EËlP¡0›-ƒ*g³e`…m¶®P¤Í–
+µÙ2ÈB±6[Z(NfË`Êlp¡H™-ƒ.*³eà…be¶¾P°Ì–"‚x!îeK!A¼÷²eÀ‡ _¶û ½Í–â‚x!îeËðÎl)d"ˆâ^¶9èÌ–!,Ù2 E/[µòeËà½l)Þ"ˆâ^¶uðÌ–á.žÙ2äEÀ3[†½xfËàA¾lDC‚›-ñBÜË–‚D‚x!îeK!#A¼÷²ep“à]¶zÄq/[†Q	ÞeË@*Á»lJ%x—-ƒ©ï²ex•à]¶°¼Ë–!V‚wÙ2ÈJð.[p	êeË6RÜl~'°—-ùö²eHŸÀ^¶îØË–Á~{Ù2äO`/[
+òeËðCA¾lÄ(°—-Ãù²e£ _¶xäË–Á‚|Ù2ˆR/[S
+òeË JA¾l\)È—-Ã,ö²eÀ¥À^¶½ØË–Aœ{Ù2˜S/[u
+ìeË0R’Ülb*à™-ÃL<³e¨©€g¶7ðÌ–a§žÙ2ôTÀ3[†Ÿ
+xfËVÏlÆ*à™-CY<³e8«€g¶iðÌ–á®žÙ2äUÀ3[†½
+xfËÐWÏl`+È—-ƒlù²e¨-in¶7ØË–ÁÇ‚|Ù2€Y/[†1“èfËpfÁ»lÒ,x—-›Iu³eˆ³à]¶s¼Ë–ÁÎ$»Ù2è™t7[
+Tâ…¸—-E«ñBÜË–âÕ‚x!îeK‘nA¼÷²eˆ»À^¶vØË–aï{Ù2€^`/[ÔìeË°z½lÜ/È—-Cüù²e ¿À^¶ýäË–ƒ _¶*ù²e€Á È—-A¾lp0òeËÀƒA/[0‚|Ù2”aØË–AƒÀ^¶oö²e Ã °—-A¾lø0ìeËP‹„7[ržÙ2˜cðÌ–ƒ€g¶ê<³ehÇ à™-Ã;Ïlâ1xfË0AÀ3[|žÙ2ècðÌ–ƒ€g¶þ<³e É à™-ƒHÏlH2xfË`’AÀ3[†”žÙ2¬dðÌ–¡%ƒ€g¶/<³eðÉ à™-XÏlÄ2xfË@–AÀ3[´žÙ2¨eðÌ–-ƒ€g¶n<³eÍ È—-ÃhA¾lL3òfË ¢A`/[†‚|Ù2ÌhäË–ÁFIo¶:ï²eàÑ x—-ÃÒÞlÈ4ÞeË`¦Að.[†4$¾Ù2°i õÍ–¢Mƒ ^ˆ{Ù2èiäË–Oƒ _¶}ñBÜË–!Tƒ _¶£ù²e8Õ@ò›-ƒ«A¾lf5òeËp«A/[\‚|Ù2ðj ýÍ–¡\	t¶íù²e€× È—-ƒ¼A¾lì5òeËp¯A/[†|‚|Ù2ôk …Î–Â_ƒ ^ˆ{ÙR„lÄq/[†•‚|Ù2ÄläË–Agƒ _¶=H¢³¥øÛ ˆâ^¶¤ù²ePÝ È—-EëA¼÷²eÝ È—-…íA¼÷²¥ÈÝ ˆâ^¶¼ñBÜË–‚|ƒ ^ˆ{Ù2¸oØË–~ƒ€g¶ýö²eá à™-
