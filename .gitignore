@@ -1,2 +1,2 @@
 data_collection_db/*
-env
+.env
