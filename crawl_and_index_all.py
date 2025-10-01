@@ -13,7 +13,13 @@ from tqdm import tqdm
 # 환경변수 로드
 # ----------------------------
 load_dotenv()
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 DB_PATH = os.getenv("EMBEDDING_DB_PATH", "./data_collection_db")
+
+if not GITHUB_TOKEN:
+    raise ValueError("⚠️ 환경변수 GITHUB_TOKEN이 설정되어 있지 않습니다.")
+
+HEADERS = {"Authorization": f"token {GITHUB_TOKEN}"}
 
 # ----------------------------
 # 설정
@@ -23,6 +29,22 @@ MAX_THREADS = 5
 CHUNK_SIZE = 1000  # 단어 기준 chunk 분리
 BASE_BLOG_URL = "https://ymkmoon.github.io"
 TAG_URL = f"{BASE_BLOG_URL}/tags/"
+
+# GitHub 레포 & 브랜치
+REPOS = {
+    "ymkmoon/llm-pipeline-template": "main",
+    "ymkmoon/mqtt-broker-template": "main",
+    "ymkmoon/springboot-consumer-template": "develop",
+    "ymkmoon/kafka-broker-template": "main",
+    "ymkmoon/springboot-jpa-template": "develop",
+    "ymkmoon/toyseven": "develop-jdk-17",
+    "ymkmoon/slack-bot-notifiaction-template": "develop",
+    "ymkmoon/react-web-template": "develop",
+    "ymkmoon/springboot-admin-template": "develop",
+    "ymkmoon/sprintboot-canvas-template": "develop",
+    "ymkmoon/toyseven-react": "develop",
+    "ymkmoon/cs-study": "main"
+}
 
 # ----------------------------
 # 헬퍼: 문서 chunk 분리
@@ -64,6 +86,35 @@ def get_blog_content(url: str):
         return f"{title_text}\n{content}"
     except Exception as e:
         print(f"❌ 블로그 크롤링 실패: {url} ({e})")
+        return None
+
+# ----------------------------
+# GitHub 파일 가져오기
+# ----------------------------
+def get_repo_files(repo_full_name, path="", branch="main"):
+    try:
+        url = f"https://api.github.com/repos/{repo_full_name}/contents/{path}?ref={branch}"
+        res = requests.get(url, headers=HEADERS, timeout=30)
+        res.raise_for_status()
+        files = []
+        for item in res.json():
+            if item["type"] == "file":
+                files.append(item["download_url"])
+            elif item["type"] == "dir":
+                new_path = f"{path}/{item['name']}".strip("/")
+                files.extend(get_repo_files(repo_full_name, path=new_path, branch=branch))
+        return files
+    except Exception as e:
+        print(f"❌ 레포 파일 가져오기 실패: {repo_full_name} ({e})")
+        return []
+
+def download_file(file_url):
+    try:
+        res = requests.get(file_url, headers=HEADERS, timeout=30)
+        res.raise_for_status()
+        return res.text
+    except Exception as e:
+        print(f"❌ 파일 다운로드 실패: {file_url} ({e})")
         return None
 
 # ----------------------------
@@ -113,6 +164,31 @@ def main():
                 global_idx += len(batch_docs)
     print(f"✅ 블로그 완료 (총 {global_idx}문서)")
 
+    # ===== GitHub =====
+    print("\n🔹 GitHub 레포 인덱싱 시작")
+    batch_docs = []
+
+    for repo, branch in REPOS.items():
+        print(f"🔹 처리 중: {repo} (브랜치: {branch})")
+        file_urls = get_repo_files(repo, branch=branch)
+        with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
+            futures = {executor.submit(download_file, url): url for url in file_urls}
+            with tqdm(total=len(file_urls), desc=repo, unit="파일", ncols=100) as pbar:
+                for future in as_completed(futures):
+                    content = future.result()
+                    pbar.update(1)
+                    if content:
+                        for chunk in chunk_text(content):
+                            batch_docs.append(chunk)
+                    if len(batch_docs) >= BATCH_SIZE:
+                        save_batch_to_vectorstore(batch_docs, db, prefix="github", start_idx=global_idx)
+                        global_idx += BATCH_SIZE
+                        pbar.set_postfix_str(f"배치 저장 완료 ({global_idx}문서)")
+            if batch_docs:
+                save_batch_to_vectorstore(batch_docs, db, prefix="github", start_idx=global_idx)
+                global_idx += len(batch_docs)
+
+    print(f"\n✅ GitHub 완료 (총 {global_idx}문서)")
 
 # ----------------------------
 if __name__ == "__main__":

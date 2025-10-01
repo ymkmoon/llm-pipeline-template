@@ -1,29 +1,34 @@
-## Github 저장소 인덱싱
-## python crawl_and_index_github.py
-
-# crawl_and_index_github.py
+# crawl_and_index_safe.py
 import os
 import requests
+from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from dotenv import load_dotenv
 import gc
 from tqdm import tqdm
-import backoff
 
-# .env 로드
+# ----------------------------
+# 환경변수 로드
+# ----------------------------
 load_dotenv()
-
-# ====== 환경 변수 ======
-DB_PATH = os.getenv("EMBEDDING_DB_PATH")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+DB_PATH = os.getenv("EMBEDDING_DB_PATH", "./data_collection_db")
+
 if not GITHUB_TOKEN:
     raise ValueError("⚠️ 환경변수 GITHUB_TOKEN이 설정되어 있지 않습니다.")
+
 HEADERS = {"Authorization": f"token {GITHUB_TOKEN}"}
 
-# 레포 & 브랜치 설정
+# ----------------------------
+# 설정
+# ----------------------------
+BATCH_SIZE = 10
+MAX_THREADS = 5
+CHUNK_SIZE = 1000  # 단어 기준 chunk 분리
+
+# GitHub 레포 & 브랜치
 REPOS = {
     "ymkmoon/llm-pipeline-template": "main",
     "ymkmoon/mqtt-broker-template": "main",
@@ -39,99 +44,93 @@ REPOS = {
     "ymkmoon/cs-study": "main"
 }
 
-BATCH_SIZE = 20
-MAX_THREADS = 5
-CHUNK_SIZE = 1000  # 글자 단위 chunk
+# ----------------------------
+# 헬퍼: 문서 chunk 분리
+# ----------------------------
+def chunk_text(text, chunk_size=CHUNK_SIZE):
+    words = text.split()
+    for i in range(0, len(words), chunk_size):
+        yield " ".join(words[i:i+chunk_size])
 
 # ----------------------------
-# GitHub API에서 파일 URL 가져오기
+# GitHub 파일 가져오기
 # ----------------------------
 def get_repo_files(repo_full_name, path="", branch="main"):
-    url = f"https://api.github.com/repos/{repo_full_name}/contents/{path}?ref={branch}"
-    res = requests.get(url, headers=HEADERS, timeout=15)
-    res.raise_for_status()
-    files = []
+    try:
+        url = f"https://api.github.com/repos/{repo_full_name}/contents/{path}?ref={branch}"
+        res = requests.get(url, headers=HEADERS, timeout=30)
+        res.raise_for_status()
+        files = []
+        for item in res.json():
+            if item["type"] == "file":
+                files.append(item["download_url"])
+            elif item["type"] == "dir":
+                new_path = f"{path}/{item['name']}".strip("/")
+                files.extend(get_repo_files(repo_full_name, path=new_path, branch=branch))
+        return files
+    except Exception as e:
+        print(f"❌ 레포 파일 가져오기 실패: {repo_full_name} ({e})")
+        return []
 
-    for item in res.json():
-        if item["type"] == "file":
-            files.append(item["download_url"])
-        elif item["type"] == "dir":
-            new_path = f"{path}/{item['name']}".strip("/")
-            files.extend(get_repo_files(repo_full_name, path=new_path, branch=branch))
-    return files
-
-# ----------------------------
-# 파일 다운로드 + 재시도
-# ----------------------------
-@backoff.on_exception(backoff.expo, requests.RequestException, max_tries=3)
 def download_file(file_url):
-    res = requests.get(file_url, headers=HEADERS, timeout=30)
-    res.raise_for_status()
-    return res.text
+    try:
+        res = requests.get(file_url, headers=HEADERS, timeout=30)
+        res.raise_for_status()
+        return res.text
+    except Exception as e:
+        print(f"❌ 파일 다운로드 실패: {file_url} ({e})")
+        return None
 
 # ----------------------------
-# 배치 + chunk 저장
+# 벡터 DB 저장
 # ----------------------------
-def save_batch_to_vectorstore(docs, db, prefix="github", start_idx=0):
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=CHUNK_SIZE, chunk_overlap=50
-    )
-    all_chunks = []
-    for doc in docs:
-        chunks = splitter.split_text(doc)
-        all_chunks.extend(chunks)
-
-    ids = [f"{prefix}-{i+start_idx}" for i in range(len(all_chunks))]
-    db.add_texts(all_chunks, ids=ids)
+def save_batch_to_vectorstore(docs, db, prefix="doc", start_idx=0):
+    ids = [f"{prefix}-{i+start_idx}" for i in range(len(docs))]
+    db.add_texts(docs, ids=ids)
     docs.clear()
     gc.collect()
-    return len(all_chunks)
 
 # ----------------------------
-# 메인 크롤링 + 인덱싱
+# 메인 실행
 # ----------------------------
-def crawl_and_index():
+def main():
+    # PyTorch/Transformers 안전 환경변수
+    os.environ["TOKENIZERS_PARALLELISM"] = "false"
+    os.environ["OMP_NUM_THREADS"] = "1"
+
+    # 임베딩/DB 생성 (메인 스레드)
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     )
     db = Chroma(persist_directory=DB_PATH, embedding_function=embeddings)
-
     global_idx = 0
 
+    # ===== GitHub =====
+    print("\n🔹 GitHub 레포 인덱싱 시작")
+    batch_docs = []
+
     for repo, branch in REPOS.items():
-        print(f"\n🔹 처리 중: {repo} (브랜치: {branch})")
-        try:
-            file_urls = get_repo_files(repo, branch=branch)
-            total_files = len(file_urls)
-            print(f"총 {total_files}개의 파일 발견")
+        print(f"🔹 처리 중: {repo} (브랜치: {branch})")
+        file_urls = get_repo_files(repo, branch=branch)
+        with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
+            futures = {executor.submit(download_file, url): url for url in file_urls}
+            with tqdm(total=len(file_urls), desc=repo, unit="파일", ncols=100) as pbar:
+                for future in as_completed(futures):
+                    content = future.result()
+                    pbar.update(1)
+                    if content:
+                        for chunk in chunk_text(content):
+                            batch_docs.append(chunk)
+                    if len(batch_docs) >= BATCH_SIZE:
+                        save_batch_to_vectorstore(batch_docs, db, prefix="github", start_idx=global_idx)
+                        global_idx += BATCH_SIZE
+                        pbar.set_postfix_str(f"배치 저장 완료 ({global_idx}문서)")
+            if batch_docs:
+                save_batch_to_vectorstore(batch_docs, db, prefix="github", start_idx=global_idx)
+                global_idx += len(batch_docs)
 
-            batch_docs = []
-            with tqdm(total=total_files, desc=f"{repo}", unit="file",
-                      ncols=100, dynamic_ncols=True, unit_scale=True) as pbar:
-                with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
-                    futures = {executor.submit(download_file, url): url for url in file_urls}
-                    for future in as_completed(futures):
-                        content = future.result()
-                        pbar.update(1)
-                        if content:
-                            batch_docs.append(content)
-
-                        if len(batch_docs) >= BATCH_SIZE:
-                            added = save_batch_to_vectorstore(batch_docs, db, start_idx=global_idx)
-                            global_idx += added
-                            pbar.set_postfix_str(f"배치 저장 완료 ({global_idx}문서)")
-
-                # 남은 문서 처리
-                if batch_docs:
-                    added = save_batch_to_vectorstore(batch_docs, db, start_idx=global_idx)
-                    global_idx += added
-                    print(f"💾 마지막 배치 저장 완료 (총 {global_idx}문서)")
-
-        except Exception as e:
-            print(f"❌ 레포 접근 실패: {repo} ({e})")
-
-    print("\n✅ GitHub 레포 임베딩 DB 저장 완료")
+    print(f"\n✅ GitHub 완료 (총 {global_idx}문서)")
 
 # ----------------------------
 if __name__ == "__main__":
-    crawl_and_index()
+    main()
