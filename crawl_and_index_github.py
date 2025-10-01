@@ -7,9 +7,17 @@ import os
 import requests
 from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
+from dotenv import load_dotenv
+
+# .env 파일 로드
+load_dotenv()
 
 # ====== GitHub 설정 ======
-GITHUB_TOKEN = ""  # 개인 액세스 토큰
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+if not GITHUB_TOKEN:
+    raise ValueError("⚠️ 환경변수 GITHUB_TOKEN이 설정되어 있지 않습니다.")
+
+
 HEADERS = {"Authorization": f"token {GITHUB_TOKEN}"} if GITHUB_TOKEN else {}
 
 # ====== 인덱싱할 레포 리스트 (repo: branch) ======
