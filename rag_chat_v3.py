@@ -1,13 +1,13 @@
 ## 터미널 채팅
 ## 대화 내용을 영구 보관
 ## python rag_chat_v3.py
-
-# rag_chat_v3.py
 import os
 import json
 import textwrap
+import itertools
+import threading
+import time
 from dotenv import load_dotenv
-from langchain.chains import RetrievalQA
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -21,9 +21,11 @@ load_dotenv()
 DB_PATH = os.getenv("EMBEDDING_DB_PATH", "./data_collection_db")
 LM_STUDIO_URL = os.getenv("LM_STUDIO_URL", "http://localhost:1234/v1")
 LM_MODEL = os.getenv("LM_MODEL", "openai/gpt-oss-20b")
+SEARCH_KWARGS = 10
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["OMP_NUM_THREADS"] = "4"
+os.environ["MKL_NUM_THREADS"] = "4"
 
 # ----------------------------
 # 닉네임 입력
@@ -31,9 +33,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 def get_nickname():
     while True:
         nickname = input("👤 닉네임 (5글자) 입력: ").strip()
-        if len(nickname) == 5:
-            return nickname
-        if nickname == "ymkmoon":
+        if len(nickname) == 5 or nickname == "ymkmoon":
             return nickname
         print("⚠️ 닉네임은 정확히 5글자여야 합니다.")
 
@@ -47,7 +47,7 @@ embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 )
 db = Chroma(persist_directory=DB_PATH, embedding_function=embeddings)
-retriever = db.as_retriever(search_type="mmr", search_kwargs={"k": 5})
+retriever = db.as_retriever(search_type="mmr", search_kwargs={"k": SEARCH_KWARGS})
 
 # ----------------------------
 # LLM 연결 (LM Studio)
@@ -81,62 +81,51 @@ if os.path.exists(CHAT_HISTORY_PATH):
     except Exception as e:
         print(f"⚠️ chat_history 복원 실패: {e}")
 
-
+# ----------------------------
+# chat_history 저장
+# ----------------------------
 def save_chat_history():
     try:
         with open(CHAT_HISTORY_PATH, "w", encoding="utf-8") as f:
-            json.dump([m.dict() for m in memory.chat_memory.messages], f, ensure_ascii=False, indent=2)
+            json.dump([m.model_dump() for m in memory.chat_memory.messages], f, ensure_ascii=False, indent=2)
         print(f"💾 chat_history 저장 완료 ({len(memory.chat_memory.messages)}건)")
     except Exception as e:
         print(f"⚠️ chat_history 저장 실패: {e}")
 
 # ----------------------------
-# 문서 요약
+# 문서 요약 + 전체 진행률 표시
 # ----------------------------
-import itertools
-import sys
-import threading
-import time
-
-def summarize_text(text: str, max_length: int = 2000):
-    """문서가 너무 길면 자동 요약 + 진행 중 표시"""
+def summarize_text(text: str, doc_index: int = 0, total_docs: int = 1, max_length: int = 2000):
+    """문서가 너무 길면 자동 요약 + 전체 진행률 표시"""
     if len(text) <= max_length:
         return text
 
     chunks = textwrap.wrap(text, max_length)
     summaries = []
-    total = len(chunks)
-
-    # 스피너 쓰레드
-    stop_spinner = False
-    def spinner():
-        for c in itertools.cycle("|/-\\"):
-            if stop_spinner:
-                break
-            print(f"\r  └ 문서 요약 중 ({i}/{total}) ... {c}", end="", flush=True)
-            time.sleep(0.1)
+    total_chunks = len(chunks)
 
     for i, chunk in enumerate(chunks, start=1):
         stop_spinner = False
+
+        def spinner():
+            for c in itertools.cycle("|/-\\"):
+                if stop_spinner:
+                    break
+                overall_progress = ((doc_index + i / total_chunks) / total_docs) * 100
+                print(f"\r  └ 전체 문서 요약 진행: {overall_progress:.1f}% ... {c}", end="", flush=True)
+                time.sleep(0.1)
+
         t = threading.Thread(target=spinner)
         t.start()
 
-        # 요약 생성
-        prompt = (
-            f"다음 텍스트를 한국어로 간결하게 요약하세요. 핵심 정보는 유지하세요.\n\n{chunk}"
-        )
+        prompt = f"다음 텍스트를 한국어로 간결하게 요약하세요. 핵심 정보는 유지하세요.\n\n{chunk}"
         summary = llm.invoke(prompt).content
         summaries.append(summary)
 
-        # 스피너 종료
         stop_spinner = True
         t.join()
-    
-    # 완료 메시지 출력
-    print(f"\r  └ 문서 요약 완료 ({total}/{total}) ✅{' ' * 20}")  
+
     return "\n".join(summaries)
-
-
 
 # ----------------------------
 # RAG 프롬프트
@@ -160,14 +149,13 @@ RAG_PROMPT = PromptTemplate(
 # ----------------------------
 # 관련성 기반 RAG 체인 최적화
 # ----------------------------
-RELEVANCE_THRESHOLD = 0.3  # 관련성 임계값
+RELEVANCE_THRESHOLD = 0.3
+MAX_CONTEXT_CHARS = 8000
+MAX_CHAT_HISTORY_CHARS = 2000
 
 def rag_with_memory(query: str):
-    # ----------------------------
-    # 닉네임 + 질문 조건 확인
-    # ----------------------------
+    # 일반 대화 모드
     if not (nickname.startswith("ymkmoon") and query.startswith("ymkmoon")):
-        # print("⚠️ DB 탐색 조건 미충족 → 일반 대화 모드")
         response = llm.invoke(f"질문: {query}\n자연스럽게 대화해줘.")
         memory.chat_memory.add_user_message(query)
         memory.chat_memory.add_ai_message(response.content)
@@ -175,52 +163,48 @@ def rag_with_memory(query: str):
         return response.content.strip()
 
     # ----------------------------
-    # 조건 충족 시 RAG 실행
+    # 관련 문서 검색 및 요약
     # ----------------------------
     docs = retriever.invoke(query)
     print(f"📄 검색된 문서 수: {len(docs)}")
-
-    # 관련성 기반 필터링 및 요약
     context_docs = []
-    for i, doc in enumerate(docs):
-        relevance = getattr(doc, "score", 1.0)  # score 속성이 없으면 기본 1.0
-        print(f"  ├ 문서 {i+1} 길이: {len(doc.page_content)}자, 관련성: {relevance:.2f}")
 
-        # 관련성 낮으면 아예 제외
-        if relevance < RELEVANCE_THRESHOLD:
-            print(f"  └ 문서 {i+1} 관련성 낮음 → context에서 제외")
-            continue
+    valid_docs = [doc for doc in docs if len(doc.page_content.strip()) > 0 and getattr(doc, "score", 1.0) >= RELEVANCE_THRESHOLD]
+    total_docs = len(valid_docs)
 
-        # 길면 요약
+    for idx, doc in enumerate(valid_docs):
         if len(doc.page_content) > 1500:
-            doc.page_content = summarize_text(doc.page_content)
-
+            doc.page_content = summarize_text(doc.page_content, doc_index=idx, total_docs=total_docs)
         context_docs.append(doc.page_content)
 
-    # 관련 문서 없음 → 일반 대화 모드
-    if len(context_docs) == 0:
-        print("⚠️ 관련 문서 없음 → 일반 대화 모드로 전환")
-        response = llm.invoke(f"질문: {query}\n자연스럽게 대화해줘.")
-        memory.chat_memory.add_user_message(query)
-        memory.chat_memory.add_ai_message(response.content)
-        save_chat_history()
-        return response.content.strip()
-
-    # ----------------------------
-    # context 생성 및 LLM 호출
-    # ----------------------------
+    # context 생성 + 길이 제한
     context = "\n\n".join(context_docs)
-    chat_history = "\n".join(
-        [f"사용자: {m.content}" if m.type == "human" else f"AI: {m.content}"
-         for m in memory.chat_memory.messages]
-    )
+    if len(context) > MAX_CONTEXT_CHARS:
+        context = context[:MAX_CONTEXT_CHARS] + "\n... (생략)"
 
+    # ----------------------------
+    # 최근 대화 추출 + 길이 제한
+    # ----------------------------
+    recent_msgs = reversed(memory.chat_memory.messages)
+    chat_history = ""
+    for m in recent_msgs:
+        line = f"사용자: {m.content}" if m.type=="human" else f"AI: {m.content}"
+        if len(chat_history) + len(line) + 1 > MAX_CHAT_HISTORY_CHARS:
+            break
+        chat_history = line + "\n" + chat_history
+
+    # ----------------------------
+    # 최종 프롬프트 생성
+    # ----------------------------
     final_prompt = RAG_PROMPT.format(
         question=query,
         context=context,
         chat_history=chat_history
     )
 
+    # ----------------------------
+    # LLM 호출 + chat_history 저장
+    # ----------------------------
     try:
         response = llm.invoke(final_prompt)
         memory.chat_memory.add_user_message(query)
@@ -257,7 +241,7 @@ def main():
             print(f"\n🧠 답변: {answer}\n")
 
         except KeyboardInterrupt:
-            print("\n👋 채팅을 종료합니다 (Ctrl+C).")
+            print("\n👋 채팅 종료 (Ctrl+C)")
             save_chat_history()
             break
         except Exception as e:
