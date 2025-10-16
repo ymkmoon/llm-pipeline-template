@@ -21,11 +21,11 @@ load_dotenv()
 DB_PATH = os.getenv("EMBEDDING_DB_PATH", "./data_collection_db")
 LM_STUDIO_URL = os.getenv("LM_STUDIO_URL", "http://localhost:1234/v1")
 LM_MODEL = os.getenv("LM_MODEL", "openai/gpt-oss-20b")
-SEARCH_KWARGS = 10
+SEARCH_KWARGS = 5
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-os.environ["OMP_NUM_THREADS"] = "4"
-os.environ["MKL_NUM_THREADS"] = "4"
+os.environ["OMP_NUM_THREADS"] = "8"
+os.environ["MKL_NUM_THREADS"] = "8"
 
 # ----------------------------
 # 닉네임 입력
