@@ -1,4 +1,5 @@
 ## 터미널 채팅
+## 파이썬 프로세스 실행 동안 대화 내용이 메모리에 유지 됨
 ## python rag_chat_v2.py
 
 # rag_chat_v2.py
@@ -76,6 +77,8 @@ RAG_PROMPT = PromptTemplate(
         "{chat_history}\n\n"
         "아래의 문서를 참고하여 질문에 정확하고 자연스럽게 답변하세요.\n"
         "만약 문서에 정보가 부족하면 상식적인 대화로 응답하세요.\n\n"
+        "문서의 작성자는 모두 유명기 입니다.\n"
+        "유명기는 주로 ymkmoon 라는 닉네임을 사용합니다.\n"
         "질문: {question}\n\n"
         "관련 문서 내용:\n{context}\n\n"
         "🧠 답변:"
