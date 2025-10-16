@@ -99,7 +99,10 @@ def get_repo_files(repo_full_name, path="", branch="main"):
         files = []
         for item in res.json():
             if item["type"] == "file":
-                files.append(item["download_url"])
+                # 이미지, 바이너리 등 제외할 확장자 목록
+                excluded_exts = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".ico", ".bmp", ".tiff", ".pdf", ".zip")
+                if not item["name"].lower().endswith(excluded_exts):
+                    files.append(item["download_url"])
             elif item["type"] == "dir":
                 new_path = f"{path}/{item['name']}".strip("/")
                 files.extend(get_repo_files(repo_full_name, path=new_path, branch=branch))
@@ -107,6 +110,7 @@ def get_repo_files(repo_full_name, path="", branch="main"):
     except Exception as e:
         print(f"❌ 레포 파일 가져오기 실패: {repo_full_name} ({e})")
         return []
+
 
 def download_file(file_url):
     try:
