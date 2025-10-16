@@ -73,10 +73,14 @@ if os.path.exists(CHAT_HISTORY_PATH):
         with open(CHAT_HISTORY_PATH, "r", encoding="utf-8") as f:
             messages = json.load(f)
             for msg in messages:
-                memory.chat_memory.add_message(msg['type'], msg['content'])
+                if msg['type'] == 'human':
+                    memory.chat_memory.add_user_message(msg['content'])
+                else:
+                    memory.chat_memory.add_ai_message(msg['content'])
         print(f"✅ 이전 대화 {len(messages)}건을 복원했습니다. (닉네임: {nickname})")
     except Exception as e:
         print(f"⚠️ chat_history 복원 실패: {e}")
+
 
 def save_chat_history():
     try:
@@ -89,20 +93,50 @@ def save_chat_history():
 # ----------------------------
 # 문서 요약
 # ----------------------------
+import itertools
+import sys
+import threading
+import time
+
 def summarize_text(text: str, max_length: int = 2000):
-    """문서가 너무 길면 자동 요약"""
+    """문서가 너무 길면 자동 요약 + 진행 중 표시"""
     if len(text) <= max_length:
         return text
+
     chunks = textwrap.wrap(text, max_length)
     summaries = []
-    for i, chunk in enumerate(chunks):
-        print(f"  └ 문서 요약 중 ({i+1}/{len(chunks)}) ...")
+    total = len(chunks)
+
+    # 스피너 쓰레드
+    stop_spinner = False
+    def spinner():
+        for c in itertools.cycle("|/-\\"):
+            if stop_spinner:
+                break
+            print(f"\r  └ 문서 요약 중 ({i}/{total}) ... {c}", end="", flush=True)
+            time.sleep(0.1)
+
+    for i, chunk in enumerate(chunks, start=1):
+        stop_spinner = False
+        t = threading.Thread(target=spinner)
+        t.start()
+
+        # 요약 생성
         prompt = (
             f"다음 텍스트를 한국어로 간결하게 요약하세요. 핵심 정보는 유지하세요.\n\n{chunk}"
         )
         summary = llm.invoke(prompt).content
         summaries.append(summary)
+
+        # 스피너 종료
+        stop_spinner = True
+        t.join()
+    
+    # 완료 메시지 출력
+    print(f"\r  └ 문서 요약 완료 ({total}/{total}) ✅{' ' * 20}")  
     return "\n".join(summaries)
+
+
 
 # ----------------------------
 # RAG 프롬프트
@@ -133,7 +167,7 @@ def rag_with_memory(query: str):
     # 닉네임 + 질문 조건 확인
     # ----------------------------
     if not (nickname.startswith("ymkmoon") and query.startswith("ymkmoon")):
-        print("⚠️ DB 탐색 조건 미충족 → 일반 대화 모드")
+        # print("⚠️ DB 탐색 조건 미충족 → 일반 대화 모드")
         response = llm.invoke(f"질문: {query}\n자연스럽게 대화해줘.")
         memory.chat_memory.add_user_message(query)
         memory.chat_memory.add_ai_message(response.content)
