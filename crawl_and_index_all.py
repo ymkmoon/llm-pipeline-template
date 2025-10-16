@@ -100,7 +100,7 @@ def get_repo_files(repo_full_name, path="", branch="main"):
         for item in res.json():
             if item["type"] == "file":
                 # 이미지, 바이너리 등 제외할 확장자 목록
-                excluded_exts = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".ico", ".bmp", ".tiff", ".pdf", ".zip")
+                excluded_exts = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".ico", ".bmp", ".tiff", ".pdf", ".zip", ".class", ".log")
                 if not item["name"].lower().endswith(excluded_exts):
                     files.append(item["download_url"])
             elif item["type"] == "dir":
